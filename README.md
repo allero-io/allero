@@ -55,10 +55,10 @@ Generate the token with the following permissions:
 | ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | prevent-npm-install       | Prevents the usage of npm install in pipelines           | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
 | prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines         | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
-| ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | [link (#3)](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
+| ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | [link](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
 
 ### Adding your own rules
-Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/data-schema-example.json).
+Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/github/data-schema-example.json).
 1. Create a new json file and define your rule. Example rules can be found [here](https://github.com/allero-io/allero/tree/main/examples).
 Make sure to update the rule description and failureMessage.
 2. Copy-paste the file to "~/.allero/rules/github/"
@@ -67,7 +67,7 @@ Make sure to update the rule description and failureMessage.
 We encourage you to contribute to Allero!
 #### Created a new rule and want to give back to the community?
 1. **Fork our repo**
-2. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/github) directory.**
+2. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) directory.**
 3. **Create a PR!**
 
 **Interested in contributing more to the CLI?**
