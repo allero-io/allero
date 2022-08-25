@@ -22,7 +22,7 @@ Allero CLI can be run from anywhere! We recommend running Allero directly from a
 Allero repo has a GitHub Action that runs the CLI every day at 8am on your entire organization. By forking the `allero` repo you'll get the same setup.
 1. [Fork](https://github.com/allero-io/allero/fork) Allero repo
 2. Create a GitHub Personal Access Token and store it in your forked repo as an encrypted secret named `ALLERO_GITHUB_TOKEN`.
-3. GitHub disable scheduled Actions on a forked repo by default. To enable Allero Action, browse to your forked allero repo, navigate to GitHub Actions and click enable workflow. 
+3. GitHub disables scheduled Actions on a forked repo by default. To enable the Allero Action, browse to your forked allero repo, navigate to GitHub Actions and click enable workflow. 
 
 * You can of course change the schedule and the fetched repos by editing the workflow file!
 
