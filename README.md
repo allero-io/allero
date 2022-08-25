@@ -1,5 +1,5 @@
 <p align="center">
- <img src="https://github.com/allero-io/allero/blob/main/static/allero_banner.png" alt="allero=github" border="0" />
+ <img src="./static/allero_banner.png" alt="allero=github" border="0" />
 </p>
 
 <h1 align="center">
