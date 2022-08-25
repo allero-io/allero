@@ -11,6 +11,9 @@ VERSION=$1
 
 BREW_REPO_URL="https://${GITHUB_TOKEN}@github.com/allero-io/homebrew-allero.git"
 
+git config --global user.email "ci@allero.io"
+git config --global user.name "Allero CI"
+
 git clone $BREW_REPO_URL
 bash ./scripts/brew_formula_generator.sh $VERSION
 cd homebrew-allero
