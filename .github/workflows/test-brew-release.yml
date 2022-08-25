@@ -13,4 +13,6 @@ jobs:
         uses: actions/checkout@master
 
       - name: push formula
+        env:
+          GITHUB_TOKEN: ${CI_GITHUB_TOKEN}
         run: bash ./scripts/brew_push_formula.sh 0.0.1
