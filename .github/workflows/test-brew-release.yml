@@ -1,0 +1,15 @@
+name: Brew test release
+
+on:
+  push:
+    branches:
+      - feature/release-to-brew
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - run: ./scripts/brew_push_formula.sh 0.0.1
