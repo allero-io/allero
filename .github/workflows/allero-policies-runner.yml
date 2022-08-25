@@ -24,7 +24,6 @@ jobs:
         
       - name: Missing GitHub Token
         run: |
-          if [ ! "$ALLERO_GITHUB_TOKEN" ]
-            then
-              echo "::notice::Policies ran only on public repositories associated with your organization. Define ALLERO_GITHUB_TOKEN with your GitHub PAT as an Encrypted Secret to run on your private repos."
-            fi
+          if [ ! "$ALLERO_GITHUB_TOKEN" ]; then
+            echo "::notice::Policies ran only on public repositories associated with your organization. Define ALLERO_GITHUB_TOKEN with your GitHub PAT as an Encrypted Secret to run on your private repos."
+          fi
