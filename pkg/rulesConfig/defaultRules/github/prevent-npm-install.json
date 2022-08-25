@@ -1,0 +1,51 @@
+{
+    "description": "Prevent use of npm install",
+    "failureMessage": "npm install is used. It is highly recommended to use npm ci instead",
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "github-actions-workflows": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "properties": {
+                                                "jobs": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "properties": {
+                                                            "steps": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "run": {
+                                                                            "not": {
+                                                                                "type": "string",
+                                                                                "pattern": ".*(npm install|npm i |npm i$).*"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,104 @@
+{
+    "{OWNER: ORGANIZATION/USER}": {
+        "ownerName": "{ORGANIZATION1}",
+        "ownerType": "Organization",
+        "id": 102559014,
+        "repositories": {
+            "{REPO_NAME1}": {
+                "name": "{REPO_NAME1}",
+                "fullName": "{ORGANIZATION1}/{REPO_NAME1}",
+                "id": 475198994,
+                "github-actions-workflows": {
+                    "pipeline1": {
+                        "relativePath": ".github/workflows/pipeline1.yml",
+                        "localPath": "",
+                        "filename": "pipeline1.yml",
+                        "content": {
+                            "jobs": {
+                                "job1": {
+                                    "runs-on": "ubuntu-latest",
+                                    "steps": [
+                                        {
+                                            "name": "First step",
+                                            "uses": "actions/checkout@v2"
+                                        },
+                                        {
+                                            "name": "Second step",
+                                            "run": "echo This is the second step of the first job!"
+                                        }
+                                    ]
+                                },
+                                "job2": {
+                                    "runs-on": "ubuntu-latest",
+                                    "steps": [
+                                        {
+                                            "name": "First step",
+                                            "uses": "actions/checkout@v2"
+                                        },
+                                        {
+                                            "name": "Second step",
+                                            "run": "echo This is the second step of the first job!"
+                                        }
+                                    ]
+                                }
+                            },
+                            "name": "Pipeline1",
+                            "true": {
+                                "schedule": [
+                                    {
+                                        "cron": "1 0 * * *"
+                                    }
+                                ],
+                                "workflow_dispatch": null
+                            }
+                        }
+                    },
+                    "pipeline2": {
+                        "relativePath": ".github/workflows/pipeline2.yml",
+                        "localPath": "",
+                        "filename": "pipeline2.yml",
+                        "content": {
+                            "jobs": {
+                                "job1": {
+                                    "runs-on": "ubuntu-latest",
+                                    "steps": [
+                                        {
+                                            "name": "First step",
+                                            "uses": "actions/checkout@v2"
+                                        },
+                                        {
+                                            "name": "Second step",
+                                            "run": "echo This is the second step of the first job!"
+                                        }
+                                    ]
+                                },
+                                "job2": {
+                                    "runs-on": "ubuntu-latest",
+                                    "steps": [
+                                        {
+                                            "name": "First step",
+                                            "uses": "actions/checkout@v2"
+                                        },
+                                        {
+                                            "name": "Second step",
+                                            "run": "echo This is the second step of the first job!"
+                                        }
+                                    ]
+                                }
+                            },
+                            "name": "Pipeline2",
+                            "true": {
+                                "schedule": [
+                                    {
+                                        "cron": "2 0 * * *"
+                                    }
+                                ],
+                                "workflow_dispatch": null
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

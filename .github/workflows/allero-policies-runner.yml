@@ -1,0 +1,30 @@
+name: Allero Pipelines Validator
+
+on:
+  schedule:
+    # every day at 8 a.m.
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+env:
+  ALLERO_GITHUB_TOKEN: ${{ secrets.ALLERO_GITHUB_TOKEN }}
+
+jobs:
+  allero-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate ALLERO_GITHUB_TOKEN environment variable
+        run: |
+          if [ ! "$ALLERO_GITHUB_TOKEN" ]
+            then
+              echo "ALLERO_GITHUB_TOKEN environment variable was not found. Fetching and validating policies will run only on public repositories of your organization."
+            fi
+
+      - name: Get allero cli
+        run: curl https://get.allero.io/ | bash
+
+      - name: Fetch all organization workflow files from all repositories
+        run: allero fetch github ${{ github.repository_owner }}
+
+      - name: Run policies validation
+        run: allero validate

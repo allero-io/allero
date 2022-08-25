@@ -1,0 +1,24 @@
+{
+    "description": "Ensure eash github repo has at least one workflow",
+    "failureMessage": "Github repo has no workflow",
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "github-actions-workflows": {
+                                "type": "object",
+                                "minProperties": 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

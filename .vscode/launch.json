@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Fetch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "./main.go",
+            "env": {},
+            // "args": ["fetch", "github", "allero-io", "dimabru", "datreeio/datree"],
+            // "args": ["fetch", "github", "kubernetes"],
+            // "args": ["fetch", "github", "kubernetes/noderesourcetopology-api"],
+            "args": ["fetch", "github", "jenkinsci/xldeploy-plugin"],
+            // "args": ["fetch", "github", "jenkinsci/xlrelease-plugin"],
+        }
+    ]
+}

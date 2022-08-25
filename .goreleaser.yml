@@ -1,0 +1,55 @@
+project_name: allero
+release:
+  prerelease: auto
+
+before:
+  hooks:
+    - go generate ./...
+builds:
+  - env:
+      - CGO_ENABLED=0
+    binary: allero
+    id: allero
+    goos:
+      - linux
+      - windows
+    main: ./main.go
+    flags:
+      - -tags=production
+    ldflags:
+      - -X github.com/allero-io/allero/cmd.CliVersion={{.Env.ALLERO_BUILD_VERSION}}
+  - env:
+      - CGO_ENABLED=0
+    binary: allero
+    id: allero-macos
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    targets:
+      - darwin_arm64
+      - darwin_amd64
+    main: ./main.go
+    flags:
+      - -tags=production
+    ldflags:
+      - -X github.com/allero-io/allero/cmd.CliVersion={{.Env.ALLERO_BUILD_VERSION}}
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      amd64: x86_64
+    format: zip
+    id: allero-zip
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

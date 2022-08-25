@@ -1,0 +1,47 @@
+{
+  "description": "Workflow must not use latest image",
+  "failureMessage": "Github workflow uses image latest",
+  "schema": {
+    "type": "object",
+    "additionalProperties": {
+      "type": "object",
+      "properties": {
+        "repositories": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "github-actions-workflows": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "object",
+                      "properties": {
+                        "jobs": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "runs-on": {
+                                "not": {
+                                  "type": "string",
+                                  "pattern": ".*latest.*"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
