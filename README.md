@@ -19,10 +19,11 @@ By running Allero, you can easily reveal and prevent problematic pipelines acros
 Allero CLI can be run from anywhere! We recommend running Allero directly from a GitHub Action to ensure bad practices are validated on a regular basis (just like crontab).
 
 ### 🏎️ One minute installation to run allero validation on a daily basis (most recommended)
-Allero repo has a GitHub Action that runs the CLI every day at 8am. By forking the `allero` repo you'll get the same setup. (you can always change the schedule!)
+Allero repo has a GitHub Action that runs the CLI every day at 8am on the entire organization. By forking the `allero` repo you'll get the same setup.
 1. [Fork](https://github.com/allero-io/allero/fork) Allero repo
 2. Create a GitHub Personal Access Token and store it in your forked repo as an encrypted secret named `ALLERO_GITHUB_TOKEN`.
-3. Change the organizations and repositories specified in the `allero fetch github` command to match yours.
+
+* You can of course change the schedule and the fetched repos by editing the workflow file!
 
 ### 👩‍💻 CLI Installation
 Since Allero is a CLI, you can run it everywhere - including your local machine! Download our CLI now!
