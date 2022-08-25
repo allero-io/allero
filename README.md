@@ -31,7 +31,7 @@ Since Allero is a CLI, you can run it everywhere - including your local machine!
 
 ```bash
 # Get allero cli
-curl https://get.allero.io | /bin/bash
+curl http://get.allero.io | /bin/bash
 # Fetch one or more organizations / repos
 allero fetch github allero-io dapr/dapr
 # Run allero validation!

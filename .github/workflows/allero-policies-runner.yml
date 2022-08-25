@@ -21,7 +21,7 @@ jobs:
             fi
 
       - name: Get allero cli
-        run: curl https://get.allero.io/ | bash
+        run: curl http://get.allero.io/ | bash
 
       - name: Fetch all organization workflow files from all repositories
         run: allero fetch github ${{ github.repository_owner }}
