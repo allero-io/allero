@@ -12,6 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-        name: push formula
-      - run: ./scripts/brew_push_formula.sh 0.0.1
+      - name: push formula
+        run: ./scripts/brew_push_formula.sh 0.0.1
         shell: bash
