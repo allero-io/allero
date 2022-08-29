@@ -11,26 +11,25 @@ type AlleroBackendClientDeps struct {
 }
 
 type AlleroBackendClient struct {
-	HttpClient           *httpClient.HttpClient
-	ConfigurationManager *configurationManager.ConfigurationManager
+	httpClient           *httpClient.HttpClient
+	configurationManager *configurationManager.ConfigurationManager
 	AlleroToken          string
 }
 
 func New(deps *AlleroBackendClientDeps) (*AlleroBackendClient, error) {
-	alleroBackendClient := &AlleroBackendClient{
-		HttpClient:           deps.HttpClient,
-		ConfigurationManager: deps.ConfigurationManager,
-	}
-	alleroToken, err := alleroBackendClient.getAlleroToken()
+	alleroToken, err := getAlleroToken(deps.HttpClient, deps.ConfigurationManager)
 	if err != nil {
 		return nil, err
 	}
-	alleroBackendClient.AlleroToken = alleroToken
-	return alleroBackendClient, nil
+	return &AlleroBackendClient{
+		httpClient:           deps.HttpClient,
+		configurationManager: deps.ConfigurationManager,
+		AlleroToken:          alleroToken,
+	}, nil
 }
 
-func (c *AlleroBackendClient) getAlleroToken() (string, error) {
-	userConfig, _, err := c.ConfigurationManager.GetUserConfig()
+func getAlleroToken(hc *httpClient.HttpClient, cm *configurationManager.ConfigurationManager) (string, error) {
+	userConfig, _, err := cm.GetUserConfig()
 	if err != nil {
 		return "", err
 	}
@@ -38,12 +37,12 @@ func (c *AlleroBackendClient) getAlleroToken() (string, error) {
 	if userConfig.AlleroToken == "" {
 		// TODO OY replace
 		// respBody, err := c.HttpClient.Get("token")
-		respBody, err := c.HttpClient.Get("")
+		respBody, err := hc.Get("")
 		if err != nil {
 			return "", err
 		}
 		userConfig.AlleroToken = string(respBody)
-		err = c.ConfigurationManager.UpdateUserConfig(userConfig)
+		err = cm.UpdateUserConfig(userConfig)
 
 		if err != nil {
 			return "", err
