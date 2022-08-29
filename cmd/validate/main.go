@@ -3,6 +3,7 @@ package validate
 import (
 	"errors"
 
+	"github.com/allero-io/allero/pkg/alleroBackendClient"
 	"github.com/allero-io/allero/pkg/configurationManager"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
@@ -16,6 +17,7 @@ type ValidateCommandDependencies struct {
 	RulesConfig          *rulesConfig.RulesConfig
 	ConfigurationManager *configurationManager.ConfigurationManager
 	PosthogClient        *posthog.PosthogClient
+	AlleroBackendClient  *alleroBackendClient.AlleroBackendClient
 }
 
 func New(deps *ValidateCommandDependencies) *cobra.Command {

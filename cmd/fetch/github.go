@@ -1,6 +1,8 @@
 package fetch
 
 import (
+	"fmt"
+
 	"github.com/allero-io/allero/pkg/clients"
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	"github.com/google/go-github/github"
@@ -25,6 +27,11 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 			deps.PosthogClient.PublishCmdUse("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			alleroToken, err := deps.AlleroBackendClient.GetAlleroToken()
+			if err != nil {
+				return err
+			}
+			fmt.Println(alleroToken)
 			githubToken := deps.ConfigurationManager.GetGithubToken()
 			githubClient := clients.CreateGithubClient(githubToken)
 

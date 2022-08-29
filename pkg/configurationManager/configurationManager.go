@@ -30,14 +30,22 @@ func (cm *ConfigurationManager) GetUserConfig() (*UserConfig, bool, error) {
 		// A new user
 		userId := uuid.New()
 		jsonContent.MachineId = userId.String()
+		jsonContent.AlleroToken = ""
 		jsonContentBytes, _ := json.MarshalIndent(jsonContent, "", "  ")
 		err = fileManager.WriteToFile(alleroUserConfig, jsonContentBytes)
 		if err != nil {
 			return nil, false, err
 		}
+
 		return jsonContent, true, err
 	}
 	return nil, false, err
+}
+
+func (cm *ConfigurationManager) UpdateUserConfig(userConfig *UserConfig) error {
+	alleroUserConfig := fmt.Sprintf("%s/config.json", fileManager.GetAlleroHomedir())
+	jsonContentBytes, _ := json.MarshalIndent(userConfig, "", "  ")
+	return fileManager.WriteToFile(alleroUserConfig, jsonContentBytes)
 }
 
 func (cm *ConfigurationManager) GetGithubToken() string {
