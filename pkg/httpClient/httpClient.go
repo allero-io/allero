@@ -11,6 +11,7 @@ type HttpClient struct {
 
 func New() (*HttpClient, error) {
 	return &HttpClient{
+		// TODO OY replace
 		baseUrl: "https://api-service-goxe6bbhaa-uc.a.run.app",
 	}, nil
 }
