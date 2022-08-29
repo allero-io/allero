@@ -18,6 +18,10 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 		Long:  "Fetch data of GitHub repositories and entire organizations",
 		Args:  cobra.MinimumNArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
+			args_head := []string{
+				"github",
+			}
+			args = append(args_head, args...)
 			deps.PosthogClient.PublishCmdUse("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
