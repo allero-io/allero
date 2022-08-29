@@ -2,6 +2,7 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/allero-io/allero/pkg/alleroBackendClient"
 	"github.com/allero-io/allero/pkg/configurationManager"
@@ -41,6 +42,7 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 
 func execute(deps *ValidateCommandDependencies) error {
 	err := deps.RulesConfig.Initialize()
+	fmt.Println("test allero token", deps.AlleroBackendClient.AlleroToken)
 	if err != nil {
 		return err
 	}

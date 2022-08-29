@@ -1,7 +1,6 @@
 package httpClient
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -17,7 +16,6 @@ func New() (*HttpClient, error) {
 }
 
 func (c *HttpClient) Get(relativeUrl string) ([]byte, error) {
-	fmt.Println("sda")
 	var url string
 	if relativeUrl == "" {
 		url = c.baseUrl

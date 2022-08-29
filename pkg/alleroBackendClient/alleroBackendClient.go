@@ -13,16 +13,23 @@ type AlleroBackendClientDeps struct {
 type AlleroBackendClient struct {
 	HttpClient           *httpClient.HttpClient
 	ConfigurationManager *configurationManager.ConfigurationManager
+	AlleroToken          string
 }
 
 func New(deps *AlleroBackendClientDeps) (*AlleroBackendClient, error) {
-	return &AlleroBackendClient{
+	alleroBackendClient := &AlleroBackendClient{
 		HttpClient:           deps.HttpClient,
 		ConfigurationManager: deps.ConfigurationManager,
-	}, nil
+	}
+	alleroToken, err := alleroBackendClient.getAlleroToken()
+	if err != nil {
+		return nil, err
+	}
+	alleroBackendClient.AlleroToken = alleroToken
+	return alleroBackendClient, nil
 }
 
-func (c *AlleroBackendClient) GetAlleroToken() (string, error) {
+func (c *AlleroBackendClient) getAlleroToken() (string, error) {
 	userConfig, _, err := c.ConfigurationManager.GetUserConfig()
 	if err != nil {
 		return "", err
