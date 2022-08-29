@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
- Prevent Bad Practices from Getting into CI/CD Pipelines!
+ Protecting Your Production Pipelines!
 </h1>
 
 
