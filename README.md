@@ -63,9 +63,10 @@ Generate the token with the following permissions:
 ## 🚨 Supported Rules
 | _Rule Name_               | _Description_                                            | _Reason_                                                                                                               |
 | ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| prevent-npm-install       | Prevents the usage of npm install in pipelines           | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
-| prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines         | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
+| prevent-npm-install       | Prevents the usage of `npm install` in pipelines. We recommend using `npm ci` instead           | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
+| prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines. We recommend using helm or any other k8s deployment tool         | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
 | ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | [link](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
+snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects vulnerabilities | Keep production secured
 
 ### Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/github/data-schema-example.json).
