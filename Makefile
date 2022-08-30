@@ -14,5 +14,5 @@ create-bin:
 	goreleaser --snapshot --skip-publish --rm-dist
 
 fetch: 
-	go run main.go fetch github supran2811/familyApp
-	go run main.go fetch github allero-io
+	# go run main.go fetch github supran2811/familyApp
+	go run main.go fetch github curbengh/hexo-yam
