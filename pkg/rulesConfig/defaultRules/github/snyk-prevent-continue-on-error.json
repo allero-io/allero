@@ -1,0 +1,69 @@
+{
+    "description": "Prevent continue-on-error from being used on snyk action",
+    "failureMessage": "continue-on-error is used with snyk action. It is highly recommended to not skip potential security vulnerabilities",
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "github-actions-workflows": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "properties": {
+                                                "jobs": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "properties": {
+                                                            "steps": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "if": {
+                                                                        "properties": {
+                                                                            "uses": {
+                                                                                "type": "string",
+                                                                                "pattern": "snyk/actions/*"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "uses"
+                                                                        ]
+                                                                    },
+                                                                    "then": {
+                                                                        "not": {
+                                                                            "properties": {
+                                                                                "continue-on-error": {
+                                                                                    "enum": [
+                                                                                        true
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "continue-on-error"
+                                                                            ]
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
