@@ -67,6 +67,8 @@ Generate the token with the following permissions:
 | prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines. We recommend using helm or any other k8s deployment tool         | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
 | ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | [link](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
 snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects vulnerabilities | Keep production secured
+prevent-password-plain-text | Prevent use of password as plain text | Keep passwords from leaking
+ensure-node-version | Make sure a specific version is set when using a node image | Avoid unexpected behavior
 
 ### Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/github/data-schema-example.json).
