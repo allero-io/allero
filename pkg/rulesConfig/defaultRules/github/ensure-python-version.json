@@ -1,0 +1,67 @@
+{
+    "description": "Ensure python-version is set",
+    "failureMessage": "python-version property should be set to a specific version when using action actions/setup-python",
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "github-actions-workflows": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "properties": {
+                                                "jobs": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "properties": {
+                                                            "steps": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "if": {
+                                                                        "properties": {
+                                                                            "uses": {
+                                                                                "type": "string",
+                                                                                "pattern": "actions/setup-python.*"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "uses"
+                                                                        ]
+                                                                    },
+                                                                    "then": {
+                                                                        "properties": {
+                                                                            "with": {
+                                                                                "required": [
+                                                                                    "python-version"
+                                                                                ]
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "with"
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
