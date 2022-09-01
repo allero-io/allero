@@ -6,7 +6,9 @@ import (
 	"github.com/allero-io/allero/cmd/fetch"
 	"github.com/allero-io/allero/cmd/validate"
 	"github.com/allero-io/allero/cmd/version"
+	"github.com/allero-io/allero/pkg/alleroBackendClient"
 	"github.com/allero-io/allero/pkg/configurationManager"
+	"github.com/allero-io/allero/pkg/httpClient"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/rulesConfig"
 	"github.com/fatih/color"
@@ -37,26 +39,33 @@ var CliVersion string
 
 func init() {
 	configurationManager := configurationManager.New()
+	httpClient, _ := httpClient.New()
 
 	posthogClient, _ := posthog.New(&posthog.PosthogClientDependencies{
 		ConfigurationManager: configurationManager,
 		CliVersion:           CliVersion,
 	})
 
-	rulesConfigDeps := &rulesConfig.RulesConfigDependencies{
+	alleroBackendClient, _ := alleroBackendClient.New(&alleroBackendClient.AlleroBackendClientDeps{
 		ConfigurationManager: configurationManager,
-	}
-	rulesConfig := rulesConfig.New(rulesConfigDeps)
+		HttpClient:           httpClient,
+	})
+
+	rulesConfig := rulesConfig.New(&rulesConfig.RulesConfigDependencies{
+		ConfigurationManager: configurationManager,
+	})
 
 	rootCmd.AddCommand(fetch.New(&fetch.FetchCommandDependencies{
 		ConfigurationManager: configurationManager,
 		PosthogClient:        posthogClient,
+		AlleroBackendClient:  alleroBackendClient,
 	}))
 
 	rootCmd.AddCommand(validate.New(&validate.ValidateCommandDependencies{
 		ConfigurationManager: configurationManager,
 		PosthogClient:        posthogClient,
 		RulesConfig:          rulesConfig,
+		AlleroBackendClient:  alleroBackendClient,
 	}))
 
 	rootCmd.AddCommand(version.New(&version.VersionCommandDependencies{

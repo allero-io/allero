@@ -1,6 +1,7 @@
 package fetch
 
 import (
+	"github.com/allero-io/allero/pkg/alleroBackendClient"
 	"github.com/allero-io/allero/pkg/configurationManager"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/spf13/cobra"
@@ -9,6 +10,7 @@ import (
 type FetchCommandDependencies struct {
 	ConfigurationManager *configurationManager.ConfigurationManager
 	PosthogClient        *posthog.PosthogClient
+	AlleroBackendClient  *alleroBackendClient.AlleroBackendClient
 }
 
 var fetchCmd = &cobra.Command{

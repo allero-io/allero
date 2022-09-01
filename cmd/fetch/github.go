@@ -18,6 +18,10 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 		Long:  "Fetch data of GitHub repositories and entire organizations",
 		Args:  cobra.MinimumNArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
+			argsHead := []string{
+				"github",
+			}
+			args = append(argsHead, args...)
 			deps.PosthogClient.PublishCmdUse("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -36,6 +40,7 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 }
 
 func execute(deps *FetchGithubDependencies, args []string) error {
+
 	githubConnectorDeps := &githubConnector.GithubConnectorDependencies{Client: deps.GithubClient}
 	githubConnector := githubConnector.New(githubConnectorDeps)
 
