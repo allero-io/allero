@@ -1,6 +1,6 @@
 {
-    "description": "Ensure node-version is set",
-    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node",
+    "description": "Ensure python-version is set",
+    "failureMessage": "python-version property should be set to a specific version when using action actions/setup-python",
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -29,7 +29,7 @@
                                                                         "properties": {
                                                                             "uses": {
                                                                                 "type": "string",
-                                                                                "pattern": "actions/setup-node.*"
+                                                                                "pattern": "actions/setup-python.*"
                                                                             }
                                                                         },
                                                                         "required": [
@@ -40,7 +40,7 @@
                                                                         "properties": {
                                                                             "with": {
                                                                                 "required": [
-                                                                                    "node-version"
+                                                                                    "python-version"
                                                                                 ]
                                                                             }
                                                                         },
