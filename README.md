@@ -70,6 +70,7 @@ snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects 
 prevent-password-plain-text | Prevent use of password as plain text | Keep passwords from leaking
 ensure-node-version | Make sure a specific version is set when using a node image | Avoid unexpected behavior
 ensure-python-version | Make sure a specific version is set when using a python image | Avoid unexpected behavior
+ensure-github-action-version | Ensure github action version is set | Avoid unexpected behavior
 
 ### Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/github/data-schema-example.json).
