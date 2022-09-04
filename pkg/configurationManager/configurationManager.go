@@ -1,6 +1,8 @@
 package configurationManager
 
 import (
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -28,8 +30,8 @@ func (cm *ConfigurationManager) GetUserConfig() (*UserConfig, bool, error) {
 	}
 	if os.IsNotExist(err) {
 		// A new user
-		userId := uuid.New()
-		jsonContent.MachineId = userId.String()
+		machineId := calcMachineId()
+		jsonContent.MachineId = machineId
 		jsonContent.AlleroToken = ""
 		jsonContentBytes, _ := json.MarshalIndent(jsonContent, "", "  ")
 		err = fileManager.WriteToFile(alleroUserConfig, jsonContentBytes)
@@ -67,4 +69,19 @@ func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte) er
 	}
 
 	return nil
+}
+
+func calcMachineId() string {
+	var userMachineHashKey string
+	runningWithCi := os.Getenv("CI_CONTEXT")
+	if runningWithCi == "" {
+		userMachineHashKey = uuid.New().String()
+	} else {
+		userMachineHashKey = os.Getenv("GITHUB_REPO_CONTEXT") + "-" + os.Getenv("GITHUB_WORKFLOW_CONTEXT")
+	}
+	keyBytes := []byte(userMachineHashKey)
+	hasher := sha1.New()
+	hasher.Write(keyBytes)
+	sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	return sha
 }
