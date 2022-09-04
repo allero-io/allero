@@ -8,7 +8,7 @@ on:
 
 env:
   ALLERO_GITHUB_TOKEN: ${{ secrets.ALLERO_GITHUB_TOKEN }}
-  GITHUB_CI_CONTEXT: ${{ env.CI }}
+  GITHUB_CI_CONTEXT: $GITHUB_CI
   GITHUB_REPO_CONTEXT: ${{ github.repository }}
   GITHUB_WORKFLOW_CONTEXT: ${{ github.workflow }}
 
