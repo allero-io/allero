@@ -73,7 +73,7 @@ func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte) er
 
 func calcMachineId() string {
 	var userMachineHashKey string
-	runningWithCi := os.Getenv("CI_CONTEXT")
+	runningWithCi := os.Getenv("GITHUB_CI_CONTEXT")
 	if runningWithCi == "" {
 		userMachineHashKey = uuid.New().String()
 	} else {
