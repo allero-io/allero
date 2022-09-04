@@ -9,7 +9,18 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-func PrintResults(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) {
+func PrintResults(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string) error {
+	if outputFormat == "" {
+		printPretty(ruleResults, summary)
+		printSummary(summary)
+	} else if outputFormat == "csv" {
+		return printCSV(ruleResults, summary)
+	}
+
+	return nil
+}
+
+func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) {
 	headingColored := color.New(color.FgCyan, color.Bold, color.Underline)
 	headingColored.Println("Allero Pipelines Validation Results")
 	fmt.Println()
