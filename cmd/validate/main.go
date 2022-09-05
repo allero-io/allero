@@ -2,6 +2,7 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/allero-io/allero/pkg/alleroBackendClient"
 	"github.com/allero-io/allero/pkg/configurationManager"
@@ -20,6 +21,10 @@ type ValidateCommandDependencies struct {
 	AlleroBackendClient  *alleroBackendClient.AlleroBackendClient
 }
 
+type ValidateCommandFlags struct {
+	output string
+}
+
 func New(deps *ValidateCommandDependencies) *cobra.Command {
 	var policiesCmd = &cobra.Command{
 		Use:           "validate",
@@ -32,14 +37,40 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			deps.PosthogClient.PublishCmdUse("validate", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return execute(deps)
+			output := cmd.Flag("output").Value.String()
+			if !validateOutputFlag(output) {
+				return fmt.Errorf("invalid output flag %s", output)
+			}
+
+			validateCommandFlags := &ValidateCommandFlags{
+				output: output,
+			}
+
+			return execute(deps, validateCommandFlags)
 		},
 	}
+
+	policiesCmd.Flags().StringP("output", "o", "", "Define output format. Can be 'csv'")
 
 	return policiesCmd
 }
 
-func execute(deps *ValidateCommandDependencies) error {
+func validateOutputFlag(output string) bool {
+	if output == "" {
+		return true
+	}
+
+	outputFormats := []string{"csv"}
+	for _, verifiedOutput := range outputFormats {
+		if output == verifiedOutput {
+			return true
+		}
+	}
+
+	return false
+}
+
+func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) error {
 	err := deps.RulesConfig.Initialize()
 	if err != nil {
 		return err
@@ -82,7 +113,10 @@ func execute(deps *ValidateCommandDependencies) error {
 	summary.TotalRulesEvaluated = len(ruleResults)
 	summary.TotalFailedRules = totalRulesFailed
 
-	resultsPrinter.PrintResults(ruleResults, summary)
+	err = resultsPrinter.PrintResults(ruleResults, summary, flags.output)
+	if err != nil {
+		return err
+	}
 
 	if !shouldPassExecution {
 		return ErrViolationsFound

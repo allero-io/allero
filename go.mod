@@ -38,6 +38,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-playground/validator/v10 v10.11.0
+	github.com/gocarina/gocsv v0.0.0-20220823132111-71f3a5cb2654
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
