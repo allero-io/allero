@@ -8,6 +8,9 @@ on:
 
 env:
   ALLERO_GITHUB_TOKEN: ${{ secrets.ALLERO_GITHUB_TOKEN }}
+  GITHUB_CI_CONTEXT: true
+  GITHUB_REPO_CONTEXT: ${{ github.repository }}
+  GITHUB_WORKFLOW_CONTEXT: ${{ github.workflow }}
 
 jobs:
   allero-validate:

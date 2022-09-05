@@ -35,12 +35,15 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 		}
 		defer client.Close()
 
+		runningPlatform := getRunningPlatform()
+
 		client.Enqueue(posthog.Identify{
 			DistinctId: userConfig.MachineId,
 			Properties: posthog.NewProperties().
 				Set("Os Name", osName).
 				Set("Os Architecture", osArch).
-				Set("Os Host", osHost),
+				Set("Os Host", osHost).
+				Set("Running Platfrom", runningPlatform),
 		})
 	}
 
@@ -57,4 +60,13 @@ func getClient() (posthog.Client, error) {
 			Endpoint: posthogProjectHost,
 		},
 	)
+}
+
+func getRunningPlatform() string {
+	runningWithCi := os.Getenv("GITHUB_CI_CONTEXT")
+	if runningWithCi != "" {
+		return "Github Actions"
+	} else {
+		return "local"
+	}
 }
