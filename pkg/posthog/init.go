@@ -64,7 +64,7 @@ func getClient() (posthog.Client, error) {
 
 func getRunningPlatform() string {
 	runningWithCi := os.Getenv("GITHUB_CI_CONTEXT")
-	if runningWithCi == "" {
+	if runningWithCi != "" {
 		return "Github Actions"
 	} else {
 		return "local"
