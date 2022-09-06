@@ -19,11 +19,11 @@ type PosthogClient struct {
 }
 
 func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
-	userConfig, newUser, err := deps.ConfigurationManager.GetUserConfig()
+	userConfig, isNewUser, err := deps.ConfigurationManager.GetUserConfig()
 	if err != nil {
 		return nil, err
 	}
-	if newUser {
+	if isNewUser {
 		// A new user
 		osName := runtime.GOOS
 		osArch := runtime.GOARCH

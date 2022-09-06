@@ -23,32 +23,32 @@ func (cm *ConfigurationManager) GetUserConfig() (*UserConfig, bool, error) {
 	content, err := fileManager.ReadFile(alleroUserConfig)
 	if err == nil {
 		// An existing user
-		newUser := false
+		isNewUser := false
 		err = json.Unmarshal(content, &userConfigInstance)
 		if err != nil {
-			return nil, newUser, err
+			return nil, isNewUser, err
 		}
 		if userConfigInstance.MachineId == "" {
-			newUser = true
+			isNewUser = true
 			userConfigInstance.MachineId = calcMachineId()
 			err = cm.UpdateUserConfig(userConfigInstance)
 			if err != nil {
-				return nil, newUser, err
+				return nil, isNewUser, err
 			}
 		}
-		return userConfigInstance, newUser, nil
+		return userConfigInstance, isNewUser, nil
 	}
 	if os.IsNotExist(err) {
 		// A new user
-		newUser := true
+		isNewUser := true
 		userConfigInstance.MachineId = calcMachineId()
 		userConfigInstance.AlleroToken = ""
 		err = cm.UpdateUserConfig(userConfigInstance)
 		if err != nil {
-			return nil, newUser, err
+			return nil, isNewUser, err
 		}
 
-		return userConfigInstance, newUser, nil
+		return userConfigInstance, isNewUser, nil
 	}
 	return nil, false, err
 }
