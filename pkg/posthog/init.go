@@ -40,6 +40,7 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 		client.Enqueue(posthog.Identify{
 			DistinctId: userConfig.MachineId,
 			Properties: posthog.NewProperties().
+				Set("Machine Id", userConfig.MachineId).
 				Set("Os Name", osName).
 				Set("Os Architecture", osArch).
 				Set("Os Host", osHost).
