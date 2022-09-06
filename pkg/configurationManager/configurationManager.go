@@ -19,27 +19,36 @@ func New() *ConfigurationManager {
 
 func (cm *ConfigurationManager) GetUserConfig() (*UserConfig, bool, error) {
 	alleroUserConfig := fmt.Sprintf("%s/config.json", fileManager.GetAlleroHomedir())
-	jsonContent := &UserConfig{}
+	userConfigInstance := &UserConfig{}
 	content, err := fileManager.ReadFile(alleroUserConfig)
 	if err == nil {
-		err = json.Unmarshal(content, &jsonContent)
+		// An existing user
+		isNewUser := false
+		err = json.Unmarshal(content, &userConfigInstance)
 		if err != nil {
-			return nil, false, err
+			return nil, isNewUser, err
 		}
-		return jsonContent, false, nil
+		if userConfigInstance.MachineId == "" {
+			isNewUser = true
+			userConfigInstance.MachineId = calcMachineId()
+			err = cm.UpdateUserConfig(userConfigInstance)
+			if err != nil {
+				return nil, isNewUser, err
+			}
+		}
+		return userConfigInstance, isNewUser, nil
 	}
 	if os.IsNotExist(err) {
 		// A new user
-		machineId := calcMachineId()
-		jsonContent.MachineId = machineId
-		jsonContent.AlleroToken = ""
-		jsonContentBytes, _ := json.MarshalIndent(jsonContent, "", "  ")
-		err = fileManager.WriteToFile(alleroUserConfig, jsonContentBytes)
+		isNewUser := true
+		userConfigInstance.MachineId = calcMachineId()
+		userConfigInstance.AlleroToken = ""
+		err = cm.UpdateUserConfig(userConfigInstance)
 		if err != nil {
-			return nil, false, err
+			return nil, isNewUser, err
 		}
 
-		return jsonContent, true, err
+		return userConfigInstance, isNewUser, nil
 	}
 	return nil, false, err
 }
