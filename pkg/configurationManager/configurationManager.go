@@ -82,10 +82,11 @@ func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte) er
 
 func calcMachineId() string {
 	var userMachineHashKey string
-	githubRepository, ok := os.LookupEnv("GITHUB_REPOSITORY")
-	githubWorkflow, ok2 := os.LookupEnv("GITHUB_WORKFLOW")
-	if ok && ok2 {
-		userMachineHashKey = githubRepository + "-" + githubWorkflow
+	_, flag1 := os.LookupEnv("GITHUB_ACTIONS")
+	githubRepository, flag2 := os.LookupEnv("GITHUB_REPOSITORY")
+	githubWorkflow, flag3 := os.LookupEnv("GITHUB_WORKFLOW")
+	if flag1 && flag2 && flag3 {
+		userMachineHashKey = "github_actions-" + githubRepository + "-" + githubWorkflow
 	} else {
 		userMachineHashKey = uuid.New().String()
 	}

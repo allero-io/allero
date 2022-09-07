@@ -64,11 +64,12 @@ func getClient() (posthog.Client, error) {
 }
 
 func getRunningPlatform() string {
-	_, ok := os.LookupEnv("GITHUB_REPOSITORY")
-	_, ok2 := os.LookupEnv("GITHUB_WORKFLOW")
-	if ok && ok2 {
+	_, flag1 := os.LookupEnv("GITHUB_ACTIONS")
+	_, flag2 := os.LookupEnv("GITHUB_REPOSITORY")
+	_, flag3 := os.LookupEnv("GITHUB_WORKFLOW")
+	if flag1 && flag2 && flag3 {
 		return "Github Actions"
 	} else {
-		return "local"
+		return "Local"
 	}
 }
