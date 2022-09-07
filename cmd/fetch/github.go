@@ -1,10 +1,17 @@
 package fetch
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/allero-io/allero/pkg/clients"
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	"github.com/google/go-github/github"
 	"github.com/spf13/cobra"
+)
+
+var (
+	reposFetchCounter int
 )
 
 type FetchGithubDependencies struct {
@@ -34,6 +41,14 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 
 			return execute(fetchGithubDeps, args)
 		},
+		PostRun: func(cmd *cobra.Command, args []string) {
+			_, tokenWasProvided := os.LookupEnv("GITHUB_TOKEN")
+			analyticsArgs := []string{
+				"reposFetchedCounter=" + fmt.Sprint(reposFetchCounter),
+				"tokenWasProvided=" + fmt.Sprint(tokenWasProvided),
+			}
+			deps.PosthogClient.PublishCmdUse("data fetched summary", analyticsArgs)
+		},
 	}
 
 	return githubCmd
@@ -43,8 +58,8 @@ func execute(deps *FetchGithubDependencies, args []string) error {
 
 	githubConnectorDeps := &githubConnector.GithubConnectorDependencies{Client: deps.GithubClient}
 	githubConnector := githubConnector.New(githubConnectorDeps)
-
-	err := githubConnector.Get(args)
+	var err error
+	reposFetchCounter, err = githubConnector.Get(args)
 	if err != nil {
 		return err
 	}

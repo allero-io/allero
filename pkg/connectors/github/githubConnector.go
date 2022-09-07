@@ -54,16 +54,16 @@ func New(deps *GithubConnectorDependencies) *GithubConnector {
 	}
 }
 
-func (gc *GithubConnector) Get(args []string) error {
+func (gc *GithubConnector) Get(args []string) (int, error) {
 	repositoriesChan := gc.getAllRepositories(args)
 
 	githubJsonObject := make(map[string]*GithubOwner)
-
+	reposFetchCounter := 0
 	for repo := range repositoriesChan {
 		if repo.Error != nil {
-			return repo.Error
+			return reposFetchCounter, repo.Error
 		}
-
+		reposFetchCounter += 1
 		err := gc.addRepo(githubJsonObject, repo.Repository)
 		if err != nil {
 			fmt.Println(err)
@@ -79,11 +79,11 @@ func (gc *GithubConnector) Get(args []string) error {
 
 	githubJson, err := json.MarshalIndent(githubJsonObject, "", "  ")
 	if err != nil {
-		return err
+		return reposFetchCounter, err
 	}
 
 	alleroHomedir := fileManager.GetAlleroHomedir()
-	return fileManager.WriteToFile(fmt.Sprintf("%s/repo_files/github.json", alleroHomedir), githubJson)
+	return reposFetchCounter, fileManager.WriteToFile(fmt.Sprintf("%s/repo_files/github.json", alleroHomedir), githubJson)
 }
 
 func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, repo *github.Repository) error {
