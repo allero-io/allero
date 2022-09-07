@@ -60,8 +60,8 @@ func (cm *ConfigurationManager) UpdateUserConfig(userConfig *UserConfig) error {
 }
 
 func (cm *ConfigurationManager) GetGithubToken() string {
-	githubToken := os.Getenv("ALLERO_GITHUB_TOKEN")
-	if githubToken == "" {
+	githubToken, ok := os.LookupEnv("ALLERO_GITHUB_TOKEN")
+	if !ok {
 		githubToken = os.Getenv("GITHUB_TOKEN")
 		if githubToken == "" {
 			fmt.Println("Recommended to provide github PAT token through environment variable ALLERO_GITHUB_TOKEN or GITHUB_TOKEN to avoid rate limit")
@@ -82,11 +82,13 @@ func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte) er
 
 func calcMachineId() string {
 	var userMachineHashKey string
-	runningWithCi := os.Getenv("GITHUB_CI_CONTEXT")
-	if runningWithCi == "" {
-		userMachineHashKey = uuid.New().String()
+	_, flag1 := os.LookupEnv("GITHUB_ACTIONS")
+	githubRepository, flag2 := os.LookupEnv("GITHUB_REPOSITORY")
+	githubWorkflow, flag3 := os.LookupEnv("GITHUB_WORKFLOW")
+	if flag1 && flag2 && flag3 {
+		userMachineHashKey = "github_actions-" + githubRepository + "-" + githubWorkflow
 	} else {
-		userMachineHashKey = os.Getenv("GITHUB_REPO_CONTEXT") + "-" + os.Getenv("GITHUB_WORKFLOW_CONTEXT")
+		userMachineHashKey = uuid.New().String()
 	}
 	keyBytes := []byte(userMachineHashKey)
 	hasher := sha1.New()

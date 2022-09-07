@@ -64,10 +64,12 @@ func getClient() (posthog.Client, error) {
 }
 
 func getRunningPlatform() string {
-	runningWithCi := os.Getenv("GITHUB_CI_CONTEXT")
-	if runningWithCi != "" {
+	_, flag1 := os.LookupEnv("GITHUB_ACTIONS")
+	_, flag2 := os.LookupEnv("GITHUB_REPOSITORY")
+	_, flag3 := os.LookupEnv("GITHUB_WORKFLOW")
+	if flag1 && flag2 && flag3 {
 		return "Github Actions"
 	} else {
-		return "local"
+		return "Local"
 	}
 }
