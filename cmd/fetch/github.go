@@ -44,8 +44,8 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 		PostRun: func(cmd *cobra.Command, args []string) {
 			_, tokenWasProvided := os.LookupEnv("GITHUB_TOKEN")
 			analyticsArgs := []string{
-				"reposFetchedCounter=" + fmt.Sprint(reposFetchCounter),
-				"tokenWasProvided=" + fmt.Sprint(tokenWasProvided),
+				"ReposFetchedCounter=" + fmt.Sprint(reposFetchCounter),
+				"TokenWasProvided=" + fmt.Sprint(tokenWasProvided),
 			}
 			deps.PosthogClient.PublishCmdUse("data fetched summary", analyticsArgs)
 		},

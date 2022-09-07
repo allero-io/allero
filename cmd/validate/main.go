@@ -13,6 +13,9 @@ import (
 )
 
 var ErrViolationsFound = errors.New("")
+var (
+	summary rulesConfig.OutputSummary
+)
 
 type ValidateCommandDependencies struct {
 	RulesConfig          *rulesConfig.RulesConfig
@@ -25,7 +28,19 @@ type ValidateCommandFlags struct {
 	output string
 }
 
+type wrapper struct {
+	err error
+}
+
+func (w *wrapper) Run(f func(cmd *cobra.Command, args []string) error) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		err := f(cmd, args)
+		w.err = err
+	}
+}
+
 func New(deps *ValidateCommandDependencies) *cobra.Command {
+	cmdWrap := wrapper{}
 	var policiesCmd = &cobra.Command{
 		Use:           "validate",
 		Short:         "Validate set of default rules",
@@ -34,9 +49,9 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PreRun: func(cmd *cobra.Command, args []string) {
-			deps.PosthogClient.PublishCmdUse("validate", args)
+			deps.PosthogClient.PublishCmdUse("data validated", args)
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: cmdWrap.Run(func(cmd *cobra.Command, args []string) error {
 			output := cmd.Flag("output").Value.String()
 			if !validateOutputFlag(output) {
 				return fmt.Errorf("invalid output flag %s", output)
@@ -47,11 +62,21 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			}
 
 			return execute(deps, validateCommandFlags)
+		}),
+		PostRunE: func(cmd *cobra.Command, args []string) error {
+			analyticsArgs := []string{
+				"summary.TotalOwners=" + fmt.Sprint(summary.TotalOwners),
+				"summary.TotalRepositories=" + fmt.Sprint(summary.TotalRepositories),
+				"summary.TotalPipelines=" + fmt.Sprint(summary.TotalPipelines),
+				"summary.TotalRulesEvaluated=" + fmt.Sprint(summary.TotalRulesEvaluated),
+				"summary.TotalFailedRules=" + fmt.Sprint(summary.TotalFailedRules),
+			}
+			deps.PosthogClient.PublishCmdUse("data validated summary", analyticsArgs)
+			return cmdWrap.err
 		},
 	}
 
 	policiesCmd.Flags().StringP("output", "o", "", "Define output format. Can be 'csv'")
-
 	return policiesCmd
 }
 
@@ -78,7 +103,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 
 	ruleResults := []*rulesConfig.RuleResult{}
 	shouldPassExecution := true
-	summary := deps.RulesConfig.GetSummary()
+	summary = deps.RulesConfig.GetSummary()
 	totalRulesFailed := 0
 	ruleNames := deps.RulesConfig.GetAllRuleNames()
 
@@ -117,10 +142,8 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 	if err != nil {
 		return err
 	}
-
 	if !shouldPassExecution {
 		return ErrViolationsFound
 	}
-
 	return nil
 }
