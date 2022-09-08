@@ -11,6 +11,7 @@ require (
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef // indirect
+	github.com/fatih/structs v1.1.0 // indirect
 	github.com/go-openapi/errors v0.20.2 // indirect
 	github.com/go-openapi/strfmt v0.21.3 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

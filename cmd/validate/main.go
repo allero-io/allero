@@ -9,6 +9,7 @@ import (
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
 	"github.com/allero-io/allero/pkg/rulesConfig"
+	"github.com/fatih/structs"
 	"github.com/spf13/cobra"
 )
 
@@ -64,14 +65,8 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			return execute(deps, validateCommandFlags)
 		}),
 		PostRunE: func(cmd *cobra.Command, args []string) error {
-			analyticsArgs := []string{
-				"summary.TotalOwners=" + fmt.Sprint(summary.TotalOwners),
-				"summary.TotalRepositories=" + fmt.Sprint(summary.TotalRepositories),
-				"summary.TotalPipelines=" + fmt.Sprint(summary.TotalPipelines),
-				"summary.TotalRulesEvaluated=" + fmt.Sprint(summary.TotalRulesEvaluated),
-				"summary.TotalFailedRules=" + fmt.Sprint(summary.TotalFailedRules),
-			}
-			deps.PosthogClient.PublishCmdUse("data validated summary", analyticsArgs)
+			analyticsArgs := structs.Map(summary)
+			deps.PosthogClient.PublishEventWithArgs("data validated summary", analyticsArgs)
 			return cmdWrap.err
 		},
 	}

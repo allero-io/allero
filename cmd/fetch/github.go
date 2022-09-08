@@ -1,7 +1,6 @@
 package fetch
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/allero-io/allero/pkg/clients"
@@ -24,12 +23,12 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 		Short: "Fetch data of GitHub repositories",
 		Long:  "Fetch data of GitHub repositories and entire organizations",
 		Args:  cobra.MinimumNArgs(1),
-		PreRun: func(cmd *cobra.Command, args []string) {
-			argsHead := []string{
+		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
+			cmdArgsHead := []string{
 				"github",
 			}
-			args = append(argsHead, args...)
-			deps.PosthogClient.PublishCmdUse("data fetched", args)
+			cmdArgs = append(cmdArgsHead, cmdArgs...)
+			deps.PosthogClient.PublishCmdUse("data fetched", cmdArgs)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			githubToken := deps.ConfigurationManager.GetGithubToken()
@@ -43,11 +42,10 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 		},
 		PostRun: func(cmd *cobra.Command, args []string) {
 			_, tokenWasProvided := os.LookupEnv("GITHUB_TOKEN")
-			analyticsArgs := []string{
-				"ReposFetchedCounter=" + fmt.Sprint(reposFetchCounter),
-				"TokenWasProvided=" + fmt.Sprint(tokenWasProvided),
-			}
-			deps.PosthogClient.PublishCmdUse("data fetched summary", analyticsArgs)
+			analyticsArgs := make(map[string]any)
+			analyticsArgs["TotalFetchedRepos"] = reposFetchCounter
+			analyticsArgs["TokenWasProvided"] = tokenWasProvided
+			deps.PosthogClient.PublishEventWithArgs("data fetched summary", analyticsArgs)
 		},
 	}
 
