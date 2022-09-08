@@ -49,8 +49,10 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 		Example:       `allero validate`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		PreRun: func(cmd *cobra.Command, args []string) {
-			deps.PosthogClient.PublishCmdUse("data validated", args)
+		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
+			args := make(map[string]any)
+			args["Args"] = cmdArgs
+			deps.PosthogClient.PublishEventWithArgs("data validated", args)
 		},
 		Run: cmdWrap.Run(func(cmd *cobra.Command, args []string) error {
 			output := cmd.Flag("output").Value.String()

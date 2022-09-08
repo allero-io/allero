@@ -24,11 +24,10 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 		Long:  "Fetch data of GitHub repositories and entire organizations",
 		Args:  cobra.MinimumNArgs(1),
 		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
-			cmdArgsHead := []string{
-				"github",
-			}
-			cmdArgs = append(cmdArgsHead, cmdArgs...)
-			deps.PosthogClient.PublishCmdUse("data fetched", cmdArgs)
+			args := make(map[string]any)
+			args["Platform"] = "github"
+			args["Args"] = cmdArgs
+			deps.PosthogClient.PublishEventWithArgs("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			githubToken := deps.ConfigurationManager.GetGithubToken()

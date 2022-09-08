@@ -6,12 +6,6 @@ import (
 	"github.com/posthog/posthog-go"
 )
 
-func (pc *PosthogClient) PublishCmdUse(command string, cmdArgs []string) error {
-	args := make(map[string]any)
-	args["Args"] = cmdArgs
-	return pc.PublishEventWithArgs(command, args)
-}
-
 func (pc *PosthogClient) PublishEventWithArgs(command string, args map[string]interface{}) error {
 	client, err := getClient()
 	if err != nil {
