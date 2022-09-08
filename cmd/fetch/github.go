@@ -11,6 +11,7 @@ import (
 
 var (
 	reposFetchCounter int
+	err               error
 )
 
 type FetchGithubDependencies struct {
@@ -55,7 +56,6 @@ func execute(deps *FetchGithubDependencies, args []string) error {
 
 	githubConnectorDeps := &githubConnector.GithubConnectorDependencies{Client: deps.GithubClient}
 	githubConnector := githubConnector.New(githubConnectorDeps)
-	var err error
 	reposFetchCounter, err = githubConnector.Get(args)
 	if err != nil {
 		return err
