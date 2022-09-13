@@ -36,3 +36,14 @@ func ReadFolder(folderPath string) []fs.FileInfo {
 	files, _ := ioutil.ReadDir(folderPath)
 	return files
 }
+
+func IsExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
