@@ -1,6 +1,7 @@
 {
-    "description": "Prevent direct use of kubectl apply",
-    "failureMessage": "kubectl apply is used directly in workflow",
+    "description": "Ensure action version is set",
+    "failureMessage": "github action version should be set",
+    "uniqueId": 1,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -24,12 +25,11 @@
                                                             "steps": {
                                                                 "type": "array",
                                                                 "items": {
+                                                                    "type": "object",
                                                                     "properties": {
-                                                                        "run": {
-                                                                            "not": {
-                                                                                "type": "string",
-                                                                                "pattern": ".*kubectl apply.*"
-                                                                            }
+                                                                        "uses": {
+                                                                            "type": "string",
+                                                                            "pattern": ".*@.+"
                                                                         }
                                                                     }
                                                                 }

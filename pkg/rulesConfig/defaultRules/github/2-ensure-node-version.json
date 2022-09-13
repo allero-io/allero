@@ -1,6 +1,7 @@
 {
-    "description": "Prevent continue-on-error from being used on snyk action",
-    "failureMessage": "continue-on-error is used with snyk action. It is highly recommended to not skip potential security vulnerabilities",
+    "description": "Ensure node-version is set",
+    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node",
+    "uniqueId": 2,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -29,7 +30,7 @@
                                                                         "properties": {
                                                                             "uses": {
                                                                                 "type": "string",
-                                                                                "pattern": "snyk/actions/*"
+                                                                                "pattern": "actions/setup-node.*"
                                                                             }
                                                                         },
                                                                         "required": [
@@ -37,18 +38,16 @@
                                                                         ]
                                                                     },
                                                                     "then": {
-                                                                        "not": {
-                                                                            "properties": {
-                                                                                "continue-on-error": {
-                                                                                    "enum": [
-                                                                                        true
-                                                                                    ]
-                                                                                }
-                                                                            },
-                                                                            "required": [
-                                                                                "continue-on-error"
-                                                                            ]
-                                                                        }
+                                                                        "properties": {
+                                                                            "with": {
+                                                                                "required": [
+                                                                                    "node-version"
+                                                                                ]
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "with"
+                                                                        ]
                                                                     }
                                                                 }
                                                             }
