@@ -15,7 +15,7 @@ func NewClearCommand(deps *ConfigCommandDependencies) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := clear(deps, args[0])
 			if err != nil {
-				fmt.Printf("Failed setting %s with value %s. Error: %s", args[0], args[1], err)
+				fmt.Printf("Failed clearing %s. Error: %s", args[0], err)
 			}
 		},
 		Args: func(cmd *cobra.Command, args []string) error {
