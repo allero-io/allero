@@ -24,7 +24,8 @@ type ValidateCommandDependencies struct {
 }
 
 type ValidateCommandFlags struct {
-	output string
+	output      string
+	ignoreToken bool
 }
 
 type wrapper struct {
@@ -58,8 +59,11 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 				return fmt.Errorf("invalid output flag %s", output)
 			}
 
+			ignoreToken := cmd.Flag("ignore-token").Value.String() == "true"
+
 			validateCommandFlags := &ValidateCommandFlags{
-				output: output,
+				output:      output,
+				ignoreToken: ignoreToken,
 			}
 
 			return execute(deps, validateCommandFlags)
@@ -72,6 +76,8 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 	}
 
 	policiesCmd.Flags().StringP("output", "o", "", "Define output format. Can be 'csv'")
+	policiesCmd.Flags().Bool("ignore-token", false, "Ignore token and run as anonymous user")
+
 	return policiesCmd
 }
 
@@ -102,10 +108,20 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 	totalRulesFailed := 0
 	ruleNames := deps.RulesConfig.GetAllRuleNames()
 
+	selectedRuleIds, err := deps.RulesConfig.GetSelectedRuleIds(flags.ignoreToken)
+	if err != nil {
+		return err
+	}
+	hasToken := selectedRuleIds != nil
+
 	for _, ruleName := range ruleNames {
 		rule, err := deps.RulesConfig.GetRule(ruleName)
 		if err != nil {
 			return err
+		}
+
+		if hasToken && !selectedRuleIds[rule.UniqueId] {
+			continue
 		}
 
 		schemaErrors, err := deps.RulesConfig.Validate(ruleName, rule)
@@ -132,6 +148,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 
 	summary.TotalRulesEvaluated = len(ruleResults)
 	summary.TotalFailedRules = totalRulesFailed
+	summary.ShouldPrintUrl = !hasToken
 
 	err = resultsPrinter.PrintResults(ruleResults, summary, flags.output)
 	if err != nil {

@@ -2,6 +2,7 @@ package rulesConfig
 
 import (
 	"embed"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -19,6 +20,7 @@ var githubRulesList embed.FS
 
 type Rule struct {
 	Description    string                 `json:"description"`
+	UniqueId       int                    `json:"uniqueId"`
 	Schema         map[string]interface{} `json:"schema" validate:"required"`
 	FailureMessage string                 `json:"failureMessage" validate:"required"`
 }
@@ -51,6 +53,13 @@ type OutputSummary struct {
 	TotalPipelines      int
 	TotalRulesEvaluated int
 	TotalFailedRules    int
+	ShouldPrintUrl      bool
+}
+
+type DecodedToken struct {
+	Rules    []bool `json:"rules"`
+	Email    string `json:"email"`
+	UniqueId string `json:"uniqueId"`
 }
 
 func New(deps *RulesConfigDependencies) *RulesConfig {
@@ -160,6 +169,40 @@ func (rc *RulesConfig) GetAllRuleNames() []string {
 	}
 
 	return ruleNames
+}
+
+func (rc *RulesConfig) GetSelectedRuleIds(ignoreToken bool) (map[int]bool, error) {
+	if ignoreToken {
+		return nil, nil
+	}
+
+	token, err := rc.configurationManager.Get("token")
+	if err != nil {
+		return nil, err
+	}
+	if token == nil {
+		return nil, nil
+	}
+
+	rawDecodedToken, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", token))
+	if err != nil {
+		return nil, fmt.Errorf("error decoding token. run `allero config clear token` to clear the existing token")
+	}
+
+	decodedToken := &DecodedToken{}
+	err = json.Unmarshal(rawDecodedToken, decodedToken)
+	if err != nil {
+		return nil, err
+	}
+
+	selectedRuleIds := make(map[int]bool)
+	for i, rule := range decodedToken.Rules {
+		if rule {
+			selectedRuleIds[i+1] = true
+		}
+	}
+
+	return selectedRuleIds, nil
 }
 
 func (rc *RulesConfig) GetRule(ruleName string) (*Rule, error) {

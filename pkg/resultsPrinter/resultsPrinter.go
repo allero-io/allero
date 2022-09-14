@@ -48,14 +48,12 @@ func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Outp
 		fmt.Printf("\n\n\n")
 
 	}
-
-	printSummary(summary)
 }
 
 func printSummary(summary rulesConfig.OutputSummary) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	fmt.Println("SUMMARY")
+	fmt.Println("Summary")
 
 	t.AppendRow([]interface{}{"Owners", summary.TotalOwners})
 	t.AppendSeparator()
@@ -66,5 +64,11 @@ func printSummary(summary rulesConfig.OutputSummary) {
 	t.AppendRow([]interface{}{"Total rules evaluated", summary.TotalRulesEvaluated})
 	t.AppendSeparator()
 	t.AppendRow([]interface{}{"Failed rules", summary.TotalFailedRules})
+
+	if summary.ShouldPrintUrl {
+		t.AppendSeparator()
+		t.AppendRow([]interface{}{"Select your own rules", "https://allero-mvp.webflow.io/selective-rules"})
+	}
+
 	t.Render()
 }
