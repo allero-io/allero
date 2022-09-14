@@ -37,9 +37,9 @@ func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Outp
 
 			t.SetStyle(table.StyleBold)
 			t.SetOutputMirror(os.Stdout)
-			t.AppendHeader(table.Row{"#", "SCM Platform", "CICD Platform", "Owner Name", "Repository Name", "Pipeline Relative Path"})
+			t.AppendHeader(table.Row{"SCM Platform", "CICD Platform", "Owner Name", "Repository Name", "Pipeline Relative Path"})
 			for _, schemaError := range ruleResult.SchemaErrors {
-				t.AppendRow([]interface{}{"", "Github", "Github Actions", schemaError.OwnerName, schemaError.RepositryName, schemaError.WorkflowRelPath})
+				t.AppendRow([]interface{}{"Github", "Github Actions", schemaError.OwnerName, schemaError.RepositryName, schemaError.WorkflowRelPath})
 				t.AppendSeparator()
 			}
 			t.Render()
