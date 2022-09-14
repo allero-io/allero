@@ -10,6 +10,12 @@ run:
 validate:
 	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate
 
+set-token:
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go config set token somethingsds
+
+clear-token:
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go config clear token
+
 create-bin:
 	goreleaser --snapshot --skip-publish --rm-dist
 

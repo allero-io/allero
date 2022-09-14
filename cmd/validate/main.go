@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/allero-io/allero/pkg/alleroBackendClient"
 	"github.com/allero-io/allero/pkg/configurationManager"
 	"github.com/allero-io/allero/pkg/mapStructure"
 	"github.com/allero-io/allero/pkg/posthog"
@@ -22,7 +21,6 @@ type ValidateCommandDependencies struct {
 	RulesConfig          *rulesConfig.RulesConfig
 	ConfigurationManager *configurationManager.ConfigurationManager
 	PosthogClient        *posthog.PosthogClient
-	AlleroBackendClient  *alleroBackendClient.AlleroBackendClient
 }
 
 type ValidateCommandFlags struct {

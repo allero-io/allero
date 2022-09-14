@@ -1,6 +1,7 @@
 {
-    "description": "Ensure action version is set",
-    "failureMessage": "github action version should be set",
+    "description": "Ensure --ignore-scripts is used for npm install or ci commands",
+    "failureMessage": "npm install or ci is used without ignoring post and preinstall scripts",
+    "uniqueId": 3,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -24,11 +25,15 @@
                                                             "steps": {
                                                                 "type": "array",
                                                                 "items": {
-                                                                    "type": "object",
                                                                     "properties": {
-                                                                        "uses": {
+                                                                        "run": {
                                                                             "type": "string",
-                                                                            "pattern": ".*@.+"
+                                                                            "if": {
+                                                                                "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
+                                                                            },
+                                                                            "then": {
+                                                                                "pattern": ".*--ignore-scripts.*"
+                                                                            }
                                                                         }
                                                                     }
                                                                 }

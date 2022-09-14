@@ -1,6 +1,7 @@
 {
-    "description": "Ensure --ignore-scripts is used for npm install or ci commands",
-    "failureMessage": "npm install or ci is used without ignoring post and preinstall scripts",
+    "description": "Prevent direct use of kubectl apply",
+    "failureMessage": "kubectl apply is used directly in workflow",
+    "uniqueId": 5,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -26,12 +27,9 @@
                                                                 "items": {
                                                                     "properties": {
                                                                         "run": {
-                                                                            "type": "string",
-                                                                            "if": {
-                                                                                "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
-                                                                            },
-                                                                            "then": {
-                                                                                "pattern": ".*--ignore-scripts.*"
+                                                                            "not": {
+                                                                                "type": "string",
+                                                                                "pattern": ".*kubectl apply.*"
                                                                             }
                                                                         }
                                                                     }
