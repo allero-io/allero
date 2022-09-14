@@ -6,15 +6,70 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/allero-io/allero/pkg/fileManager"
 	"github.com/google/uuid"
+	"github.com/spf13/viper"
 )
 
 type ConfigurationManager struct{}
 
 func New() *ConfigurationManager {
 	return &ConfigurationManager{}
+}
+
+func (cm *ConfigurationManager) initConfigFile() error {
+	configHome, configName, configType, err := setViperConfig()
+	if err != nil {
+		return err
+	}
+	// workaround for creating config file when not exist
+	// open issue in viper: https://github.com/spf13/viper/issues/430
+	// should be fixed in pr https://github.com/spf13/viper/pull/936
+	configPath := filepath.Join(configHome, configName+"."+configType)
+
+	isDirExists, err := fileManager.IsExists(configHome)
+	if err != nil {
+		return err
+	}
+	if !isDirExists {
+		osMkdirErr := os.Mkdir(configHome, os.ModePerm)
+		if osMkdirErr != nil {
+			return osMkdirErr
+		}
+	}
+
+	isConfigExists, err := fileManager.IsExists(configPath)
+	if err != nil {
+		return err
+	}
+	if !isConfigExists {
+		_, osCreateErr := os.Create(configPath)
+		if osCreateErr != nil {
+			return osCreateErr
+		}
+	}
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func setViperConfig() (string, string, string, error) {
+	configHome := fileManager.GetAlleroHomedir()
+
+	configName := "config"
+	configType := "json"
+
+	viper.SetConfigName(configName)
+	viper.SetConfigType(configType)
+	viper.AddConfigPath(configHome)
+
+	return configHome, configName, configType, nil
 }
 
 func (cm *ConfigurationManager) GetUserConfig() (*UserConfig, bool, error) {
@@ -77,6 +132,42 @@ func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte) er
 		fileManager.WriteToFile(fmt.Sprintf("%s/%s", alleroRulesDir, filename), []byte(content))
 	}
 
+	return nil
+}
+
+func (cm *ConfigurationManager) Set(key string, value string) error {
+	initConfigFileErr := cm.initConfigFile()
+	if initConfigFileErr != nil {
+		return initConfigFileErr
+	}
+
+	viper.Set(key, value)
+	writeClientIdErr := viper.WriteConfig()
+	if writeClientIdErr != nil {
+		return writeClientIdErr
+	}
+	return nil
+}
+
+func (cm *ConfigurationManager) Clear(key string) error {
+	initConfigFileErr := cm.initConfigFile()
+	if initConfigFileErr != nil {
+		return initConfigFileErr
+	}
+
+	fullConfig := viper.AllSettings()
+	delete(fullConfig, key)
+	viper.Reset()
+	setViperConfig()
+	for k, v := range fullConfig {
+		viper.Set(k, v)
+	}
+
+	writeClientIdErr := viper.WriteConfig()
+	if writeClientIdErr != nil {
+		fmt.Println(writeClientIdErr)
+		return writeClientIdErr
+	}
 	return nil
 }
 
