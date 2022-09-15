@@ -1,4 +1,4 @@
-package mapStructure
+package mapStructureEncoder
 
 import "github.com/mitchellh/mapstructure"
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
-	"github.com/allero-io/allero/pkg/mapStructure"
+	"github.com/allero-io/allero/pkg/mapStructureEncoder"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
 	"github.com/allero-io/allero/pkg/rulesConfig"
@@ -65,7 +65,7 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			return execute(deps, validateCommandFlags)
 		}),
 		PostRunE: func(cmd *cobra.Command, args []string) error {
-			summaryProperties, err := mapStructure.Encode(summary)
+			summaryProperties, err := mapStructureEncoder.Encode(summary)
 			if err != nil {
 				return err
 			}
