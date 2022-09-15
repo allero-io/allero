@@ -13,10 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ConfigurationManager struct{}
+type ConfigurationManager struct {
+	TokenGenerationUrl string
+}
 
 func New() *ConfigurationManager {
-	return &ConfigurationManager{}
+	return &ConfigurationManager{
+		TokenGenerationUrl: "https://allero-mvp.webflow.io/selective-rules",
+	}
 }
 
 func (cm *ConfigurationManager) initConfigFile() error {
@@ -149,6 +153,15 @@ func (cm *ConfigurationManager) Set(key string, value string) error {
 	return nil
 }
 
+func (cm *ConfigurationManager) Get(key string) (interface{}, error) {
+	err := cm.initConfigFile()
+	if err != nil {
+		return nil, err
+	}
+
+	return viper.Get(key), nil
+}
+
 func (cm *ConfigurationManager) Clear(key string) error {
 	initConfigFileErr := cm.initConfigFile()
 	if initConfigFileErr != nil {
@@ -165,7 +178,6 @@ func (cm *ConfigurationManager) Clear(key string) error {
 
 	writeClientIdErr := viper.WriteConfig()
 	if writeClientIdErr != nil {
-		fmt.Println(writeClientIdErr)
 		return writeClientIdErr
 	}
 	return nil

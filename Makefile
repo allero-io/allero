@@ -10,11 +10,14 @@ run:
 validate:
 	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate
 
+validate-ignore-token:
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate --ignore-token
+
 set-token:
-	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go config set token somethingsds
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go config set token ewogICJydWxlcyI6IFt0cnVlLCBmYWxzZSwgdHJ1ZSwgZmFsc2UsIHRydWUsIGZhbHNlLCB0cnVlLCBmYWxzZV0sCiAgImVtYWlsIjogImRpbWFicnVAZ21haWwuY29tIiwKICAidW5pcXVlSWQiOiAiYWJjMTIzIiAKfQ==
 
 clear-token:
-	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go config clear token
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go config clear token 
 
 create-bin:
 	goreleaser --snapshot --skip-publish --rm-dist
