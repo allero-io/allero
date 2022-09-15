@@ -108,11 +108,16 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 	totalRulesFailed := 0
 	ruleNames := deps.RulesConfig.GetAllRuleNames()
 
-	selectedRuleIds, err := deps.RulesConfig.GetSelectedRuleIds(flags.ignoreToken)
-	if err != nil {
-		return err
+	hasToken := false
+	selectedRuleIds := make(map[int]bool)
+
+	if !flags.ignoreToken {
+		selectedRuleIds, err = deps.RulesConfig.GetSelectedRuleIds()
+		if err != nil {
+			return err
+		}
+		hasToken = selectedRuleIds != nil
 	}
-	hasToken := selectedRuleIds != nil
 
 	for _, ruleName := range ruleNames {
 		rule, err := deps.RulesConfig.GetRule(ruleName)
@@ -148,7 +153,10 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 
 	summary.TotalRulesEvaluated = len(ruleResults)
 	summary.TotalFailedRules = totalRulesFailed
-	summary.ShouldPrintUrl = !hasToken
+
+	if !hasToken {
+		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
+	}
 
 	err = resultsPrinter.PrintResults(ruleResults, summary, flags.output)
 	if err != nil {

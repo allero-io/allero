@@ -53,7 +53,7 @@ type OutputSummary struct {
 	TotalPipelines      int
 	TotalRulesEvaluated int
 	TotalFailedRules    int
-	ShouldPrintUrl      bool
+	URL                 string
 }
 
 type DecodedToken struct {
@@ -171,11 +171,7 @@ func (rc *RulesConfig) GetAllRuleNames() []string {
 	return ruleNames
 }
 
-func (rc *RulesConfig) GetSelectedRuleIds(ignoreToken bool) (map[int]bool, error) {
-	if ignoreToken {
-		return nil, nil
-	}
-
+func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
 	token, err := rc.configurationManager.Get("token")
 	if err != nil {
 		return nil, err
@@ -186,7 +182,8 @@ func (rc *RulesConfig) GetSelectedRuleIds(ignoreToken bool) (map[int]bool, error
 
 	rawDecodedToken, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", token))
 	if err != nil {
-		return nil, fmt.Errorf("error decoding token. run `allero config clear token` to clear the existing token")
+		return nil, fmt.Errorf(
+			"error decoding token. run `allero config clear token` to clear the existing token and generate a new token using %s", rc.configurationManager.TokenGenerationUrl)
 	}
 
 	decodedToken := &DecodedToken{}

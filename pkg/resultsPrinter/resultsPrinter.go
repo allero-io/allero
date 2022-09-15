@@ -65,9 +65,9 @@ func printSummary(summary rulesConfig.OutputSummary) {
 	t.AppendSeparator()
 	t.AppendRow([]interface{}{"Failed rules", summary.TotalFailedRules})
 
-	if summary.ShouldPrintUrl {
+	if summary.URL != "" {
 		t.AppendSeparator()
-		t.AppendRow([]interface{}{"Select your own rules", "https://allero-mvp.webflow.io/selective-rules"})
+		t.AppendRow([]interface{}{"Select your own rules", summary.URL})
 	}
 
 	t.Render()

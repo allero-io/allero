@@ -13,10 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ConfigurationManager struct{}
+type ConfigurationManager struct {
+	TokenGenerationUrl string
+}
 
 func New() *ConfigurationManager {
-	return &ConfigurationManager{}
+	return &ConfigurationManager{
+		TokenGenerationUrl: "https://allero-mvp.webflow.io/selective-rules",
+	}
 }
 
 func (cm *ConfigurationManager) initConfigFile() error {
