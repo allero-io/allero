@@ -47,11 +47,11 @@ type RuleResult struct {
 	FailureMessage string
 }
 type OutputSummary struct {
-	TotalOwners         int `mapstructure:"Total Owners"`
-	TotalRepositories   int `mapstructure:"Total Repositories"`
-	TotalPipelines      int `mapstructure:"Total Pipelines"`
-	TotalRulesEvaluated int `mapstructure:"Total Rules Evaluated"`
-	TotalFailedRules    int `mapstructure:"Total Failed Rules"`
+	TotalOwners         int    `mapstructure:"Total Owners"`
+	TotalRepositories   int    `mapstructure:"Total Repositories"`
+	TotalPipelines      int    `mapstructure:"Total Pipelines"`
+	TotalRulesEvaluated int    `mapstructure:"Total Rules Evaluated"`
+	TotalFailedRules    int    `mapstructure:"Total Failed Rules"`
 	URL                 string `mapstructure:"URL"`
 }
 
