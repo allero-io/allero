@@ -82,8 +82,9 @@ Make sure to update the rule description and failureMessage.
 We encourage you to contribute to Allero!
 #### Created a new rule and want to give back to the community?
 1. **Fork our repo**
-2. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) directory.**
-3. **Create a PR!**
+2. **Read how to add your own rule [here](#adding-your-own-rules)**
+3. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) directory.**
+4. **Create a PR!**
 
 **Interested in contributing more to the CLI?**
 We will provide a more detailed explanation on how to contribute soon. If you're intrested, you can [contact us](mailto:contact@allero.io) to get our help with your first PR!
