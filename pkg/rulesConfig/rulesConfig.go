@@ -19,10 +19,11 @@ import (
 var githubRulesList embed.FS
 
 type Rule struct {
-	Description    string                 `json:"description"`
-	UniqueId       int                    `json:"uniqueId"`
-	Schema         map[string]interface{} `json:"schema" validate:"required"`
-	FailureMessage string                 `json:"failureMessage" validate:"required"`
+	Description      string                 `json:"description"`
+	UniqueId         int                    `json:"uniqueId" validate:"required"`
+	Schema           map[string]interface{} `json:"schema" validate:"required"`
+	FailureMessage   string                 `json:"failureMessage" validate:"required"`
+	EnabledByDefault bool                   `json:"enabledByDefault"`
 }
 
 type RulesConfig struct {
