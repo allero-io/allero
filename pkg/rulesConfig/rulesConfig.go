@@ -47,14 +47,13 @@ type RuleResult struct {
 	SchemaErrors   []*SchemaError
 	FailureMessage string
 }
-
 type OutputSummary struct {
-	TotalOwners         int
-	TotalRepositories   int
-	TotalPipelines      int
-	TotalRulesEvaluated int
-	TotalFailedRules    int
-	URL                 string
+	TotalOwners         int    `mapstructure:"Total Owners"`
+	TotalRepositories   int    `mapstructure:"Total Repositories"`
+	TotalPipelines      int    `mapstructure:"Total Pipelines"`
+	TotalRulesEvaluated int    `mapstructure:"Total Rules Evaluated"`
+	TotalFailedRules    int    `mapstructure:"Total Failed Rules"`
+	URL                 string `mapstructure:"URL"`
 }
 
 type DecodedToken struct {

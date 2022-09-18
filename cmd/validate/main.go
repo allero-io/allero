@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
+	"github.com/allero-io/allero/pkg/mapStructureEncoder"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
 	"github.com/allero-io/allero/pkg/rulesConfig"
-	"github.com/fatih/structs"
 	"github.com/spf13/cobra"
 )
 
@@ -69,8 +69,11 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			return execute(deps, validateCommandFlags)
 		}),
 		PostRunE: func(cmd *cobra.Command, args []string) error {
-			analyticsArgs := structs.Map(summary)
-			deps.PosthogClient.PublishEventWithArgs("data validated summary", analyticsArgs)
+			summaryProperties, err := mapStructureEncoder.Encode(summary)
+			if err != nil {
+				return err
+			}
+			deps.PosthogClient.PublishEventWithArgs("data validated summary", summaryProperties)
 			return cmdWrap.err
 		},
 	}
