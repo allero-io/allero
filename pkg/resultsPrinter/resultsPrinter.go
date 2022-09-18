@@ -9,6 +9,11 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+var CICD_PLATFORMS = map[string]string{
+	"github-actions-workflows": "Github Actions",
+	"jfrog-pipelines":          "Jfrog Pipelines",
+}
+
 func PrintResults(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string) error {
 	if outputFormat == "" {
 		printPretty(ruleResults, summary)
@@ -39,7 +44,7 @@ func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Outp
 			t.SetOutputMirror(os.Stdout)
 			t.AppendHeader(table.Row{"SCM Platform", "CICD Platform", "Owner Name", "Repository Name", "Pipeline Relative Path"})
 			for _, schemaError := range ruleResult.SchemaErrors {
-				t.AppendRow([]interface{}{"Github", "Github Actions", schemaError.OwnerName, schemaError.RepositryName, schemaError.WorkflowRelPath})
+				t.AppendRow([]interface{}{"Github", CICD_PLATFORMS[schemaError.CiCdPlatform], schemaError.OwnerName, schemaError.RepositryName, schemaError.WorkflowRelPath})
 				t.AppendSeparator()
 			}
 			t.Render()
