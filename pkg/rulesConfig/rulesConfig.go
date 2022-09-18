@@ -39,6 +39,7 @@ type SchemaError struct {
 	OwnerName       string
 	RepositryName   string
 	WorkflowRelPath string
+	CiCdPlatform    string
 }
 
 type RuleResult struct {
@@ -146,10 +147,18 @@ func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.G
 	if len(keyFields) >= 3 {
 		schemaError.RepositryName = keyFields[2]
 	}
+	if len(keyFields) >= 4 {
+		schemaError.CiCdPlatform = keyFields[3]
+	}
 	if len(keyFields) >= 5 {
 		workflowName := keyFields[4]
-		relpath := githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].GithubActionsWorkflows[workflowName].RelativePath
-		schemaError.WorkflowRelPath = relpath
+
+		if schemaError.CiCdPlatform == "github-actions-workflows" {
+			schemaError.WorkflowRelPath = githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].GithubActionsWorkflows[workflowName].RelativePath
+		}
+		if schemaError.CiCdPlatform == "jfrog-pipelines" {
+			schemaError.WorkflowRelPath = githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
+		}
 	}
 
 	return schemaError
