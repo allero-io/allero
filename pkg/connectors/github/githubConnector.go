@@ -108,6 +108,7 @@ func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, rep
 		Name:                   *repo.Name,
 		FullName:               *repo.FullName,
 		ID:                     int(*repo.ID),
+		ProgrammingLanguage:    *repo.Language,
 		GithubActionsWorkflows: make(map[string]*PipelineFile),
 		JfrogPipelines:         make(map[string]*PipelineFile),
 	}
