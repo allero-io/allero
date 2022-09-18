@@ -8,15 +8,17 @@ type GithubOwner struct {
 }
 
 type GithubRepository struct {
-	Name                   string                     `json:"name"`
-	FullName               string                     `json:"fullName"`
-	ID                     int                        `json:"id"`
-	GithubActionsWorkflows map[string]*GithubWorkflow `json:"github-actions-workflows"`
+	Name                   string                   `json:"name"`
+	FullName               string                   `json:"fullName"`
+	ID                     int                      `json:"id"`
+	GithubActionsWorkflows map[string]*PipelineFile `json:"github-actions-workflows"`
+	JfrogPipelines         map[string]*PipelineFile `json:"jfrog-pipelines"`
 }
 
-type GithubWorkflow struct {
+type PipelineFile struct {
 	RelativePath string      `json:"relativePath"`
 	LocalPath    string      `json:"localPath"`
 	Filename     string      `json:"filename"`
+	Origin       string      `json:"origin"`
 	Content      interface{} `json:"content"`
 }

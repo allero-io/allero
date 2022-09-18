@@ -42,6 +42,10 @@ var SUPPORTED_CICD_PLATFORMS = []CICDPlatform{
 		Name:               "github_actions",
 		RelevantFilesRegex: "\\.github/workflows/.*\\.ya?ml",
 	},
+	{
+		Name:               "jfrog_pipelines",
+		RelevantFilesRegex: "jfrog.*\\.ya?ml",
+	},
 	// {
 	// 	Name:               "jenkins",
 	// 	RelevantFilesRegex: "(?i)jenkinsfile[^/]*$",
@@ -104,7 +108,8 @@ func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, rep
 		Name:                   *repo.Name,
 		FullName:               *repo.FullName,
 		ID:                     int(*repo.ID),
-		GithubActionsWorkflows: make(map[string]*GithubWorkflow),
+		GithubActionsWorkflows: make(map[string]*PipelineFile),
+		JfrogPipelines:         make(map[string]*PipelineFile),
 	}
 
 	return nil
@@ -127,7 +132,7 @@ func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*Git
 			continue
 		}
 
-		jsonContentBytes, err := yaml.YAMLToJSON(byteContent)
+		jsonContentBytes, err := gc.yamlToJson(byteContent)
 		if err != nil {
 			processingError = err
 			continue
@@ -143,14 +148,28 @@ func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*Git
 		workflowFile.Content = jsonContent
 
 		filenameWithoutPostfix := strings.Split(workflowFile.Filename, ".")[0]
-		githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].GithubActionsWorkflows[filenameWithoutPostfix] = workflowFile
+
+		if workflowFile.Origin == "github_actions" {
+			githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].GithubActionsWorkflows[filenameWithoutPostfix] = workflowFile
+		} else if workflowFile.Origin == "jfrog_pipelines" {
+			githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].JfrogPipelines[filenameWithoutPostfix] = workflowFile
+		} else {
+			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, *repo.FullName)
+			continue
+		}
 	}
 
 	return processingError
 }
 
-func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (chan *GithubWorkflow, error) {
-	workflowFilesEntitiesChan := make(chan *GithubWorkflow)
+func (gc *GithubConnector) yamlToJson(byteContent []byte) ([]byte, error) {
+	strContent := string(byteContent)
+	modifiedStr := regexp.MustCompile(`{{.*}}`).ReplaceAllString(strContent, "DYNAMIC_VALUE")
+	return yaml.YAMLToJSON([]byte(modifiedStr))
+}
+
+func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (chan *PipelineFile, error) {
+	workflowFilesEntitiesChan := make(chan *PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
@@ -171,10 +190,11 @@ func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (ch
 					return
 				}
 
-				workflowFilesEntitiesChan <- &GithubWorkflow{
+				workflowFilesEntitiesChan <- &PipelineFile{
 					RelativePath: filePath,
 					LocalPath:    localPath,
 					Filename:     path.Base(filePath),
+					Origin:       cicdPlatform.Name,
 				}
 			}
 		}
