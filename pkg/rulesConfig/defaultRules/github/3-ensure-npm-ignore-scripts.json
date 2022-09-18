@@ -2,6 +2,7 @@
     "description": "Ensure --ignore-scripts is used for npm install or ci commands",
     "failureMessage": "npm install or ci is used without ignoring post and preinstall scripts",
     "uniqueId": 3,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {

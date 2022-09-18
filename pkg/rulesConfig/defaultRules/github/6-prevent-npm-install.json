@@ -2,6 +2,7 @@
     "description": "Prevent use of npm install",
     "failureMessage": "npm install is used. It is highly recommended to use npm ci instead",
     "uniqueId": 6,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {

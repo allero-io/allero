@@ -2,6 +2,7 @@
     "description": "Ensure action version is set",
     "failureMessage": "github action version should be set",
     "uniqueId": 1,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {

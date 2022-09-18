@@ -127,6 +127,8 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 
 		if hasToken && !selectedRuleIds[rule.UniqueId] {
 			continue
+		} else if !hasToken && !rule.EnabledByDefault {
+			continue
 		}
 
 		schemaErrors, err := deps.RulesConfig.Validate(ruleName, rule)

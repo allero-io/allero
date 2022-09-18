@@ -2,6 +2,7 @@
     "description": "Prevent direct use of kubectl apply",
     "failureMessage": "kubectl apply is used directly in workflow",
     "uniqueId": 5,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {
