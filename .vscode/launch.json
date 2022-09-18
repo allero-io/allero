@@ -11,11 +11,7 @@
             "mode": "debug",
             "program": "./main.go",
             "env": {},
-            // "args": ["fetch", "github", "allero-io", "dimabru", "datreeio/datree"],
-            // "args": ["fetch", "github", "kubernetes"],
-            // "args": ["fetch", "github", "kubernetes/noderesourcetopology-api"],
-            "args": ["fetch", "github", "jenkinsci/xldeploy-plugin"],
-            // "args": ["fetch", "github", "jenkinsci/xlrelease-plugin"],
+            "args": ["fetch", "github", "allero-io"],
         }
     ]
 }
