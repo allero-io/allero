@@ -18,7 +18,6 @@ type GithubRepository struct {
 
 type PipelineFile struct {
 	RelativePath string      `json:"relativePath"`
-	LocalPath    string      `json:"localPath"`
 	Filename     string      `json:"filename"`
 	Origin       string      `json:"origin"`
 	Content      interface{} `json:"content"`
