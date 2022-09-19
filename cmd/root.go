@@ -39,13 +39,13 @@ var CliVersion string
 func init() {
 	configurationManager := configurationManager.New()
 
-	rulesConfig := rulesConfig.New(&rulesConfig.RulesConfigDependencies{
-		ConfigurationManager: configurationManager,
-	})
-
 	posthogClient, _ := posthog.New(&posthog.PosthogClientDependencies{
 		ConfigurationManager: configurationManager,
 		CliVersion:           CliVersion,
+	})
+
+	rulesConfig := rulesConfig.New(&rulesConfig.RulesConfigDependencies{
+		ConfigurationManager: configurationManager,
 	})
 
 	rootCmd.AddCommand(fetch.New(&fetch.FetchCommandDependencies{
