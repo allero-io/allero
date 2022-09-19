@@ -82,7 +82,8 @@ allero config set token <the-token-you-recivied-by-email>
 allero validate
 ```
 
-After you set the token you can clear the token or choose to ignore it and validate your pipelines with all the rules as default.
+Even though your token is configured you can choose to ignore it and validates your pipelines with all the rules as default. It is not recommended but you can clear the token as well. 
+
 ```bash
 # Run allero validate without using your configured token
 allero validate --ignore-token
