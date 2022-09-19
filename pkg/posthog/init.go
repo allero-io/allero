@@ -50,8 +50,8 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 	}
 	decodedToken, err := deps.RulesConfig.ParseToken()
 	client.Enqueue(posthog.Alias{
-		DistinctId: fmt.Sprintf("user:%s", userConfig.MachineId),
-		Alias:      fmt.Sprintf("user:%s", decodedToken.Email),
+		DistinctId: fmt.Sprintf("user:%s", decodedToken.Email),
+		Alias:      fmt.Sprintf("user:%s", userConfig.MachineId),
 	})
 	return &PosthogClient{cliVersion: deps.CliVersion, userConfig: userConfig}, nil
 }
