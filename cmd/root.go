@@ -45,7 +45,6 @@ func init() {
 
 	posthogClient, _ := posthog.New(&posthog.PosthogClientDependencies{
 		ConfigurationManager: configurationManager,
-		RulesConfig:          rulesConfig,
 		CliVersion:           CliVersion,
 	})
 

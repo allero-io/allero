@@ -6,13 +6,11 @@ import (
 	"runtime"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
-	"github.com/allero-io/allero/pkg/rulesConfig"
 	"github.com/posthog/posthog-go"
 )
 
 type PosthogClientDependencies struct {
 	ConfigurationManager *configurationManager.ConfigurationManager
-	RulesConfig          *rulesConfig.RulesConfig
 	CliVersion           string
 }
 type PosthogClient struct {
