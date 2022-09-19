@@ -44,8 +44,9 @@ func init() {
 	})
 
 	posthogClient, _ := posthog.New(&posthog.PosthogClientDependencies{
-		RulesConfig: rulesConfig,
-		CliVersion:  CliVersion,
+		ConfigurationManager: configurationManager,
+		RulesConfig:          rulesConfig,
+		CliVersion:           CliVersion,
 	})
 
 	rootCmd.AddCommand(fetch.New(&fetch.FetchCommandDependencies{

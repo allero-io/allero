@@ -11,8 +11,9 @@ import (
 )
 
 type PosthogClientDependencies struct {
-	RulesConfig *rulesConfig.RulesConfig
-	CliVersion  string
+	ConfigurationManager *configurationManager.ConfigurationManager
+	RulesConfig          *rulesConfig.RulesConfig
+	CliVersion           string
 }
 type PosthogClient struct {
 	cliVersion string
@@ -20,7 +21,7 @@ type PosthogClient struct {
 }
 
 func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
-	userConfig, isNewUser, err := deps.RulesConfig.ConfigurationManager.GetUserConfig()
+	userConfig, isNewUser, err := deps.ConfigurationManager.GetUserConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 				Set("Running Platfrom", runningPlatform),
 		})
 	}
-	decodedToken, err := deps.RulesConfig.ParseToken()
+	decodedToken, err := deps.ConfigurationManager.ParseToken()
 	client.Enqueue(posthog.Alias{
 		DistinctId: fmt.Sprintf("user:%s", decodedToken.Email),
 		Alias:      fmt.Sprintf("user:%s", userConfig.MachineId),

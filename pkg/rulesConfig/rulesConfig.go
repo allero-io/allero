@@ -2,7 +2,6 @@ package rulesConfig
 
 import (
 	"embed"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -27,7 +26,7 @@ type Rule struct {
 }
 
 type RulesConfig struct {
-	ConfigurationManager *configurationManager.ConfigurationManager
+	configurationManager *configurationManager.ConfigurationManager
 	githubData           map[string]*githubConnector.GithubOwner
 }
 
@@ -57,15 +56,9 @@ type OutputSummary struct {
 	URL                 string `mapstructure:"URL"`
 }
 
-type DecodedToken struct {
-	Rules    []bool `json:"rules"`
-	Email    string `json:"email"`
-	UniqueId string `json:"uniqueId"`
-}
-
 func New(deps *RulesConfigDependencies) *RulesConfig {
 	return &RulesConfig{
-		ConfigurationManager: deps.ConfigurationManager,
+		configurationManager: deps.ConfigurationManager,
 		githubData:           getGithubData(),
 	}
 }
@@ -88,7 +81,7 @@ func (rc *RulesConfig) Initialize() error {
 		files[file.Name()] = content
 	}
 
-	return rc.ConfigurationManager.SyncRules(files)
+	return rc.configurationManager.SyncRules(files)
 }
 
 func (rc *RulesConfig) Validate(ruleName string, rule *Rule) ([]*SchemaError, error) {
@@ -179,31 +172,9 @@ func (rc *RulesConfig) GetAllRuleNames() []string {
 
 	return ruleNames
 }
-func (rc *RulesConfig) ParseToken() (*DecodedToken, error) {
-	token, err := rc.ConfigurationManager.Get("token")
-	if err != nil {
-		return nil, err
-	}
-	if token == nil {
-		return nil, nil
-	}
-
-	rawDecodedToken, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", token))
-	if err != nil {
-		return nil, fmt.Errorf(
-			"error decoding token. run `allero config clear token` to clear the existing token and generate a new token using %s", rc.ConfigurationManager.TokenGenerationUrl)
-	}
-
-	decodedToken := &DecodedToken{}
-	err = json.Unmarshal(rawDecodedToken, decodedToken)
-	if err != nil {
-		return nil, err
-	}
-	return decodedToken, nil
-}
 
 func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
-	decodedToken, err := rc.ParseToken()
+	decodedToken, err := rc.configurationManager.ParseToken()
 	if err != nil {
 		return nil, err
 	}
