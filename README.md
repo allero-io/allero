@@ -72,6 +72,26 @@ ensure-node-version | Make sure a specific version is set when using a node imag
 ensure-python-version | Make sure a specific version is set when using a python image | Avoid unexpected behavior
 ensure-github-action-version | Ensure github action version is set | Avoid unexpected behavior
 
+### Selecting your own set of rules
+Our CLI validates your pipelines by all the supported rules as default. To validate a subset of the supported rules please create your own token [here](https://allero.io/selective-rules)
+You will recieve an email with the token, then set the token and validate:
+```bash
+# Set your token
+allero config set token <the-token-you-recivied-by-email> 
+# Run allero validation!
+allero validate
+```
+
+After you set the token you can clear the token or choose to ignore it and validate your pipelines with all the rules as default.
+```bash
+# Run allero validate without using your configured token
+allero validate --ignore-token
+
+# Clear your token permanently
+allero config clear token 
+```
+
+
 ### Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/github/data-schema-example.json).
 1. Create a new json file and define your rule. Example rules can be found [here](https://github.com/allero-io/allero/tree/main/examples).
