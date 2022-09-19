@@ -27,7 +27,7 @@ type Rule struct {
 }
 
 type RulesConfig struct {
-	configurationManager *configurationManager.ConfigurationManager
+	ConfigurationManager *configurationManager.ConfigurationManager
 	githubData           map[string]*githubConnector.GithubOwner
 }
 
@@ -65,7 +65,7 @@ type DecodedToken struct {
 
 func New(deps *RulesConfigDependencies) *RulesConfig {
 	return &RulesConfig{
-		configurationManager: deps.ConfigurationManager,
+		ConfigurationManager: deps.ConfigurationManager,
 		githubData:           getGithubData(),
 	}
 }
@@ -88,7 +88,7 @@ func (rc *RulesConfig) Initialize() error {
 		files[file.Name()] = content
 	}
 
-	return rc.configurationManager.SyncRules(files)
+	return rc.ConfigurationManager.SyncRules(files)
 }
 
 func (rc *RulesConfig) Validate(ruleName string, rule *Rule) ([]*SchemaError, error) {
@@ -179,9 +179,8 @@ func (rc *RulesConfig) GetAllRuleNames() []string {
 
 	return ruleNames
 }
-
-func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
-	token, err := rc.configurationManager.Get("token")
+func (rc *RulesConfig) ParseToken() (*DecodedToken, error) {
+	token, err := rc.ConfigurationManager.Get("token")
 	if err != nil {
 		return nil, err
 	}
@@ -192,11 +191,19 @@ func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
 	rawDecodedToken, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", token))
 	if err != nil {
 		return nil, fmt.Errorf(
-			"error decoding token. run `allero config clear token` to clear the existing token and generate a new token using %s", rc.configurationManager.TokenGenerationUrl)
+			"error decoding token. run `allero config clear token` to clear the existing token and generate a new token using %s", rc.ConfigurationManager.TokenGenerationUrl)
 	}
 
 	decodedToken := &DecodedToken{}
 	err = json.Unmarshal(rawDecodedToken, decodedToken)
+	if err != nil {
+		return nil, err
+	}
+	return decodedToken, nil
+}
+
+func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
+	decodedToken, err := rc.ParseToken()
 	if err != nil {
 		return nil, err
 	}
