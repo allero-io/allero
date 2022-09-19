@@ -6,6 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	reposFetchCounter int
+	err               error
+)
+
 type FetchCommandDependencies struct {
 	ConfigurationManager *configurationManager.ConfigurationManager
 	PosthogClient        *posthog.PosthogClient
@@ -20,6 +25,7 @@ var fetchCmd = &cobra.Command{
 
 func New(deps *FetchCommandDependencies) *cobra.Command {
 	fetchCmd.AddCommand(NewGithubCommand(deps))
+	fetchCmd.AddCommand(NewGitlabCommand(deps))
 
 	return fetchCmd
 }

@@ -123,7 +123,18 @@ func (cm *ConfigurationManager) GetGithubToken() string {
 	if !ok {
 		githubToken = os.Getenv("GITHUB_TOKEN")
 		if githubToken == "" {
-			fmt.Println("Recommended to provide github PAT token through environment variable ALLERO_GITHUB_TOKEN or GITHUB_TOKEN to avoid rate limit")
+			fmt.Println("We recommend providing github PAT token through environment variable ALLERO_GITHUB_TOKEN or GITHUB_TOKEN to avoid rate limit")
+		}
+	}
+	return githubToken
+}
+
+func (cm *ConfigurationManager) GetGitlabToken() string {
+	githubToken, ok := os.LookupEnv("ALLERO_GITLAB_TOKEN")
+	if !ok {
+		githubToken = os.Getenv("GITLAB_TOKEN")
+		if githubToken == "" {
+			fmt.Println("We recommend providing gitlab PAT token through environment variable ALLERO_GITLAB_TOKEN or GITLAB_TOKEN to avoid rate limit")
 		}
 	}
 	return githubToken

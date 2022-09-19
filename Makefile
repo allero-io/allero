@@ -22,6 +22,9 @@ clear-token:
 create-bin:
 	goreleaser --snapshot --skip-publish --rm-dist
 
-fetch: 
+github: 
 	# go run main.go fetch github supran2811/familyApp
 	go run main.go fetch github curbengh/hexo-yam
+
+gitlab:
+	go run main.go fetch gitlab GitLab-examples/clojure-web-application
