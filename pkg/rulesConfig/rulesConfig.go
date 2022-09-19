@@ -179,6 +179,10 @@ func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
 		return nil, err
 	}
 
+	if decodedToken == nil {
+		return nil, nil
+	}
+
 	selectedRuleIds := make(map[int]bool)
 	for i, rule := range decodedToken.Rules {
 		if rule {

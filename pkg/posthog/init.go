@@ -48,7 +48,7 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 		})
 	}
 	decodedToken, err := deps.ConfigurationManager.ParseToken()
-	if err == nil {
+	if decodedToken != nil {
 		client.Enqueue(posthog.Alias{
 			DistinctId: decodedToken.Email,
 			Alias:      userConfig.MachineId,
