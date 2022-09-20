@@ -1,0 +1,102 @@
+{
+    "description": "Ensure that at least one pipeline in each repository runs IaC tool checker",
+    "failureMessage": "IaC validator tool was not detected in the repository pipelines. It is highly recommended add one to ensure that infrastructure is well configured.",
+    "uniqueId": 9,
+    "enabledByDefault": false,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "github-actions-workflows": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "properties": {
+                                                "jobs": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "properties": {
+                                                            "steps": {
+                                                                "type": "array",
+                                                                "contains": {
+                                                                    "anyOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*Snyk IaC.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*kics.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*Datree.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*Checkov.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*Trivy.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*kubescape.*"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "minContains": 1
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
