@@ -3,6 +3,7 @@ package resultsPrinter
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/allero-io/allero/pkg/rulesConfig"
 	"github.com/fatih/color"
@@ -47,7 +48,10 @@ func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Outp
 			t.SetOutputMirror(os.Stdout)
 			t.AppendHeader(table.Row{"SCM Platform", "CICD Platform", "Owner Name", "Repository Name", "Pipeline Relative Path"})
 			for _, schemaError := range ruleResult.SchemaErrors {
-				t.AppendRow([]interface{}{"Github", CICD_PLATFORMS[schemaError.CiCdPlatform], schemaError.OwnerName, schemaError.RepositryName, schemaError.WorkflowRelPath})
+				uneascapedRepoName := unescapeValue(schemaError.RepositryName)
+				uneascapedFilepath := unescapeValue(schemaError.WorkflowRelPath)
+
+				t.AppendRow([]interface{}{"Github", CICD_PLATFORMS[schemaError.CiCdPlatform], schemaError.OwnerName, uneascapedRepoName, uneascapedFilepath})
 				t.AppendSeparator()
 			}
 			t.Render()
@@ -56,6 +60,10 @@ func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Outp
 		fmt.Printf("\n\n\n")
 
 	}
+}
+
+func unescapeValue(value string) string {
+	return strings.ReplaceAll(value, "[ESCAPED_DOT]", ".")
 }
 
 func printSummary(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) {
