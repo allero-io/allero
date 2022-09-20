@@ -14,10 +14,13 @@ var CICD_PLATFORMS = map[string]string{
 	"jfrog-pipelines":          "Jfrog Pipelines",
 }
 
+const colorRed = "\033[31m"
+const colorReset = "\033[0m"
+
 func PrintResults(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string) error {
 	if outputFormat == "" {
 		printPretty(ruleResults, summary)
-		printSummary(summary)
+		printSummary(ruleResults, summary)
 	} else if outputFormat == "csv" {
 		return printCSV(ruleResults, summary)
 	}
@@ -55,7 +58,7 @@ func printPretty(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Outp
 	}
 }
 
-func printSummary(summary rulesConfig.OutputSummary) {
+func printSummary(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	fmt.Println("Summary")
@@ -70,10 +73,20 @@ func printSummary(summary rulesConfig.OutputSummary) {
 	t.AppendSeparator()
 	t.AppendRow([]interface{}{"Failed rules", summary.TotalFailedRules})
 
-	if summary.URL != "" {
-		t.AppendSeparator()
-		t.AppendRow([]interface{}{"Select your own rules", summary.URL})
-	}
+	// if summary.URL != "" {
+	// 	t.AppendSeparator()
+	// 	t.AppendRow([]interface{}{"Select your own rules", summary.URL})
+	// }
 
 	t.Render()
+
+	if summary.TotalFailedRules > 0 {
+		fmt.Println()
+		fmt.Println("Failed rules summary:")
+		for _, ruleResult := range ruleResults {
+			if !ruleResult.Valid {
+				fmt.Println(string(colorRed), "\r", ruleResult.RuleName, string(colorReset))
+			}
+		}
+	}
 }
