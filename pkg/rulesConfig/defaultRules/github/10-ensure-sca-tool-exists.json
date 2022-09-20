@@ -1,7 +1,7 @@
 {
-    "description": "Ensure that at least one pipeline in each repository runs IaC tool checker",
-    "failureMessage": "IaC validator tool was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
-    "uniqueId": 9,
+    "description": "Ensure that at least one pipeline in each repository runs SCA tool checker",
+    "failureMessage": "SCA tool was not detected in the repository pipelines. It is highly recommended to add a scan to verify licensing and assess vulnerabilities.",
+    "uniqueId": 10,
     "enabledByDefault": false,
     "schema": {
         "type": "object",
@@ -32,7 +32,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Snyk IaC.*"
+                                                                                    "pattern": ".*Grype.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -41,7 +41,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*kics.*"
+                                                                                    "pattern": ".*Black Duck.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -50,7 +50,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Datree.*"
+                                                                                    "pattern": ".*JFrog XRay.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -59,7 +59,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Checkov.*"
+                                                                                    "pattern": ".*Checkmarx SCA.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -77,7 +77,25 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*kubescape.*"
+                                                                                    "pattern": ".*Whitesource (Mend).*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*Snyk OSS.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "run": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*GitLab SCA.*"
                                                                                 }
                                                                             }
                                                                         }
