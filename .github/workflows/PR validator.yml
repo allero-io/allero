@@ -15,7 +15,7 @@ jobs:
         run: curl https://get.allero.io | bash
 
       - name: Fetch all organization workflow files from all repositories
-        run: allero fetch github ${{ github.github.repository }}
+        run: allero fetch github ${{ github.repository }}
 
       - name: Run policies validation
         run: allero validate
