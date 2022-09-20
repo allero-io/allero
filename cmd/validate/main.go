@@ -51,6 +51,10 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
 			args := make(map[string]any)
 			args["Args"] = cmdArgs
+			decodedToken, _ := deps.ConfigurationManager.ParseToken()
+			if decodedToken != nil {
+				args["User Email"] = decodedToken.Email
+			}
 			deps.PosthogClient.PublishEventWithArgs("data validated", args)
 		},
 		Run: cmdWrap.Run(func(cmd *cobra.Command, args []string) error {

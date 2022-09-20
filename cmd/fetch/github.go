@@ -23,6 +23,10 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 			args := make(map[string]any)
 			args["Platform"] = "github"
 			args["Args"] = cmdArgs
+			decodedToken, _ := deps.ConfigurationManager.ParseToken()
+			if decodedToken != nil {
+				args["User Email"] = decodedToken.Email
+			}
 			deps.PosthogClient.PublishEventWithArgs("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {

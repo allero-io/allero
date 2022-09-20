@@ -13,6 +13,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+type DecodedToken struct {
+	Rules    []bool `json:"rules"`
+	Email    string `json:"email"`
+	UniqueId string `json:"uniqueId"`
+}
+
 type ConfigurationManager struct {
 	TokenGenerationUrl string
 }
@@ -209,4 +215,27 @@ func calcMachineId() string {
 	hasher.Write(keyBytes)
 	sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	return sha
+}
+
+func (cm *ConfigurationManager) ParseToken() (*DecodedToken, error) {
+	token, err := cm.Get("token")
+	if err != nil {
+		return nil, err
+	}
+	if token == nil {
+		return nil, nil
+	}
+
+	rawDecodedToken, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", token))
+	if err != nil {
+		return nil, fmt.Errorf(
+			"error decoding token. run `allero config clear token` to clear the existing token and generate a new token using %s", cm.TokenGenerationUrl)
+	}
+
+	decodedToken := &DecodedToken{}
+	err = json.Unmarshal(rawDecodedToken, decodedToken)
+	if err != nil {
+		return nil, err
+	}
+	return decodedToken, nil
 }

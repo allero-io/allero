@@ -23,17 +23,17 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 	if err != nil {
 		return nil, err
 	}
+	client, err := getClient()
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+
 	if isNewUser {
 		// A new user
 		osName := runtime.GOOS
 		osArch := runtime.GOARCH
 		osHost, _ := os.Hostname()
-
-		client, err := getClient()
-		if err != nil {
-			return nil, err
-		}
-		defer client.Close()
 
 		runningPlatform := getRunningPlatform()
 
@@ -47,7 +47,13 @@ func New(deps *PosthogClientDependencies) (*PosthogClient, error) {
 				Set("Running Platfrom", runningPlatform),
 		})
 	}
-
+	decodedToken, err := deps.ConfigurationManager.ParseToken()
+	if decodedToken != nil {
+		client.Enqueue(posthog.Alias{
+			DistinctId: decodedToken.Email,
+			Alias:      userConfig.MachineId,
+		})
+	}
 	return &PosthogClient{cliVersion: deps.CliVersion, userConfig: userConfig}, nil
 }
 
