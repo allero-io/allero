@@ -79,16 +79,35 @@ func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, rep
 		}
 	}
 
+	languages, err := gc.getProgrammingLanguages(repo)
+	if err != nil {
+		return err
+	}
+
 	githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name] = &GithubRepository{
 		Name:                   *repo.Name,
 		FullName:               *repo.FullName,
 		ID:                     int(*repo.ID),
-		ProgrammingLanguage:    *repo.Language,
+		ProgrammingLanguages:   languages,
 		GithubActionsWorkflows: make(map[string]*PipelineFile),
 		JfrogPipelines:         make(map[string]*PipelineFile),
 	}
 
 	return nil
+}
+
+func (gc *GithubConnector) getProgrammingLanguages(repo *github.Repository) ([]string, error) {
+	languagesMapping, _, err := gc.client.Repositories.ListLanguages(context.Background(), *repo.Owner.Login, *repo.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	var languages []string
+	for language := range languagesMapping {
+		languages = append(languages, language)
+	}
+
+	return languages, nil
 }
 
 func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*GithubOwner, repo *github.Repository) error {
