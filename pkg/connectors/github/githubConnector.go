@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/allero-io/allero/pkg/connectors"
 	"github.com/allero-io/allero/pkg/fileManager"
 	"github.com/google/go-github/github"
-	"sigs.k8s.io/yaml"
 )
 
 type GithubConnector struct {
@@ -22,34 +22,9 @@ type GithubConnectorDependencies struct {
 	Client *github.Client
 }
 
-type OwnerWithRepo struct {
-	repo  string
-	owner string
-}
-
-type CICDPlatform struct {
-	Name               string
-	RelevantFilesRegex string
-}
-
 type GithubRepositoryApiResponse struct {
 	Repository *github.Repository
 	Error      error
-}
-
-var SUPPORTED_CICD_PLATFORMS = []CICDPlatform{
-	{
-		Name:               "github_actions",
-		RelevantFilesRegex: "\\.github/workflows/.*\\.ya?ml",
-	},
-	{
-		Name:               "jfrog_pipelines",
-		RelevantFilesRegex: "jfrog.*\\.ya?ml",
-	},
-	// {
-	// 	Name:               "jenkins",
-	// 	RelevantFilesRegex: "(?i)jenkinsfile[^/]*$",
-	// },
 }
 
 func New(deps *GithubConnectorDependencies) *GithubConnector {
@@ -104,16 +79,35 @@ func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, rep
 		}
 	}
 
+	languages, err := gc.getProgrammingLanguages(repo)
+	if err != nil {
+		return err
+	}
+
 	githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name] = &GithubRepository{
 		Name:                   *repo.Name,
 		FullName:               *repo.FullName,
 		ID:                     int(*repo.ID),
-		ProgrammingLanguage:    *repo.Language,
+		ProgrammingLanguages:   languages,
 		GithubActionsWorkflows: make(map[string]*PipelineFile),
 		JfrogPipelines:         make(map[string]*PipelineFile),
 	}
 
 	return nil
+}
+
+func (gc *GithubConnector) getProgrammingLanguages(repo *github.Repository) ([]string, error) {
+	languagesMapping, _, err := gc.client.Repositories.ListLanguages(context.Background(), *repo.Owner.Login, *repo.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	var languages []string
+	for language := range languagesMapping {
+		languages = append(languages, language)
+	}
+
+	return languages, nil
 }
 
 func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*GithubOwner, repo *github.Repository) error {
@@ -133,7 +127,7 @@ func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*Git
 			continue
 		}
 
-		jsonContentBytes, err := gc.yamlToJson(byteContent)
+		jsonContentBytes, err := connectors.YamlToJson(byteContent)
 		if err != nil {
 			processingError = err
 			continue
@@ -163,37 +157,23 @@ func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*Git
 	return processingError
 }
 
-func (gc *GithubConnector) yamlToJson(byteContent []byte) ([]byte, error) {
-	strContent := string(byteContent)
-	modifiedStr := regexp.MustCompile(`{{.*}}`).ReplaceAllString(strContent, "DYNAMIC_VALUE")
-	return yaml.YAMLToJSON([]byte(modifiedStr))
-}
-
 func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (chan *PipelineFile, error) {
 	workflowFilesEntitiesChan := make(chan *PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
-		defer func() {
-			close(workflowFilesEntitiesChan)
-		}()
+		defer close(workflowFilesEntitiesChan)
+
 		tree, _, err := gc.client.Git.GetTree(context.Background(), *repo.Owner.Login, *repo.Name, *repo.DefaultBranch, true)
 		if err != nil {
 			return
 		}
 
-		for _, cicdPlatform := range SUPPORTED_CICD_PLATFORMS {
+		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
 			relevantFilesPaths := gc.matchedFiles(tree, cicdPlatform.RelevantFilesRegex)
 			for _, filePath := range relevantFilesPaths {
-				localPath, err := gc.buildLocalPath(repo, filePath)
-				if err != nil {
-					getEntitiesErr = err
-					return
-				}
-
 				workflowFilesEntitiesChan <- &PipelineFile{
 					RelativePath: filePath,
-					LocalPath:    localPath,
 					Filename:     path.Base(filePath),
 					Origin:       cicdPlatform.Name,
 				}
@@ -202,11 +182,6 @@ func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (ch
 	}()
 
 	return workflowFilesEntitiesChan, getEntitiesErr
-}
-
-func (gc *GithubConnector) buildLocalPath(repo *github.Repository, filePath string) (string, error) {
-	alleroHomedir := fileManager.GetAlleroHomedir()
-	return fmt.Sprintf("%s/repo_files/github/%s/%s/%s", alleroHomedir, *repo.Owner.Login, *repo.Name, filePath), nil
 }
 
 func (gc *GithubConnector) matchedFiles(tree *github.Tree, regex string) []string {
@@ -230,16 +205,14 @@ func (gc *GithubConnector) getAllRepositories(args []string) chan *GithubReposit
 	repositoriesChan := make(chan *GithubRepositoryApiResponse)
 
 	go func() {
-		defer func() {
-			close(repositoriesChan)
-		}()
+		defer close(repositoriesChan)
 
 		for _, arg := range args {
-			ownerWithRepo := gc.splitParentRepo(arg)
+			ownerWithRepo := connectors.SplitParentRepo(arg)
 
-			if ownerWithRepo.repo != "" {
-				fmt.Printf("Start fetching repository %s/%s\n", ownerWithRepo.owner, ownerWithRepo.repo)
-				repoMetadata, _, err := gc.client.Repositories.Get(context.Background(), ownerWithRepo.owner, ownerWithRepo.repo)
+			if ownerWithRepo.Repo != "" {
+				fmt.Printf("Start fetching repository %s/%s\n", ownerWithRepo.Owner, ownerWithRepo.Repo)
+				repoMetadata, _, err := gc.client.Repositories.Get(context.Background(), ownerWithRepo.Owner, ownerWithRepo.Repo)
 				if err != nil {
 					err = fmt.Errorf("unable to get repository %s", arg)
 				}
@@ -248,21 +221,21 @@ func (gc *GithubConnector) getAllRepositories(args []string) chan *GithubReposit
 					Repository: repoMetadata,
 					Error:      err,
 				}
-				fmt.Printf("Finished fetching repository %s/%s\n", ownerWithRepo.owner, ownerWithRepo.repo)
+				fmt.Printf("Finished fetching repository %s/%s\n", ownerWithRepo.Owner, ownerWithRepo.Repo)
 
 			} else {
-				ownerType, err := gc.getGithubOwnerType(ownerWithRepo.owner)
+				ownerType, err := gc.getGithubOwnerType(ownerWithRepo.Owner)
 				if err != nil {
-					err = fmt.Errorf("unable to get data on owner %s", ownerWithRepo.owner)
+					err = fmt.Errorf("unable to get data on owner %s", ownerWithRepo.Owner)
 
 					repositoriesChan <- &GithubRepositoryApiResponse{
 						Repository: nil,
 						Error:      err,
 					}
 				} else {
-					ownerRepos, err := ListByOwnerWithPagination(gc.client, ownerWithRepo.owner, ownerType)
+					ownerRepos, err := ListByOwnerWithPagination(gc.client, ownerWithRepo.Owner, ownerType)
 					if err != nil {
-						err = fmt.Errorf("unable to get repositories from owner %s", ownerWithRepo.owner)
+						err = fmt.Errorf("unable to get repositories from owner %s", ownerWithRepo.Owner)
 					}
 
 					for repo := range ownerRepos {
@@ -287,16 +260,4 @@ func (gc *GithubConnector) getGithubOwnerType(owner string) (string, error) {
 	}
 
 	return *metadata.Type, err
-}
-
-func (gc *GithubConnector) splitParentRepo(arg string) *OwnerWithRepo {
-	splits := strings.Split(arg, "/")
-	owner := splits[0]
-
-	var repo string
-	if len(splits) > 1 {
-		repo = splits[1]
-	}
-
-	return &OwnerWithRepo{owner: owner, repo: repo}
 }
