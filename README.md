@@ -5,6 +5,7 @@
 <h1 align="center">
 Prevent CI/CD misconfiguration
 </h1>
+
 ## What is Allero?
 Allero is a policy tool that prevents misconfigurations in CI/CD pipelines. 
 This helps prevent failures and security risks from reaching production. It also allows R&D teams be less dependent on DevOps engineers when building and maintaining CI/CD pipelines.
