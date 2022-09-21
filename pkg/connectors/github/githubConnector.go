@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"path"
 	"regexp"
-	"strings"
 
 	"github.com/allero-io/allero/pkg/connectors"
 	"github.com/allero-io/allero/pkg/fileManager"
@@ -66,10 +65,6 @@ func (gc *GithubConnector) Get(args []string) (int, error) {
 }
 
 func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, repo *github.Repository) error {
-	if strings.Contains(*repo.Name, ".") {
-		return fmt.Errorf("failed fetching repo %s: should not contain a dot", *repo.FullName)
-	}
-
 	if _, ok := githubJsonObject[*repo.Owner.Login]; !ok {
 		githubJsonObject[*repo.Owner.Login] = &GithubOwner{
 			Name:         *repo.Owner.Login,
@@ -84,7 +79,9 @@ func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, rep
 		return err
 	}
 
-	githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name] = &GithubRepository{
+	escapedRepoName := connectors.EscapeJsonKey(*repo.Name)
+
+	githubJsonObject[*repo.Owner.Login].Repositories[escapedRepoName] = &GithubRepository{
 		Name:                   *repo.Name,
 		FullName:               *repo.FullName,
 		ID:                     int(*repo.ID),
@@ -141,13 +138,12 @@ func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*Git
 		}
 
 		workflowFile.Content = jsonContent
-
-		filenameWithoutPostfix := strings.Split(workflowFile.Filename, ".")[0]
+		escapedFilename := connectors.EscapeJsonKey(workflowFile.Filename)
 
 		if workflowFile.Origin == "github_actions" {
-			githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].GithubActionsWorkflows[filenameWithoutPostfix] = workflowFile
+			githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].GithubActionsWorkflows[escapedFilename] = workflowFile
 		} else if workflowFile.Origin == "jfrog_pipelines" {
-			githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].JfrogPipelines[filenameWithoutPostfix] = workflowFile
+			githubJsonObject[*repo.Owner.Login].Repositories[*repo.Name].JfrogPipelines[escapedFilename] = workflowFile
 		} else {
 			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, *repo.FullName)
 			continue
