@@ -63,6 +63,7 @@ _Using any other scheduler:_ as a CLI tool, Allero can be easily run in - CI/CD,
 | ensure-node-version | Make sure a specific version is set when using a node image | Avoid unexpected behavior
 | ensure-python-version | Make sure a specific version is set when using a python image | Avoid unexpected behavior
 | ensure-github-action-version | Ensure github action version is set | Avoid unexpected behavior
+| prevent-using-uncontrolled-values | avoid running malware commands through repository names | Keep production secured
 
 ### 📝 Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
