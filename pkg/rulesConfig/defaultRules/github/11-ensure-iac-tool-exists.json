@@ -1,8 +1,8 @@
 {
-    "description": "Ensure that at least one pipeline in each repository runs Terraform tool checker",
-    "failureMessage": "Terraform validator tool was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
+    "description": "Ensure that at least one pipeline in each repository runs Terraform scanner",
+    "failureMessage": "Terraform scanner was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
     "uniqueId": 11,
-    "enabledByDefault": false,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -28,6 +28,7 @@
                                                                 "contains": {
                                                                     "anyOf": [
                                                                         {
+                                                                            "required": ["uses"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -37,6 +38,7 @@
                                                                             }
                                                                         },                                                                        
                                                                         {
+                                                                            "required": ["uses"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -46,6 +48,7 @@
                                                                             }
                                                                         },                                                                        
                                                                         {
+                                                                            "required": ["uses"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -55,7 +58,7 @@
                                                                             }
                                                                         },
                                                                         {
-                                                                            "type": "object",
+                                                                            "required": ["uses"],                                                                            "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
                                                                                     "type": "string",
@@ -64,6 +67,7 @@
                                                                             }
                                                                         },
                                                                         {
+                                                                            "required": ["run"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {

@@ -1,8 +1,8 @@
 {
-    "description": "Ensure that at least one pipeline in each repository runs SCA tool checker",
-    "failureMessage": "SCA tool was not detected in the repository pipelines. It is highly recommended to add a scan to verify licensing and assess vulnerabilities.",
+    "description": "Ensure that at least one pipeline in each repository runs SCA scanner",
+    "failureMessage": "SCA scanner was not detected in the repository pipelines. It is highly recommended to add one to verify licensing and assess vulnerabilities.",
     "uniqueId": 10,
-    "enabledByDefault": false,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -28,6 +28,7 @@
                                                                 "contains": {
                                                                     "anyOf": [
                                                                         {
+                                                                            "required": ["uses"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -37,6 +38,7 @@
                                                                             }
                                                                         },
                                                                         {
+                                                                            "required": ["run"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {
@@ -46,6 +48,7 @@
                                                                             }
                                                                         },
                                                                         {
+                                                                            "required": ["uses"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -55,6 +58,7 @@
                                                                             }
                                                                         },
                                                                         {
+                                                                            "required": ["run"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {
@@ -64,6 +68,7 @@
                                                                             }
                                                                         },
                                                                         {
+                                                                            "required": ["uses"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -73,6 +78,7 @@
                                                                             }
                                                                         },
                                                                         {
+                                                                            "required": ["run"],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {
