@@ -17,6 +17,7 @@ var CICD_PLATFORMS = map[string]string{
 
 const colorRed = "\033[31m"
 const colorReset = "\033[0m"
+const colorBlue = "\033[34m"
 
 func PrintResults(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string) error {
 	if outputFormat == "" {
@@ -80,13 +81,12 @@ func printSummary(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.Out
 	t.AppendRow([]interface{}{"Total rules evaluated", summary.TotalRulesEvaluated})
 	t.AppendSeparator()
 	t.AppendRow([]interface{}{"Failed rules", summary.TotalFailedRules})
-
-	// if summary.URL != "" {
-	// 	t.AppendSeparator()
-	// 	t.AppendRow([]interface{}{"Select your own rules", summary.URL})
-	// }
-
 	t.Render()
+
+	if summary.URL != "" {
+		fmt.Println()
+		fmt.Println("Select your own rules:", string(colorBlue), summary.URL, string(colorReset))
+	}
 
 	if summary.TotalFailedRules > 0 {
 		fmt.Println()
