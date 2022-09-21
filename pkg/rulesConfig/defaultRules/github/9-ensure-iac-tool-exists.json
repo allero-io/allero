@@ -1,6 +1,6 @@
 {
-    "description": "Ensure that at least one pipeline in each repository runs IaC tool checker",
-    "failureMessage": "IaC validator tool was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
+    "description": "Ensure that at least one pipeline in each repository runs Terraform tool checker",
+    "failureMessage": "Terraform validator tool was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
     "uniqueId": 9,
     "enabledByDefault": false,
     "schema": {
@@ -32,7 +32,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Snyk IaC.*"
+                                                                                    "pattern": ".*Snyk IaC .*"
                                                                                 }
                                                                             }
                                                                         },
