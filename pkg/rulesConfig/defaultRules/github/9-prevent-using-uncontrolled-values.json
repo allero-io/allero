@@ -1,0 +1,54 @@
+{
+    "description": "Prevent using uncontrolled values",
+    "failureMessage": "do not reference values that are not under your control",
+    "uniqueId": 9,
+    "enabledByDefault": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "github-actions-workflows": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "properties": {
+                                                "jobs": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "properties": {
+                                                            "steps": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "run": {
+                                                                            "type": "string",
+                                                                            "not": {
+                                                                                "pattern": "\\${{ github\\.event\\.((pull_request\\.title)|actor\\.(id|login|display_login)|org\\.login) }}"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

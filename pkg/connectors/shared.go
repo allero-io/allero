@@ -50,6 +50,6 @@ func SplitParentRepo(arg string) *OwnerWithRepo {
 
 func YamlToJson(byteContent []byte) ([]byte, error) {
 	strContent := string(byteContent)
-	modifiedStr := regexp.MustCompile(`{{.*}}`).ReplaceAllString(strContent, "DYNAMIC_VALUE")
+	modifiedStr := regexp.MustCompile(`[^$]{{.*}}`).ReplaceAllString(strContent, " DYNAMIC_VALUE")
 	return yaml.YAMLToJSON([]byte(modifiedStr))
 }
