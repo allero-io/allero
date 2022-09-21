@@ -18,7 +18,7 @@ Allero comes with built-in rules, and developed to be as friendly as possible fo
 ## Quick Start!
 ### 1. Install the latest release in your terminal
 _Linux & MacOS:_ `curl https://get.allero.io | /bin/bash`  
-_Brew:_ `brew install allero-io/allero/allero`
+_Brew:_ `brew install allero-io/allero/allero`  
 _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 
 
