@@ -2,7 +2,6 @@ package rulesConfig
 
 import (
 	"embed"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -55,12 +54,6 @@ type OutputSummary struct {
 	TotalRulesEvaluated int    `mapstructure:"Total Rules Evaluated"`
 	TotalFailedRules    int    `mapstructure:"Total Failed Rules"`
 	URL                 string `mapstructure:"URL"`
-}
-
-type DecodedToken struct {
-	Rules    []bool `json:"rules"`
-	Email    string `json:"email"`
-	UniqueId string `json:"uniqueId"`
 }
 
 func New(deps *RulesConfigDependencies) *RulesConfig {
@@ -181,24 +174,13 @@ func (rc *RulesConfig) GetAllRuleNames() []string {
 }
 
 func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
-	token, err := rc.configurationManager.Get("token")
+	decodedToken, err := rc.configurationManager.ParseToken()
 	if err != nil {
 		return nil, err
 	}
-	if token == nil {
+
+	if decodedToken == nil {
 		return nil, nil
-	}
-
-	rawDecodedToken, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", token))
-	if err != nil {
-		return nil, fmt.Errorf(
-			"error decoding token. run `allero config clear token` to clear the existing token and generate a new token using %s", rc.configurationManager.TokenGenerationUrl)
-	}
-
-	decodedToken := &DecodedToken{}
-	err = json.Unmarshal(rawDecodedToken, decodedToken)
-	if err != nil {
-		return nil, err
 	}
 
 	selectedRuleIds := make(map[int]bool)

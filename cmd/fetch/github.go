@@ -1,22 +1,17 @@
 package fetch
 
 import (
-	"os"
-
 	"github.com/allero-io/allero/pkg/clients"
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	"github.com/google/go-github/github"
 	"github.com/spf13/cobra"
 )
 
-var (
-	reposFetchCounter int
-	err               error
-)
-
 type FetchGithubDependencies struct {
 	GithubClient *github.Client
 }
+
+var GITHUB_TOKEN string
 
 func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 	githubCmd := &cobra.Command{
@@ -28,20 +23,25 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 			args := make(map[string]any)
 			args["Platform"] = "github"
 			args["Args"] = cmdArgs
+			decodedToken, _ := deps.ConfigurationManager.ParseToken()
+			if decodedToken != nil {
+				args["User Email"] = decodedToken.Email
+			}
 			deps.PosthogClient.PublishEventWithArgs("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			githubToken := deps.ConfigurationManager.GetGithubToken()
-			githubClient := clients.CreateGithubClient(githubToken)
+			GITHUB_TOKEN = deps.ConfigurationManager.GetGithubToken()
+			githubClient := clients.CreateGithubClient(GITHUB_TOKEN)
 
 			fetchGithubDeps := &FetchGithubDependencies{
 				GithubClient: githubClient,
 			}
 
-			return execute(fetchGithubDeps, args)
+			return executeGithub(fetchGithubDeps, args)
 		},
 		PostRun: func(cmd *cobra.Command, args []string) {
-			_, tokenWasProvided := os.LookupEnv("GITHUB_TOKEN")
+			tokenWasProvided := GITHUB_TOKEN != ""
+
 			analyticsArgs := make(map[string]any)
 			analyticsArgs["Total Fetched Repos"] = reposFetchCounter
 			analyticsArgs["Token Was Provided"] = tokenWasProvided
@@ -52,8 +52,7 @@ func NewGithubCommand(deps *FetchCommandDependencies) *cobra.Command {
 	return githubCmd
 }
 
-func execute(deps *FetchGithubDependencies, args []string) error {
-
+func executeGithub(deps *FetchGithubDependencies, args []string) error {
 	githubConnectorDeps := &githubConnector.GithubConnectorDependencies{Client: deps.GithubClient}
 	githubConnector := githubConnector.New(githubConnectorDeps)
 	reposFetchCounter, err = githubConnector.Get(args)
