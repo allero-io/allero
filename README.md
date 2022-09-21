@@ -8,7 +8,7 @@ Prevent CI/CD misconfiguration
 
 ## What is Allero?
 Allero is a policy tool that prevents misconfigurations in CI/CD pipelines. 
-This helps prevent failures and security risks from reaching production. It also allows R&D teams be less depedent on DevOps engineers when building and maintanining CI/CD pipelines.  
+This helps prevent failures and security risks from reaching production. It also allows R&D teams be less dependent on DevOps engineers when building and maintaining CI/CD pipelines.
 Allero comes with built-in rules, and developed to be as friendly as possible for you to create your own rules! 
 Here are a few use-cases that can be mitigated with Allero:
 1. Prevent Log4shell vulnerability by making sure SCA runs in every pipeline.
