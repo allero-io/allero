@@ -2,6 +2,7 @@
     "description": "Prevent using uncontrolled values",
     "failureMessage": "do not reference values that are not under your control",
     "uniqueId": 9,
+    "enabledByDefault": true,
     "schema": {
         "type": "object",
         "additionalProperties": {
@@ -29,7 +30,9 @@
                                                                     "properties": {
                                                                         "run": {
                                                                             "type": "string",
-                                                                            "pattern": ".*\\${{github\\.event\\.(pull_request\\.title|actor\\.(id|login|display_login)|org.login)}}.*"
+                                                                            "not": {
+                                                                                "pattern": "\\${{ github\\.event\\.((pull_request\\.title)|actor\\.(id|login|display_login)|org\\.login) }}"
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
