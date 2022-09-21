@@ -66,8 +66,8 @@ _Using any other scheduler:_ as a CLI tool, Allero can be easily run in - CI/CD,
 | prevent-using-uncontrolled-values | avoid running malware commands through repository names | Keep production secured
 
 ### Selecting your own set of rules
-Our CLI validates your pipelines by all the supported rules as default. To validate a subset of the supported rules please create your own token [here](https://allero.io/selective-rules)
-You will recieve an email with the token, then set the token and validate:
+Our CLI validates your pipelines by all the supported rules as default. To validate a subset of the supported rules please create your own token [here](https://allero.io/selective-rules).
+You will recieve an email with your token, then set the token and run allero validate:
 ```bash
 # Set your token
 allero config set token <the-token-you-recivied-by-email> 
@@ -75,13 +75,13 @@ allero config set token <the-token-you-recivied-by-email>
 allero validate
 ```
 
-Even though your token is configured you can choose to ignore it and validates your pipelines with all the rules as default. It is not recommended but you can clear the token as well. 
+Even though your token is configured you can choose to ignore it and validate your pipelines with all default rules. It is not recommended but you can clear the token as well. 
 
 ```bash
 # Run allero validate without using your configured token
 allero validate --ignore-token
 
-# Clear your token permanently
+# Clear your token
 allero config clear token 
 ```
 
