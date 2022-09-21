@@ -1,7 +1,7 @@
 {
     "description": "Ensure that at least one pipeline in each repository runs Terraform tool checker",
     "failureMessage": "Terraform validator tool was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
-    "uniqueId": 9,
+    "uniqueId": 11,
     "enabledByDefault": false,
     "schema": {
         "type": "object",
@@ -30,9 +30,36 @@
                                                                         {
                                                                             "type": "object",
                                                                             "properties": {
-                                                                                "run": {
+                                                                                "uses": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Snyk IaC .*"
+                                                                                    "pattern": ".*bridgecrewio/checkov-action@.*"
+                                                                                }
+                                                                            }
+                                                                        },                                                                        
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "uses": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*tenable/terrascan-action@.*"
+                                                                                }
+                                                                            }
+                                                                        },                                                                        
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "uses": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*snyk/actions/iac@.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "uses": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*aquasecurity/trivy-action@.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -41,43 +68,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*kics.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*Datree.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*Checkov.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*Trivy.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*kubescape.*"
+                                                                                    "pattern": ".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*"
                                                                                 }
                                                                             }
                                                                         }

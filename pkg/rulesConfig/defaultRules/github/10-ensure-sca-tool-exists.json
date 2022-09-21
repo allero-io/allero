@@ -30,9 +30,9 @@
                                                                         {
                                                                             "type": "object",
                                                                             "properties": {
-                                                                                "run": {
+                                                                                "uses": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Grype.*"
+                                                                                    "pattern": ".*anchore/scan-action@.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -41,7 +41,16 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Black Duck.*"
+                                                                                    "pattern": "^[\\S]*grype|docker .* run .*(anchore/)?grype.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "uses": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*synopsys-sig/detect-action@.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -50,7 +59,16 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*JFrog XRay.*"
+                                                                                    "pattern": ".*https://detect.synopsys.com/detect.*|.*docker .* run .*(blackducksoftware/)?detect.*"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "uses": {
+                                                                                    "type": "string",
+                                                                                    "pattern": ".*aquasecurity/trivy-action@.*"
                                                                                 }
                                                                             }
                                                                         },
@@ -59,43 +77,7 @@
                                                                             "properties": {
                                                                                 "run": {
                                                                                     "type": "string",
-                                                                                    "pattern": ".*Checkmarx SCA.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*Trivy.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*Whitesource (Mend).*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*Snyk OSS.*"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "run": {
-                                                                                    "type": "string",
-                                                                                    "pattern": ".*GitLab SCA.*"
+                                                                                    "pattern": ".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*"
                                                                                 }
                                                                             }
                                                                         }
