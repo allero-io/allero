@@ -47,6 +47,8 @@ Fetching data from a private GitLab group requires a Access token.
 1. Create a GitLab Access Token with access to the repos you want to scan. More information about how to create a GitLab Token can be found [here](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) 
 Generate the token with the following permissions:
     - [x]  read_api
+2. Once the token is generated, run export ALLERO_GITLAB_TOKEN={YOUR_TOKEN}.
+
 
 ## Next Steps
 ### ⛔️ Fail a PR on violation 
@@ -92,7 +94,7 @@ Tokens can be cleared from the CLI by running `allero config clear token`
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
 1. Create a new json file and define your rule. Example rules can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules).
 Make sure to update the rule description and failureMessage.
-2. Copy-paste the file to "~/.allero/rules/github/"
+2. Copy-paste the file to "~/.allero/rules/github/" or to "~/.allero/rules/gitlab/"
 3. Run `allero validate`
 
 ## Contribution 👩🏽‍💻
@@ -100,7 +102,7 @@ We encourage you to contribute to Allero!
 #### Created a new rule and want to give back to the community?
 1. **Fork our repo**
 2. **Read how to add your own rule [here](#adding-your-own-rules)**
-3. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) directory**
+3. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) or to [pkg/rulesConfig/gitlab](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/gitlab) directories**
 4. **Create a PR!**
 
 **Interested in contributing more to the CLI?**
