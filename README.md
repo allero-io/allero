@@ -22,17 +22,13 @@ _Brew:_ `brew install allero-io/allero/allero`
 _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 
 
-### 2. Validate your pipelines {.tabset}
-## Github
-* Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`  
+### 2. Validate your pipelines
+* Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`  or `allero fetch gitlab dapr/dapr`
 * Validate your pipelines across all your fetched data: `allero validate`
 
-## Gitlab
-* Fetch your group and/or repositories: `allero fetch gitlab dapr/dapr`  
-* Validate your pipelines across all your fetched data: `allero validate`
 <img src="./static/allero_validate.gif" alt="allero-cli">
 
-### Fetching private repositories
+### Fetching private repositories from Github
 Fetching data from a private GitHub organization requires a personal access token (PAT).
 1. Create a GitHub PAT with access to the repos you want to scan. More information about how to create a Github PAT can be found [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token) 
 Generate the token with the following **read** permissions:
@@ -45,6 +41,12 @@ Generate the token with the following **read** permissions:
 
 2. Once the token is generated, run `export ALLERO_GITHUB_TOKEN={YOUR_TOKEN}`.  
 - When running Allero from GitHub Actions, the PAT should be stored as an [encrypted secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
+
+### Fetching private repositories from Gitlab
+Fetching data from a private GitLab group requires a Access token.
+1. Create a GitLab Access Token with access to the repos you want to scan. More information about how to create a GitLab Token can be found [here](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) 
+Generate the token with the following permissions:
+    - [x]  read_api
 
 ## Next Steps
 ### ⛔️ Fail a PR on violation 
