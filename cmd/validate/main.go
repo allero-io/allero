@@ -32,6 +32,8 @@ type wrapper struct {
 	err error
 }
 
+var SCM_PLATFORMS = []string{"github", "gitlab"}
+
 func (w *wrapper) Run(f func(cmd *cobra.Command, args []string) error) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		err := f(cmd, args)
@@ -109,11 +111,14 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 		return err
 	}
 
-	ruleResults := []*rulesConfig.RuleResult{}
 	shouldPassExecution := true
 	summary = deps.RulesConfig.GetSummary()
 	totalRulesFailed := 0
-	ruleNames := deps.RulesConfig.GetAllRuleNames()
+
+	ruleNamesByScmPlatform := map[string][]string{}
+	for _, scmPlatform := range SCM_PLATFORMS {
+		ruleNamesByScmPlatform[scmPlatform] = deps.RulesConfig.GetAllRuleNames(scmPlatform)
+	}
 
 	hasToken := false
 	selectedRuleIds := make(map[int]bool)
@@ -126,48 +131,61 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 		hasToken = selectedRuleIds != nil
 	}
 
-	for _, ruleName := range ruleNames {
-		rule, err := deps.RulesConfig.GetRule(ruleName)
-		if err != nil {
-			return err
-		}
+	ruleResultsById := map[int]*rulesConfig.RuleResult{}
 
-		if hasToken && !selectedRuleIds[rule.UniqueId] {
-			continue
-		} else if !hasToken && !rule.EnabledByDefault {
-			continue
-		}
+	for scmPlaform, ruleNames := range ruleNamesByScmPlatform {
+		for _, ruleName := range ruleNames {
+			rule, err := deps.RulesConfig.GetRule(ruleName, scmPlaform)
+			if err != nil {
+				return err
+			}
 
-		schemaErrors, err := deps.RulesConfig.Validate(ruleName, rule)
-		if err != nil {
-			return err
-		}
+			if hasToken && !selectedRuleIds[rule.UniqueId] {
+				continue
+			} else if !hasToken && !rule.EnabledByDefault {
+				continue
+			}
 
-		if shouldPassExecution {
-			shouldPassExecution = len(schemaErrors) == 0
-		}
+			schemaErrors, err := deps.RulesConfig.Validate(ruleName, rule, scmPlaform)
+			if err != nil {
+				return err
+			}
 
-		isRuleValid := len(schemaErrors) == 0
-		if !isRuleValid {
-			totalRulesFailed++
-		}
+			if shouldPassExecution {
+				shouldPassExecution = len(schemaErrors) == 0
+			}
 
-		ruleResults = append(ruleResults, &rulesConfig.RuleResult{
-			RuleName:       ruleName,
-			Valid:          isRuleValid,
-			SchemaErrors:   schemaErrors,
-			FailureMessage: rule.FailureMessage,
-		})
+			isRuleValid := len(schemaErrors) == 0
+			if !isRuleValid {
+				totalRulesFailed++
+			}
+
+			ruleResult := &rulesConfig.RuleResult{
+				RuleName:       ruleName,
+				Valid:          isRuleValid,
+				SchemaErrors:   schemaErrors,
+				FailureMessage: rule.FailureMessage,
+			}
+
+			if ruleResultsById[rule.UniqueId] == nil {
+				ruleResultsById[rule.UniqueId] = ruleResult
+			} else {
+				ruleResultsById[rule.UniqueId].SchemaErrors = append(ruleResultsById[rule.UniqueId].SchemaErrors, schemaErrors...)
+				if !isRuleValid {
+					ruleResultsById[rule.UniqueId].Valid = false
+				}
+			}
+		}
 	}
 
-	summary.TotalRulesEvaluated = len(ruleResults)
+	summary.TotalRulesEvaluated = len(ruleResultsById)
 	summary.TotalFailedRules = totalRulesFailed
 
 	if !hasToken {
 		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
 	}
 
-	err = resultsPrinter.PrintResults(ruleResults, summary, flags.output)
+	err = resultsPrinter.PrintResults(ruleResultsById, summary, flags.output)
 	if err != nil {
 		return err
 	}
