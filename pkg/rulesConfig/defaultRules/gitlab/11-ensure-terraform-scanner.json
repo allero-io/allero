@@ -1,0 +1,7 @@
+{
+    "description": "Ensure that at least one pipeline in each repository runs Terraform scanner",
+    "failureMessage": "Terraform scanner was not detected in the repository pipelines. It is highly recommended to add one to ensure that infrastructure is well configured.",
+    "uniqueId": 11,
+    "enabledByDefault": false,
+    "inCodeImplementation": true
+}

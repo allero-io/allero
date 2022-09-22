@@ -11,9 +11,8 @@ import (
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 	"github.com/allero-io/allero/pkg/fileManager"
-	"github.com/allero-io/allero/pkg/jsonschemaValidator"
+	"github.com/allero-io/allero/pkg/rulesConfig/defaultRules"
 	"github.com/go-playground/validator"
-	"github.com/xeipuuv/gojsonschema"
 )
 
 //go:embed defaultRules/github/*
@@ -21,14 +20,6 @@ var githubRulesList embed.FS
 
 //go:embed defaultRules/gitlab/*
 var gitlabRulesList embed.FS
-
-type Rule struct {
-	Description      string                 `json:"description"`
-	UniqueId         int                    `json:"uniqueId" validate:"required"`
-	Schema           map[string]interface{} `json:"schema" validate:"required"`
-	FailureMessage   string                 `json:"failureMessage" validate:"required"`
-	EnabledByDefault bool                   `json:"enabledByDefault"`
-}
 
 type RulesConfig struct {
 	configurationManager *configurationManager.ConfigurationManager
@@ -40,19 +31,10 @@ type RulesConfigDependencies struct {
 	ConfigurationManager *configurationManager.ConfigurationManager
 }
 
-type SchemaError struct {
-	OwnerName       string
-	RepositryName   string
-	WorkflowRelPath string
-	CiCdPlatform    string
-	ScmPlatform     string
-	ErrorLevel      int
-}
-
 type RuleResult struct {
 	RuleName       string
 	Valid          bool
-	SchemaErrors   []*SchemaError
+	SchemaErrors   []*defaultRules.SchemaError
 	FailureMessage string
 }
 type OutputSummary struct {
@@ -120,48 +102,6 @@ func (rc *RulesConfig) GetRulesFiles(folderName string, rulesList embed.FS) (map
 	return files, nil
 }
 
-func (rc *RulesConfig) Validate(ruleName string, rule *Rule, scmPlatform string) ([]*SchemaError, error) {
-	ruleSchema, err := json.Marshal(rule.Schema)
-	if err != nil {
-		return nil, err
-	}
-
-	var schemaResult *gojsonschema.Result
-
-	if scmPlatform == "github" {
-		schemaResult, err = jsonschemaValidator.Validate(ruleSchema, rc.githubData)
-		if err != nil {
-			return nil, fmt.Errorf("error validating schema in %s for rule %s: %s", scmPlatform, ruleName, err)
-		}
-	} else if scmPlatform == "gitlab" {
-		schemaResult, err = jsonschemaValidator.Validate(ruleSchema, rc.gitlabData)
-		if err != nil {
-			return nil, fmt.Errorf("error validating schema in %s for rule %s: %s", scmPlatform, ruleName, err)
-		}
-	}
-
-	schemaErrors := make([]*SchemaError, 0)
-	errorByField := make(map[string]bool)
-	lowestErrorLevel := 999
-
-	for _, rawSchemaError := range schemaResult.Errors() {
-		if errorByField[rawSchemaError.Field()] {
-			continue
-		}
-
-		errorByField[rawSchemaError.Field()] = true
-		schemaError := rc.parseSchemaField(rc.githubData, rawSchemaError.Field(), scmPlatform)
-		if schemaError.ErrorLevel < lowestErrorLevel {
-			lowestErrorLevel = schemaError.ErrorLevel
-			schemaErrors = []*SchemaError{schemaError}
-		} else if schemaError.ErrorLevel == lowestErrorLevel {
-			schemaErrors = append(schemaErrors, schemaError)
-		}
-	}
-
-	return schemaErrors, nil
-}
-
 func (rc *RulesConfig) GetSummary() OutputSummary {
 	totalOwners := len(rc.githubData) + len(rc.gitlabData)
 	totalRepositories := 0
@@ -192,9 +132,9 @@ func (rc *RulesConfig) GetSummary() OutputSummary {
 	}
 }
 
-func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.GithubOwner, field string, scmPlatform string) *SchemaError {
+func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.GithubOwner, field string, scmPlatform string) *defaultRules.SchemaError {
 	keyFields := strings.Split(field, ".")
-	schemaError := &SchemaError{
+	schemaError := &defaultRules.SchemaError{
 		ScmPlatform: scmPlatform,
 	}
 	errorLevel := 0
@@ -220,9 +160,9 @@ func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.G
 		if schemaError.CiCdPlatform == "jfrog-pipelines" {
 			schemaError.WorkflowRelPath = githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
 		}
-		if schemaError.CiCdPlatform == "gitlab-ci" {
-			// TODO DB complete this condition. gitlab errors contain duplications
-		}
+		// if schemaError.CiCdPlatform == "gitlab-ci" {
+		// 	// TODO DB complete this condition. gitlab errors contain duplications
+		// }
 		errorLevel = 4
 	}
 
@@ -266,7 +206,7 @@ func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
 	return selectedRuleIds, nil
 }
 
-func (rc *RulesConfig) GetRule(ruleName string, scmPlatform string) (*Rule, error) {
+func (rc *RulesConfig) GetRule(ruleName string, scmPlatform string) (*defaultRules.Rule, error) {
 	alleroHomedir := fileManager.GetAlleroHomedir()
 	ruleFilename := fmt.Sprintf("%s/rules/%s/%s.json", alleroHomedir, scmPlatform, ruleName)
 
@@ -275,7 +215,7 @@ func (rc *RulesConfig) GetRule(ruleName string, scmPlatform string) (*Rule, erro
 		return nil, err
 	}
 
-	rule := &Rule{}
+	rule := &defaultRules.Rule{}
 	err = json.Unmarshal(content, rule)
 	if err != nil {
 		return nil, err
@@ -312,11 +252,11 @@ func getGitlabData() map[string]*gitlabConnector.GitlabGroup {
 	return gitlabData
 }
 
-func (rc *RulesConfig) validateRuleStructure(ruleName string, rule *Rule) error {
+func (rc *RulesConfig) validateRuleStructure(ruleName string, rule *defaultRules.Rule) error {
 	validate := validator.New()
 	err := validate.Struct(rule)
 	if err != nil {
-		err = fmt.Errorf("Rule %s is invalid: %s", ruleName, err.Error())
+		err = fmt.Errorf("rule %s is invalid: %s", ruleName, err.Error())
 	}
 
 	return err

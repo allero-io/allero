@@ -1,6 +1,6 @@
 {
     "description": "Ensure action version is set",
-    "failureMessage": "N/A",
+    "failureMessage": "github action version should be set",
     "uniqueId": 1,
     "enabledByDefault": true,
     "schema": {}

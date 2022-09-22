@@ -1,0 +1,7 @@
+{
+    "description": "Ensure that at least one pipeline in each repository runs SCA scanner",
+    "failureMessage": "SCA scanner was not detected in the repository pipelines. It is highly recommended to add one to verify licensing and assess vulnerabilities.",
+    "uniqueId": 10,
+    "enabledByDefault": false,
+    "inCodeImplementation": true
+}

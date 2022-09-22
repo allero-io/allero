@@ -80,6 +80,8 @@ To run the policy, you need to set the token by running `allero config set token
 Tokens can be temporarily ignored during a single validation by running `allero validate --ignore-token`  
 #### Clear a token
 Tokens can be cleared from the CLI by running `allero config clear token`
+| ensure-sca-scanner | Make sure every repository has at least one pipeline with sca scanner | Keep production secured
+| ensure-terraform-scanner | Make sure every repository has at least one pipeline with terraform scanner  | Keep production secured
 
 ### 📝 Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
