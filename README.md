@@ -52,38 +52,32 @@ _Implementing with GitHub Actions_: We created a [GitHub Action](https://github.
 
 _Using any other scheduler:_ as a CLI tool, Allero can be easily run in - CI/CD, docker scheduler, crontab, kubernetes - anywhere!
 
-## 🚨 Supported Rules
-| _Rule Name_               | _Description_                                            | _Reason_                                                                                                               |
-| ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| prevent-npm-install       | Prevents the usage of `npm install` in pipelines. We recommend using `npm ci` instead           | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
-| prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines. We recommend using helm or any other k8s deployment tool         | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
-| ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | [link](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
-| snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects vulnerabilities | Keep production secured
-| prevent-password-plain-text | Prevent use of password as plain text | Keep passwords from leaking
-| ensure-node-version | Make sure a specific version is set when using a node image | Avoid unexpected behavior
-| ensure-python-version | Make sure a specific version is set when using a python image | Avoid unexpected behavior
-| ensure-github-action-version | Ensure github action version is set | Avoid unexpected behavior
-| prevent-using-uncontrolled-values | avoid running malware commands through repository names | Keep production secured
+## 🚨 Rules
+Some rules apply to everyone, while others are very stack-specific. That is why some rules are enabled by default and others are disabled. Learn how to enable and disable rules [here](https://github.com/allero-io/allero/tree/feature/selective-rules-docs#enabling-and-disabling-rules).
 
-### Selecting your own set of rules
-Our CLI validates your pipelines by all the supported rules as default. To validate a subset of the supported rules please create your own token [here](https://allero.io/selective-rules).
-You will recieve an email with your token, then set the token and run allero validate:
-```bash
-# Set your token
-allero config set token <the-token-you-recivied-by-email> 
-# Run allero validation!
-allero validate
-```
+### Supported Rules
 
-Even though your token is configured you can choose to ignore it and validate your pipelines with all default rules. It is not recommended but you can clear the token as well. 
+| _Rule Name_               | _Description_                                            | _Default State_               | _Reason_                                                                                                               |
+| ------------------------- | -------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| prevent-npm-install       | Prevents the usage of `npm install` in pipelines. We recommend using `npm ci` instead           | Enabled | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
+| prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines. We recommend using helm or any other k8s deployment tool         | Enabled | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
+| ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | Enabled | [link](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
+| snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects vulnerabilities | Enabled | Keep production secured
+| prevent-password-plain-text | Prevent use of password as plain text | Enabled | Keep passwords from leaking
+| ensure-node-version | Make sure a specific version is set when using a node image | Enabled | Avoid unexpected behavior
+| ensure-python-version | Make sure a specific version is set when using a python image | Enabled | Avoid unexpected behavior
+| ensure-github-action-version | Ensure github action version is set | Enabled | Avoid unexpected behavior
+| prevent-using-uncontrolled-values | avoid running malware commands through repository names | Enabled | Keep production secured
 
-```bash
-# Run allero validate without using your configured token
-allero validate --ignore-token
+### Enabling and disabling rules
+A policy is a set of rules, and it is represented by a token.  
+To generate a token, go to this [page](https://allero.io/selective-rules), choose the rules you want and generate the token. The token will be sent to your email.   
+To run the policy, you need to set the token by running `allero config set token {your_token}` and re-run `allero validate`. 
 
-# Clear your token
-allero config clear token 
-```
+#### Temporarily ignore a token
+Tokens can be temporarily ignored during a single validation by running `allero validate --ignore-token`  
+#### Clear a token
+Tokens can be cleared from the CLI by running `allero config clear token`
 
 ### 📝 Adding your own rules
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
@@ -91,6 +85,7 @@ Rules can be defined using the [Json Schema](https://json-schema.org/) format. J
 Make sure to update the rule description and failureMessage.
 2. Copy-paste the file to "~/.allero/rules/github/"
 3. Run `allero validate`
+
 ## Contribution 👩🏽‍💻
 We encourage you to contribute to Allero!
 #### Created a new rule and want to give back to the community?
