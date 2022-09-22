@@ -18,21 +18,17 @@
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "properties": {
-                                                                        "run": {
-                                                                            "not": {
-                                                                                "type": "string",
-                                                                                "pattern": ".*(npm install|npm i |npm i$).*"
-                                                                            }
-                                                                        }
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "steps": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "run": {
+                                                                    "not": {
+                                                                        "type": "string",
+                                                                        "pattern": ".*(npm install|npm i |npm i$).*"
                                                                     }
                                                                 }
                                                             }

@@ -18,40 +18,36 @@
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "type": "object",
-                                                                    "if": {
-                                                                        "properties": {
-                                                                            "uses": {
-                                                                                "type": "string",
-                                                                                "pattern": "snyk/actions/*"
-                                                                            }
-                                                                        },
-                                                                        "required": [
-                                                                            "uses"
-                                                                        ]
-                                                                    },
-                                                                    "then": {
-                                                                        "not": {
-                                                                            "properties": {
-                                                                                "continue-on-error": {
-                                                                                    "enum": [
-                                                                                        true
-                                                                                    ]
-                                                                                }
-                                                                            },
-                                                                            "required": [
-                                                                                "continue-on-error"
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "steps": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "if": {
+                                                                "properties": {
+                                                                    "uses": {
+                                                                        "type": "string",
+                                                                        "pattern": "snyk/actions/*"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "uses"
+                                                                ]
+                                                            },
+                                                            "then": {
+                                                                "not": {
+                                                                    "properties": {
+                                                                        "continue-on-error": {
+                                                                            "enum": [
+                                                                                true
                                                                             ]
                                                                         }
-                                                                    }
+                                                                    },
+                                                                    "required": [
+                                                                        "continue-on-error"
+                                                                    ]
                                                                 }
                                                             }
                                                         }

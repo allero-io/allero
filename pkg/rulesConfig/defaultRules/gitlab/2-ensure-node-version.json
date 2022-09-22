@@ -18,39 +18,35 @@
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "type": "object",
-                                                                    "if": {
-                                                                        "properties": {
-                                                                            "uses": {
-                                                                                "type": "string",
-                                                                                "pattern": "actions/setup-node.*"
-                                                                            }
-                                                                        },
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "steps": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "if": {
+                                                                "properties": {
+                                                                    "uses": {
+                                                                        "type": "string",
+                                                                        "pattern": "actions/setup-node.*"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "uses"
+                                                                ]
+                                                            },
+                                                            "then": {
+                                                                "properties": {
+                                                                    "with": {
                                                                         "required": [
-                                                                            "uses"
-                                                                        ]
-                                                                    },
-                                                                    "then": {
-                                                                        "properties": {
-                                                                            "with": {
-                                                                                "required": [
-                                                                                    "node-version"
-                                                                                ]
-                                                                            }
-                                                                        },
-                                                                        "required": [
-                                                                            "with"
+                                                                            "node-version"
                                                                         ]
                                                                     }
-                                                                }
+                                                                },
+                                                                "required": [
+                                                                    "with"
+                                                                ]
                                                             }
                                                         }
                                                     }

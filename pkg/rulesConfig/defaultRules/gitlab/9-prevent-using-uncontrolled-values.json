@@ -18,22 +18,18 @@
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                        "run": {
-                                                                            "type": "string",
-                                                                            "not": {
-                                                                                "pattern": "\\${{ github\\.event\\.((pull_request\\.title)|actor\\.(id|login|display_login)|org\\.login) }}"
-                                                                            }
-                                                                        }
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "steps": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "run": {
+                                                                    "type": "string",
+                                                                    "not": {
+                                                                        "pattern": "\\${{ github\\.event\\.((pull_request\\.title)|actor\\.(id|login|display_login)|org\\.login) }}"
                                                                     }
                                                                 }
                                                             }
