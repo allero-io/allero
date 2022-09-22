@@ -72,9 +72,12 @@ func New(deps *RulesConfigDependencies) *RulesConfig {
 	}
 }
 
-func (rc *RulesConfig) Initialize() error {
+func (rc *RulesConfig) Initialize(failOnNoFetch bool) error {
 	if rc.githubData == nil && rc.gitlabData == nil {
-		return fmt.Errorf("missing repository data. Run 'allero fetch -h' for more information")
+		if failOnNoFetch {
+			return fmt.Errorf("missing repository data. Run 'allero fetch -h' for more information")
+		}
+		rc.githubData = getLocalData()
 	}
 
 	githubFiles, err := rc.GetRulesFiles("github", githubRulesList)
@@ -285,6 +288,20 @@ func (rc *RulesConfig) GetRule(ruleName string, scmPlatform string) (*Rule, erro
 }
 
 func getGithubData() map[string]*githubConnector.GithubOwner {
+	githubData := make(map[string]*githubConnector.GithubOwner)
+	alleroHomedir := fileManager.GetAlleroHomedir()
+	githubDataFilename := fmt.Sprintf("%s/repo_files/github.json", alleroHomedir)
+
+	content, err := os.ReadFile(githubDataFilename)
+	if err != nil {
+		return nil
+	}
+
+	json.Unmarshal(content, &githubData)
+	return githubData
+}
+
+func getLocalData() map[string]*githubConnector.GithubOwner {
 	githubData := make(map[string]*githubConnector.GithubOwner)
 	alleroHomedir := fileManager.GetAlleroHomedir()
 	githubDataFilename := fmt.Sprintf("%s/repo_files/github.json", alleroHomedir)
