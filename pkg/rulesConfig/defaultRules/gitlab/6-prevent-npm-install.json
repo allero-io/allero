@@ -8,12 +8,12 @@
         "additionalProperties": {
             "type": "object",
             "properties": {
-                "repositories": {
+                "projects": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
                         "properties": {
-                            "github-actions-workflows": {
+                            "gitlab-ci": {
                                 "type": "object",
                                 "additionalProperties": {
                                     "properties": {
