@@ -25,7 +25,7 @@ type ConfigurationManager struct {
 
 func New() *ConfigurationManager {
 	return &ConfigurationManager{
-		TokenGenerationUrl: "https://allero.io/selective-rules",
+		TokenGenerationUrl: "https://www.allero.io/selective-rules",
 	}
 }
 
