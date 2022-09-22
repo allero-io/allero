@@ -41,7 +41,7 @@ class Allero < Formula
   end
   def caveats
     <<~EOS
-      \033[32m[V] Downloaded Datree
+      \033[32m[V] Downloaded Allero
       [V] Finished Installation
       \033[35m Usage: $ allero fetch github <owner|owner/repo ...>
     EOS
