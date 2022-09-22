@@ -55,7 +55,7 @@ _Implementing with GitHub Actions_: We created a [GitHub Action](https://github.
 _Using any other scheduler:_ as a CLI tool, Allero can be easily run in - CI/CD, docker scheduler, crontab, kubernetes - anywhere!
 
 ## 🚨 Rules
-Some rules apply to everyone, while others are very stack-specific. That is why some rules are enabled by default and others are disabled. Learn how to enable and disable rules [here](https://github.com/allero-io/allero/tree/feature/selective-rules-docs#enabling-and-disabling-rules).
+Some rules apply to everyone, while others are very stack-specific. That is why some rules are enabled by default and others are disabled. Learn how to enable and disable rules [here](https://github.com/allero-io/allero#enabling-and-disabling-rules).
 
 ### Supported Rules
 
