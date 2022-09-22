@@ -274,6 +274,7 @@ func getGithubData() map[string]*githubConnector.GithubOwner {
 }
 
 func getLocalData() map[string]*githubConnector.GithubOwner {
+	// Fetch local folder glob to look for yamls
 	githubData := make(map[string]*githubConnector.GithubOwner)
 	alleroHomedir := fileManager.GetAlleroHomedir()
 	githubDataFilename := fmt.Sprintf("%s/repo_files/github.json", alleroHomedir)
