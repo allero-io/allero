@@ -21,19 +21,15 @@
                                             "type": "object",
                                             "additionalProperties": {
                                                 "properties": {
-                                                    "steps": {
+                                                    "script": {
                                                         "type": "array",
                                                         "items": {
-                                                            "properties": {
-                                                                "run": {
-                                                                    "type": "string",
-                                                                    "if": {
-                                                                        "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
-                                                                    },
-                                                                    "then": {
-                                                                        "pattern": ".*--ignore-scripts.*"
-                                                                    }
-                                                                }
+                                                            "type": "string",
+                                                            "if": {
+                                                                "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
+                                                            },
+                                                            "then": {
+                                                                "pattern": ".*--ignore-scripts.*"
                                                             }
                                                         }
                                                     }

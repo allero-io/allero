@@ -1,6 +1,6 @@
 {
     "description": "Ensure python-version is set",
-    "failureMessage": "python-version property should be set to a specific version when using action actions/setup-python",
+    "failureMessage": "python-version property should be set to a specific version when using action actions/setup-python or image:",
     "uniqueId": 4,
     "enabledByDefault": true,
     "schema": {

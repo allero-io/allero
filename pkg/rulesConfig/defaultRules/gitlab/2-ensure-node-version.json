@@ -1,6 +1,6 @@
 {
     "description": "Ensure node-version is set",
-    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node",
+    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node or image:",
     "uniqueId": 2,
     "enabledByDefault": true,
     "schema": {
@@ -18,36 +18,17 @@
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                                "properties": {
-                                                    "steps": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "if": {
-                                                                "properties": {
-                                                                    "uses": {
-                                                                        "type": "string",
-                                                                        "pattern": "actions/setup-node.*"
-                                                                    }
-                                                                },
-                                                                "required": [
-                                                                    "uses"
-                                                                ]
-                                                            },
-                                                            "then": {
-                                                                "properties": {
-                                                                    "with": {
-                                                                        "required": [
-                                                                            "node-version"
-                                                                        ]
-                                                                    }
-                                                                },
-                                                                "required": [
-                                                                    "with"
-                                                                ]
-                                                            }
+                                            "properties": {
+                                                "image": {
+                                                    "if": {
+                                                        "type": "string",
+                                                        "pattern": "node.*"
+                                                        },
+                                                    "then": {
+                                                        "not": {
+                                                            "type": "string",
+                                                            "pattern": ".*:latest"
+
                                                         }
                                                     }
                                                 }

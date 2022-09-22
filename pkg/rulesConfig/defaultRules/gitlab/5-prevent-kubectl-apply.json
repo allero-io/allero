@@ -21,16 +21,12 @@
                                             "type": "object",
                                             "additionalProperties": {
                                                 "properties": {
-                                                    "steps": {
+                                                    "script": {
                                                         "type": "array",
                                                         "items": {
-                                                            "properties": {
-                                                                "run": {
-                                                                    "not": {
-                                                                        "type": "string",
-                                                                        "pattern": ".*kubectl apply.*"
-                                                                    }
-                                                                }
+                                                            "type": "string",
+                                                            "not": {
+                                                                "pattern": ".*kubectl apply.*"
                                                             }
                                                         }
                                                     }
