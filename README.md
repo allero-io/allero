@@ -22,8 +22,13 @@ _Brew:_ `brew install allero-io/allero/allero`
 _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 
 
-### 2. Validate your pipelines
+### 2. Validate your pipelines {.tabset}
+## Github
 * Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`  
+* Validate your pipelines across all your fetched data: `allero validate`
+
+## Gitlab
+* Fetch your group and/or repositories: `allero fetch gitlab dapr/dapr`  
 * Validate your pipelines across all your fetched data: `allero validate`
 <img src="./static/allero_validate.gif" alt="allero-cli">
 
