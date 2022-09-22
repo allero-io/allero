@@ -15,7 +15,9 @@ Allero comes with built-in rules, and developed to be as friendly as possible fo
 2. Prevent the use of deprecated language versions. (e.g. Node version <= 12)  
 3. Ensure all IaC manifests are scanned for misconfigurations. (e.g. Run checkov on any terraform file)
 
+
 ## Quick Start!
+Allero supports GitHub Actions and GitLab Pipelines.
 ### 1. Install the latest release in your terminal
 _Linux & MacOS:_ `curl https://get.allero.io | /bin/bash`  
 _Brew:_ `brew install allero-io/allero/allero`  
@@ -23,11 +25,12 @@ _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 
 
 ### 2. Validate your pipelines
-* Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`  
+* Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`
 * Validate your pipelines across all your fetched data: `allero validate`
+
 <img src="./static/allero_validate.gif" alt="allero-cli">
 
-### Fetching private repositories
+### Fetching private repositories from Github
 Fetching data from a private GitHub organization requires a personal access token (PAT).
 1. Create a GitHub PAT with access to the repos you want to scan. More information about how to create a Github PAT can be found [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token) 
 Generate the token with the following **read** permissions:
@@ -40,6 +43,16 @@ Generate the token with the following **read** permissions:
 
 2. Once the token is generated, run `export ALLERO_GITHUB_TOKEN={YOUR_TOKEN}`.  
 - When running Allero from GitHub Actions, the PAT should be stored as an [encrypted secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
+3. Fetch your private repositories: `allero fetch githib {your_repo}`
+
+### Fetching private repositories from Gitlab
+Fetching data from a private GitLab group requires an access token.
+1. Create a GitLab Access Token with access to the repos you want to scan. More information about how to create a GitLab Token can be found [here](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) 
+Generate the token with the following permissions:
+    - [x]  read_api
+2. Once the token is generated, run `export ALLERO_GITLAB_TOKEN={YOUR_TOKEN}`.
+3. Fetch your private repositories: `allero fetch gitlab {your_repo}`
+
 
 ## Next Steps
 ### ⛔️ Fail a PR on violation 
@@ -87,7 +100,7 @@ Tokens can be cleared from the CLI by running `allero config clear token`
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
 1. Create a new json file and define your rule. Example rules can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules).
 Make sure to update the rule description and failureMessage.
-2. Copy-paste the file to "~/.allero/rules/github/"
+2. Copy-paste the rule-files to "~/.allero/rules/github/" and "~/.allero/rules/gitlab/".
 3. Run `allero validate`
 
 ## Contribution 👩🏽‍💻
@@ -95,7 +108,7 @@ We encourage you to contribute to Allero!
 #### Created a new rule and want to give back to the community?
 1. **Fork our repo**
 2. **Read how to add your own rule [here](#adding-your-own-rules)**
-3. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) directory**
+3. **Add your rule to [pkg/rulesConfig/github](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/github) or to [pkg/rulesConfig/gitlab](https://github.com/allero-io/allero/tree/main/pkg/rulesConfig/defaultRules/gitlab) directories**
 4. **Create a PR!**
 
 **Interested in contributing more to the CLI?**
