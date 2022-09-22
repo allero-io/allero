@@ -45,6 +45,7 @@ type SchemaError struct {
 	RepositryName   string
 	WorkflowRelPath string
 	CiCdPlatform    string
+	ErrorLevel      int
 	ScmPlatform     string
 	ErrorLevel      int
 }
