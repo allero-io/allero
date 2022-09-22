@@ -24,6 +24,12 @@ func (rc *RulesConfig) Validate(ruleName string, rule *defaultRules.Rule, scmPla
 }
 
 func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Rule, scmPlatform string) ([]*defaultRules.SchemaError, error) {
+	if scmPlatform == "github" && rc.githubData == nil {
+		return []*defaultRules.SchemaError{}, nil
+	} else if scmPlatform == "gitlab" && rc.gitlabData == nil {
+		return []*defaultRules.SchemaError{}, nil
+	}
+
 	ruleSchema, err := json.Marshal(rule.Schema)
 	if err != nil {
 		return nil, err
@@ -53,7 +59,14 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 		}
 
 		errorByField[rawSchemaError.Field()] = true
-		schemaError := rc.parseSchemaField(rc.githubData, rawSchemaError.Field(), scmPlatform)
+		var schemaError *defaultRules.SchemaError
+
+		if scmPlatform == "github" {
+			schemaError = rc.parseSchemaFieldGithub(rc.githubData, rawSchemaError.Field())
+		} else if scmPlatform == "gitlab" {
+			schemaError = rc.parseSchemaFieldGitlab(rc.gitlabData, rawSchemaError.Field())
+		}
+
 		if schemaError.ErrorLevel < lowestErrorLevel {
 			lowestErrorLevel = schemaError.ErrorLevel
 			schemaErrors = []*defaultRules.SchemaError{schemaError}

@@ -132,10 +132,10 @@ func (rc *RulesConfig) GetSummary() OutputSummary {
 	}
 }
 
-func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.GithubOwner, field string, scmPlatform string) *defaultRules.SchemaError {
+func (rc *RulesConfig) parseSchemaFieldGithub(githubData map[string]*githubConnector.GithubOwner, field string) *defaultRules.SchemaError {
 	keyFields := strings.Split(field, ".")
 	schemaError := &defaultRules.SchemaError{
-		ScmPlatform: scmPlatform,
+		ScmPlatform: "github",
 	}
 	errorLevel := 0
 
@@ -160,9 +160,41 @@ func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.G
 		if schemaError.CiCdPlatform == "jfrog-pipelines" {
 			schemaError.WorkflowRelPath = githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
 		}
-		// if schemaError.CiCdPlatform == "gitlab-ci" {
-		// 	// TODO DB complete this condition. gitlab errors contain duplications
-		// }
+		errorLevel = 4
+	}
+
+	schemaError.ErrorLevel = errorLevel
+	return schemaError
+}
+
+func (rc *RulesConfig) parseSchemaFieldGitlab(gitlabData map[string]*gitlabConnector.GitlabGroup, field string) *defaultRules.SchemaError {
+	keyFields := strings.Split(field, ".")
+	schemaError := &defaultRules.SchemaError{
+		ScmPlatform: "github",
+	}
+	errorLevel := 0
+
+	if len(keyFields) >= 1 {
+		schemaError.OwnerName = keyFields[0]
+		errorLevel = 1
+	}
+	if len(keyFields) >= 3 {
+		schemaError.RepositryName = keyFields[2]
+		errorLevel = 2
+	}
+	if len(keyFields) >= 4 {
+		schemaError.CiCdPlatform = keyFields[3]
+		errorLevel = 3
+	}
+	if len(keyFields) >= 5 {
+		workflowName := keyFields[4]
+
+		if schemaError.CiCdPlatform == "gitlab-ci" {
+			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].GitlabCi[workflowName].Filename
+		}
+		if schemaError.CiCdPlatform == "jfrog-pipelines" {
+			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].JfrogPipelines[workflowName].Filename
+		}
 		errorLevel = 4
 	}
 
