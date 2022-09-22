@@ -73,7 +73,7 @@ Some rules apply to everyone, while others are very stack-specific. That is why 
 
 ### Enabling and disabling rules
 A policy is a set of rules, and it is represented by a token.  
-To generate a token, go to this [page](https://allero.io/selective-rules), choose the rules you want and generate the token. The token will be sent to your email.   
+To generate a token, go to this [page](https://www.allero.io/selective-rules), choose the rules you want and generate the token. The token will be sent to your email.   
 To run the policy, you need to set the token by running `allero config set token {your_token}` and re-run `allero validate`. 
 
 #### Temporarily ignore a token

@@ -18,7 +18,7 @@ cat > homebrew-allero/allero.rb <<-EOF
 # frozen_string_literal: true
 class Allero < Formula
   desc ""
-  homepage "https://allero.io/"
+  homepage "https://www.allero.io/"
   version "$VERSION"
   if OS.mac? && Hardware::CPU.intel?
     url "https://github.com/allero-io/allero/releases/download/$VERSION/allero_${VERSION}_Darwin_x86_64.zip"
