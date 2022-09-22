@@ -221,7 +221,7 @@ func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.G
 			schemaError.WorkflowRelPath = githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
 		}
 		if schemaError.CiCdPlatform == "gitlab-ci" {
-			// TODO complete
+			// TODO DB complete this condition. gitlab errors contain duplications
 		}
 		errorLevel = 4
 	}

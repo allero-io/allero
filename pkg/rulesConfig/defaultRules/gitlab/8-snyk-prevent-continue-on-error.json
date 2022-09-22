@@ -1,6 +1,6 @@
 {
     "description": "Prevent continue-on-error from being used on snyk action",
-    "failureMessage": "continue-on-error is used with snyk action. It is highly recommended to not skip potential security vulnerabilities",
+    "failureMessage": "N/A",
     "uniqueId": 8,
     "enabledByDefault": true,
     "schema": {}

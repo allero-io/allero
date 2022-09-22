@@ -1,6 +1,6 @@
 {
     "description": "Prevent using uncontrolled values",
-    "failureMessage": "do not reference values that are not under your control",
+    "failureMessage": "N/A",
     "uniqueId": 9,
     "enabledByDefault": true,
     "schema": {}
