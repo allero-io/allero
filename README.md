@@ -15,7 +15,9 @@ Allero comes with built-in rules, and developed to be as friendly as possible fo
 2. Prevent the use of deprecated language versions. (e.g. Node version <= 12)  
 3. Ensure all IaC manifests are scanned for misconfigurations. (e.g. Run checkov on any terraform file)
 
+
 ## Quick Start!
+Allero supports GitHub Actions and GitLab Pipelines.
 ### 1. Install the latest release in your terminal
 _Linux & MacOS:_ `curl https://get.allero.io | /bin/bash`  
 _Brew:_ `brew install allero-io/allero/allero`  
@@ -23,7 +25,7 @@ _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 
 
 ### 2. Validate your pipelines
-* Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`  or `allero fetch gitlab dapr/dapr`
+* Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`
 * Validate your pipelines across all your fetched data: `allero validate`
 
 <img src="./static/allero_validate.gif" alt="allero-cli">
@@ -41,13 +43,15 @@ Generate the token with the following **read** permissions:
 
 2. Once the token is generated, run `export ALLERO_GITHUB_TOKEN={YOUR_TOKEN}`.  
 - When running Allero from GitHub Actions, the PAT should be stored as an [encrypted secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
+3. Fetch your private repositories: `allero fetch githib {your_repo}`
 
 ### Fetching private repositories from Gitlab
-Fetching data from a private GitLab group requires a Access token.
+Fetching data from a private GitLab group requires an access token.
 1. Create a GitLab Access Token with access to the repos you want to scan. More information about how to create a GitLab Token can be found [here](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) 
 Generate the token with the following permissions:
     - [x]  read_api
-2. Once the token is generated, run export ALLERO_GITLAB_TOKEN={YOUR_TOKEN}.
+2. Once the token is generated, run `export ALLERO_GITLAB_TOKEN={YOUR_TOKEN}`.
+3. Fetch your private repositories: `allero fetch gitlab {your_repo}`
 
 
 ## Next Steps
@@ -94,7 +98,7 @@ Tokens can be cleared from the CLI by running `allero config clear token`
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
 1. Create a new json file and define your rule. Example rules can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules).
 Make sure to update the rule description and failureMessage.
-2. Copy-paste the file to "~/.allero/rules/github/" or to "~/.allero/rules/gitlab/"
+2. Copy-paste the rule-files to "~/.allero/rules/github/" and "~/.allero/rules/gitlab/".
 3. Run `allero validate`
 
 ## Contribution 👩🏽‍💻
