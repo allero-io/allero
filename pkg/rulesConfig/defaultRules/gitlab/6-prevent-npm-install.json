@@ -21,16 +21,12 @@
                                             "type": "object",
                                             "additionalProperties": {
                                                 "properties": {
-                                                    "steps": {
+                                                    "script": {
                                                         "type": "array",
                                                         "items": {
-                                                            "properties": {
-                                                                "run": {
-                                                                    "not": {
-                                                                        "type": "string",
-                                                                        "pattern": ".*(npm install|npm i |npm i$).*"
-                                                                    }
-                                                                }
+                                                            "not": {
+                                                                "type": "string",
+                                                                "pattern": ".*(npm install|npm i |npm i$).*"
                                                             }
                                                         }
                                                     }
