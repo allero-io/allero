@@ -88,18 +88,12 @@ func (gc *GitlabConnector) processPipelineFiles(gitlabJsonObject map[string]*Git
 		}
 
 		workflowFile.Content = jsonContent
-
-		var filenameWithoutPostfix string
-		parts := strings.Split(workflowFile.Filename, ".")
-		if len(parts) > 0 {
-			parts = parts[:len(parts)-1]
-			filenameWithoutPostfix = strings.Join(parts, ".")
-		}
+		escapedFilename := connectors.EscapeJsonKey(workflowFile.Filename)
 
 		if workflowFile.Origin == "gitlab_ci" {
-			gitlabJsonObject[project.Namespace.Name].Projects[project.Path].GitlabCi[filenameWithoutPostfix] = workflowFile
+			gitlabJsonObject[project.Namespace.Name].Projects[project.Path].GitlabCi[escapedFilename] = workflowFile
 		} else if workflowFile.Origin == "jfrog_pipelines" {
-			gitlabJsonObject[project.Namespace.Name].Projects[project.Path].JfrogPipelines[filenameWithoutPostfix] = workflowFile
+			gitlabJsonObject[project.Namespace.Name].Projects[project.Path].JfrogPipelines[escapedFilename] = workflowFile
 		} else {
 			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.Filename, project.PathWithNamespace)
 			continue
@@ -159,10 +153,6 @@ func (gc *GitlabConnector) addProject(gitlabJsonObject map[string]*GitlabGroup, 
 
 	fullName := project.PathWithNamespace
 
-	if strings.Contains(projectName, ".") {
-		return fmt.Errorf("failed fetching repo %s: should not contain a dot", fullName)
-	}
-
 	if _, ok := gitlabJsonObject[groupName]; !ok {
 		gitlabJsonObject[groupName] = &GitlabGroup{
 			Name:     groupName,
@@ -171,7 +161,9 @@ func (gc *GitlabConnector) addProject(gitlabJsonObject map[string]*GitlabGroup, 
 		}
 	}
 
-	gitlabJsonObject[groupName].Projects[projectName] = &GitlabProject{
+	escapedProjectName := connectors.EscapeJsonKey(projectName)
+
+	gitlabJsonObject[groupName].Projects[escapedProjectName] = &GitlabProject{
 		Name:           projectName,
 		FullName:       fullName,
 		ID:             project.ID,

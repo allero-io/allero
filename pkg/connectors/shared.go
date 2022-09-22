@@ -53,3 +53,7 @@ func YamlToJson(byteContent []byte) ([]byte, error) {
 	modifiedStr := regexp.MustCompile(`[^$]{{.*}}`).ReplaceAllString(strContent, " DYNAMIC_VALUE")
 	return yaml.YAMLToJSON([]byte(modifiedStr))
 }
+
+func EscapeJsonKey(key string) string {
+	return strings.ReplaceAll(key, ".", "[ESCAPED_DOT]")
+}

@@ -1,0 +1,7 @@
+{
+    "description": "Prevent continue-on-error from being used on snyk action",
+    "failureMessage": "N/A",
+    "uniqueId": 8,
+    "enabledByDefault": true,
+    "schema": {}
+}

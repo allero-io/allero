@@ -1,6 +1,6 @@
 {
     "description": "Ensure node-version is set",
-    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node",
+    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node or image:",
     "uniqueId": 2,
     "enabledByDefault": true,
     "schema": {

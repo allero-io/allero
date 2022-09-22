@@ -1,0 +1,7 @@
+{
+    "description": "Ensure action version is set",
+    "failureMessage": "N/A",
+    "uniqueId": 1,
+    "enabledByDefault": true,
+    "schema": {}
+}

@@ -25,7 +25,7 @@ type ConfigurationManager struct {
 
 func New() *ConfigurationManager {
 	return &ConfigurationManager{
-		TokenGenerationUrl: "https://allero.io/selective-rules",
+		TokenGenerationUrl: "https://www.allero.io/selective-rules",
 	}
 }
 
@@ -146,8 +146,8 @@ func (cm *ConfigurationManager) GetGitlabToken() string {
 	return githubToken
 }
 
-func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte) error {
-	alleroRulesDir := fmt.Sprintf("%s/rules/github", fileManager.GetAlleroHomedir())
+func (cm *ConfigurationManager) SyncRules(defaultRulesList map[string][]byte, folderName string) error {
+	alleroRulesDir := fmt.Sprintf("%s/rules/%s", fileManager.GetAlleroHomedir(), folderName)
 
 	for filename, content := range defaultRulesList {
 		fileManager.WriteToFile(fmt.Sprintf("%s/%s", alleroRulesDir, filename), []byte(content))

@@ -1,0 +1,45 @@
+{
+    "description": "Prevent direct use of kubectl apply",
+    "failureMessage": "kubectl apply is used directly in workflow",
+    "uniqueId": 5,
+    "enabledByDefault": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "gitlab-ci": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "not": {
+                                                                "pattern": ".*kubectl apply.*"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

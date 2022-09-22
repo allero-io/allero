@@ -1,0 +1,45 @@
+{
+    "description": "Prevent use of npm install",
+    "failureMessage": "npm install is used. It is highly recommended to use npm ci instead",
+    "uniqueId": 6,
+    "enabledByDefault": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "gitlab-ci": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "not": {
+                                                                "type": "string",
+                                                                "pattern": ".*(npm install|npm i |npm i$).*"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

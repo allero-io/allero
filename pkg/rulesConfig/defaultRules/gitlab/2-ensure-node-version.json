@@ -1,0 +1,46 @@
+{
+    "description": "Ensure node-version is set",
+    "failureMessage": "node-version property should be set to a specific version when using action actions/setup-node or image:",
+    "uniqueId": 2,
+    "enabledByDefault": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "gitlab-ci": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "properties": {
+                                                "image": {
+                                                    "if": {
+                                                        "type": "string",
+                                                        "pattern": "node.*"
+                                                        },
+                                                    "then": {
+                                                        "not": {
+                                                            "type": "string",
+                                                            "pattern": ".*:latest"
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

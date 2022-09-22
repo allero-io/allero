@@ -18,7 +18,7 @@ cat > homebrew-allero/allero.rb <<-EOF
 # frozen_string_literal: true
 class Allero < Formula
   desc ""
-  homepage "https://allero.io/"
+  homepage "https://www.allero.io/"
   version "$VERSION"
   if OS.mac? && Hardware::CPU.intel?
     url "https://github.com/allero-io/allero/releases/download/$VERSION/allero_${VERSION}_Darwin_x86_64.zip"
@@ -41,7 +41,7 @@ class Allero < Formula
   end
   def caveats
     <<~EOS
-      \033[32m[V] Downloaded Datree
+      \033[32m[V] Downloaded Allero
       [V] Finished Installation
       \033[35m Usage: $ allero fetch github <owner|owner/repo ...>
     EOS

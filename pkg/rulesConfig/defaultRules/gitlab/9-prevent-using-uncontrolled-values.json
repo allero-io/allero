@@ -1,0 +1,45 @@
+{
+    "description": "Prevent using uncontrolled values",
+    "failureMessage": "do not reference values that are not under your control",
+    "uniqueId": 9,
+    "enabledByDefault": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "gitlab-ci": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "not": {
+                                                                "type": "string",
+                                                                "pattern": "\\$CI_COMMIT_TITLE|\\$GITLAB_USER_ID|\\$GITLAB_USER_EMAIL|\\$GITLAB_USER_LOGIN|\\$GITLAB_USER_NAME"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

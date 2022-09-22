@@ -15,7 +15,7 @@ type OutputCsv struct {
 	FailureMessage  string `csv:"failureMessage"`
 }
 
-func printCSV(ruleResults []*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) error {
+func printCSV(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) error {
 	ruleResultsCsv := []*OutputCsv{}
 	for _, ruleResult := range ruleResults {
 		if !ruleResult.Valid {

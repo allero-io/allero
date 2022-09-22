@@ -1,0 +1,48 @@
+{
+    "description": "Ensure --ignore-scripts is used for npm install or ci commands",
+    "failureMessage": "npm install or ci is used without ignoring post and preinstall scripts",
+    "uniqueId": 3,
+    "enabledByDefault": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "gitlab-ci": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "properties": {
+                                        "content": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "if": {
+                                                                "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
+                                                            },
+                                                            "then": {
+                                                                "pattern": ".*--ignore-scripts.*"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
