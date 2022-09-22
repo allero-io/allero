@@ -24,8 +24,9 @@ type ValidateCommandDependencies struct {
 }
 
 type ValidateCommandFlags struct {
-	output      string
-	ignoreToken bool
+	output        string
+	ignoreToken   bool
+	failOnNoFetch bool
 }
 
 type wrapper struct {
@@ -66,10 +67,12 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			}
 
 			ignoreToken := cmd.Flag("ignore-token").Value.String() == "true"
+			failOnNoFetch := cmd.Flag("fail-on-no-fetch").Value.String() == "true"
 
 			validateCommandFlags := &ValidateCommandFlags{
-				output:      output,
-				ignoreToken: ignoreToken,
+				output:        output,
+				ignoreToken:   ignoreToken,
+				failOnNoFetch: failOnNoFetch,
 			}
 
 			return execute(deps, validateCommandFlags)
@@ -86,6 +89,7 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 
 	policiesCmd.Flags().StringP("output", "o", "", "Define output format. Can be 'csv'")
 	policiesCmd.Flags().Bool("ignore-token", false, "Ignore token and run as anonymous user")
+	policiesCmd.Flags().Bool("fail-on-no-fetch", false, "Fail if validate command is run without any fetched data")
 
 	return policiesCmd
 }
@@ -106,7 +110,7 @@ func validateOutputFlag(output string) bool {
 }
 
 func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) error {
-	err := deps.RulesConfig.Initialize()
+	err := deps.RulesConfig.Initialize(flags.failOnNoFetch)
 	if err != nil {
 		return err
 	}
