@@ -96,6 +96,7 @@ func githubErrorsRule11(githubData map[string]*githubConnector.GithubOwner) ([]*
 					RepositryName: repo.Name,
 					CiCdPlatform:  "github-actions-workflows",
 					OwnerName:     owner.Name,
+					ScmPlatform:   "github",
 				})
 			}
 		}
