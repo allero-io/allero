@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
+	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 )
 
 type SchemaError struct {
@@ -38,12 +39,20 @@ type Step struct {
 	Run  string `json:"run"`
 }
 
-func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner) ([]*SchemaError, error) {
+type GitlabStageScript struct {
+	Script string `json:"script"`
+}
+
+type GitlabStageScripts struct {
+	Scripts []string `json:"script"`
+}
+
+func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner, gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
 	if rule.UniqueId == 10 {
-		return EnsureScaScanner(githubData)
+		return EnsureScaScanner(githubData, gitlabData)
 	}
 	if rule.UniqueId == 11 {
-		return EnsureTerraformScanner(githubData)
+		return EnsureTerraformScanner(githubData, gitlabData)
 	}
 
 	return nil, fmt.Errorf("missing implementation for rule %d", rule.UniqueId)

@@ -15,7 +15,7 @@ type GitlabProject struct {
 }
 
 type PipelineFile struct {
-	Filename string      `json:"filename"`
-	Origin   string      `json:"origin"`
-	Content  interface{} `json:"content"`
+	Filename string                 `json:"filename"`
+	Origin   string                 `json:"origin"`
+	Content  map[string]interface{} `json:"content"`
 }

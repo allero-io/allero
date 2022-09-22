@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
+	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 	"github.com/allero-io/allero/pkg/jsonschemaValidator"
 	"github.com/allero-io/allero/pkg/rulesConfig/defaultRules"
 	"github.com/xeipuuv/gojsonschema"
@@ -11,7 +13,11 @@ import (
 
 func (rc *RulesConfig) Validate(ruleName string, rule *defaultRules.Rule, scmPlatform string) ([]*defaultRules.SchemaError, error) {
 	if rule.InCodeImplementation {
-		return rc.InCodeValidate(rule)
+		if scmPlatform == "github" {
+			return rc.InCodeValidate(rule, rc.githubData, nil)
+		} else if scmPlatform == "gitlab" {
+			return rc.InCodeValidate(rule, nil, rc.gitlabData)
+		}
 	}
 
 	return rc.JSONSchemaValidate(ruleName, rule, scmPlatform)
@@ -59,6 +65,6 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 	return schemaErrors, nil
 }
 
-func (rc *RulesConfig) InCodeValidate(rule *defaultRules.Rule) ([]*defaultRules.SchemaError, error) {
-	return defaultRules.Validate(rule, rc.githubData)
+func (rc *RulesConfig) InCodeValidate(rule *defaultRules.Rule, githubData map[string]*githubConnector.GithubOwner, gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*defaultRules.SchemaError, error) {
+	return defaultRules.Validate(rule, githubData, gitlabData)
 }

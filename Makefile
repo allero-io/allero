@@ -27,4 +27,5 @@ github:
 	go run main.go fetch github curbengh/hexo-yam
 
 gitlab:
-	go run main.go fetch gitlab GitLab-examples/clojure-web-application
+	# go run main.go fetch gitlab GitLab-examples/clojure-web-application
+	go run main.go fetch gitlab allero/demo

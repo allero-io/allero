@@ -14,6 +14,7 @@ import (
 var CICD_PLATFORMS = map[string]string{
 	"github-actions-workflows": "Github Actions",
 	"jfrog-pipelines":          "Jfrog Pipelines",
+	"gitlab-ci":                "Gitlab CI",
 }
 
 var SCM_PLATFORMS = map[string]string{
