@@ -8,34 +8,25 @@
         "additionalProperties": {
             "type": "object",
             "properties": {
-                "repositories": {
+                "projects": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
                         "properties": {
-                            "github-actions-workflows": {
+                            "gitlab-ci": {
                                 "type": "object",
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                        "run": {
-                                                                            "type": "string",
-                                                                            "not": {
-                                                                                "pattern": "\\${{ github\\.event\\.((pull_request\\.title)|actor\\.(id|login|display_login)|org\\.login) }}"
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "not": {
+                                                                "type": "string",
+                                                                "pattern": "\\$CI_COMMIT_TITLE|\\$GITLAB_USER_ID|\\$GITLAB_USER_EMAIL|\\$GITLAB_USER_LOGIN|\\$GITLAB_USER_NAME"
                                                             }
                                                         }
                                                     }

@@ -46,6 +46,7 @@ type SchemaError struct {
 	WorkflowRelPath string
 	CiCdPlatform    string
 	ScmPlatform     string
+	ErrorLevel      int
 }
 
 type RuleResult struct {
@@ -141,6 +142,8 @@ func (rc *RulesConfig) Validate(ruleName string, rule *Rule, scmPlatform string)
 
 	schemaErrors := make([]*SchemaError, 0)
 	errorByField := make(map[string]bool)
+	lowestErrorLevel := 999
+
 	for _, rawSchemaError := range schemaResult.Errors() {
 		if errorByField[rawSchemaError.Field()] {
 			continue
@@ -148,7 +151,12 @@ func (rc *RulesConfig) Validate(ruleName string, rule *Rule, scmPlatform string)
 
 		errorByField[rawSchemaError.Field()] = true
 		schemaError := rc.parseSchemaField(rc.githubData, rawSchemaError.Field(), scmPlatform)
-		schemaErrors = append(schemaErrors, schemaError)
+		if schemaError.ErrorLevel < lowestErrorLevel {
+			lowestErrorLevel = schemaError.ErrorLevel
+			schemaErrors = []*SchemaError{schemaError}
+		} else if schemaError.ErrorLevel == lowestErrorLevel {
+			schemaErrors = append(schemaErrors, schemaError)
+		}
 	}
 
 	return schemaErrors, nil
@@ -189,15 +197,19 @@ func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.G
 	schemaError := &SchemaError{
 		ScmPlatform: scmPlatform,
 	}
+	errorLevel := 0
 
 	if len(keyFields) >= 1 {
 		schemaError.OwnerName = keyFields[0]
+		errorLevel = 1
 	}
 	if len(keyFields) >= 3 {
 		schemaError.RepositryName = keyFields[2]
+		errorLevel = 2
 	}
 	if len(keyFields) >= 4 {
 		schemaError.CiCdPlatform = keyFields[3]
+		errorLevel = 3
 	}
 	if len(keyFields) >= 5 {
 		workflowName := keyFields[4]
@@ -208,8 +220,13 @@ func (rc *RulesConfig) parseSchemaField(githubData map[string]*githubConnector.G
 		if schemaError.CiCdPlatform == "jfrog-pipelines" {
 			schemaError.WorkflowRelPath = githubData[schemaError.OwnerName].Repositories[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
 		}
+		if schemaError.CiCdPlatform == "gitlab-ci" {
+			// TODO DB complete this condition. gitlab errors contain duplications
+		}
+		errorLevel = 4
 	}
 
+	schemaError.ErrorLevel = errorLevel
 	return schemaError
 }
 

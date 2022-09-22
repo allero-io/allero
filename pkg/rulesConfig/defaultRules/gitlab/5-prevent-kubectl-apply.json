@@ -8,33 +8,25 @@
         "additionalProperties": {
             "type": "object",
             "properties": {
-                "repositories": {
+                "projects": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
                         "properties": {
-                            "github-actions-workflows": {
+                            "gitlab-ci": {
                                 "type": "object",
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "properties": {
-                                                                        "run": {
-                                                                            "not": {
-                                                                                "type": "string",
-                                                                                "pattern": ".*kubectl apply.*"
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "not": {
+                                                                "pattern": ".*kubectl apply.*"
                                                             }
                                                         }
                                                     }

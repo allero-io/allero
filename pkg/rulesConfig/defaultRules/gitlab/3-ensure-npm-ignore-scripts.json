@@ -8,36 +8,28 @@
         "additionalProperties": {
             "type": "object",
             "properties": {
-                "repositories": {
+                "projects": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
                         "properties": {
-                            "github-actions-workflows": {
+                            "gitlab-ci": {
                                 "type": "object",
                                 "additionalProperties": {
                                     "properties": {
                                         "content": {
-                                            "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "properties": {
-                                                                        "run": {
-                                                                            "type": "string",
-                                                                            "if": {
-                                                                                "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
-                                                                            },
-                                                                            "then": {
-                                                                                "pattern": ".*--ignore-scripts.*"
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "script": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "if": {
+                                                                "pattern": ".*(npm install|npm i |npm i$|npm ci).*"
+                                                            },
+                                                            "then": {
+                                                                "pattern": ".*--ignore-scripts.*"
                                                             }
                                                         }
                                                     }
