@@ -6,39 +6,58 @@
     "schema": {
         "type": "object",
         "additionalProperties": {
-            "type": "object",
             "properties": {
                 "repositories": {
-                    "type": "object",
                     "additionalProperties": {
-                        "type": "object",
                         "properties": {
                             "github-actions-workflows": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "properties": {
-                                        "content": {
+                                "anyOf": [
+                                    {
+                                        "additionalProperties": {
                                             "properties": {
-                                                "jobs": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "properties": {
-                                                            "steps": {
-                                                                "type": "array",
-                                                                "contains": {
-                                                                    "anyOf": [
-                                                                        {
-                                                                            "required": ["uses"],
-                                                                            "type": "object",
+                                                "content": {
+                                                    "properties": {
+                                                        "jobs": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "properties": {
+                                                                    "steps": {
+                                                                        "type": "array",
+                                                                        "contains": {
                                                                             "properties": {
                                                                                 "uses": {
-                                                                                    "type": "string",
                                                                                     "pattern": ".*anchore/scan-action@.*"
                                                                                 }
-                                                                            }
+                                                                            },
+                                                                            "required": [
+                                                                                "uses"
+                                                                            ]
                                                                         },
-                                                                        {
-                                                                            "required": ["run"],
+                                                                        "minContains": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "additionalProperties": {
+                                            "properties": {
+                                                "content": {
+                                                    "properties": {
+                                                        "jobs": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "properties": {
+                                                                    "steps": {
+                                                                        "type": "array",
+                                                                        "contains": {
+                                                                            "required": [
+                                                                                "run"
+                                                                            ],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {
@@ -47,8 +66,31 @@
                                                                                 }
                                                                             }
                                                                         },
-                                                                        {
-                                                                            "required": ["uses"],
+                                                                        "minContains": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "additionalProperties": {
+                                            "properties": {
+                                                "content": {
+                                                    "properties": {
+                                                        "jobs": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "properties": {
+                                                                    "steps": {
+                                                                        "type": "array",
+                                                                        "contains": {
+                                                                            "required": [
+                                                                                "uses"
+                                                                            ],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -57,8 +99,31 @@
                                                                                 }
                                                                             }
                                                                         },
-                                                                        {
-                                                                            "required": ["run"],
+                                                                        "minContains": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "additionalProperties": {
+                                            "properties": {
+                                                "content": {
+                                                    "properties": {
+                                                        "jobs": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "properties": {
+                                                                    "steps": {
+                                                                        "type": "array",
+                                                                        "contains": {
+                                                                            "required": [
+                                                                                "run"
+                                                                            ],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {
@@ -67,8 +132,31 @@
                                                                                 }
                                                                             }
                                                                         },
-                                                                        {
-                                                                            "required": ["uses"],
+                                                                        "minContains": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "additionalProperties": {
+                                            "properties": {
+                                                "content": {
+                                                    "properties": {
+                                                        "jobs": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "properties": {
+                                                                    "steps": {
+                                                                        "type": "array",
+                                                                        "contains": {
+                                                                            "required": [
+                                                                                "uses"
+                                                                            ],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "uses": {
@@ -77,8 +165,31 @@
                                                                                 }
                                                                             }
                                                                         },
-                                                                        {
-                                                                            "required": ["run"],
+                                                                        "minContains": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "additionalProperties": {
+                                            "properties": {
+                                                "content": {
+                                                    "properties": {
+                                                        "jobs": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "properties": {
+                                                                    "steps": {
+                                                                        "type": "array",
+                                                                        "contains": {
+                                                                            "required": [
+                                                                                "run"
+                                                                            ],
                                                                             "type": "object",
                                                                             "properties": {
                                                                                 "run": {
@@ -86,10 +197,10 @@
                                                                                     "pattern": ".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*"
                                                                                 }
                                                                             }
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                "minContains": 1
+                                                                        },
+                                                                        "minContains": 1
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -97,7 +208,7 @@
                                             }
                                         }
                                     }
-                                }
+                                ]
                             }
                         }
                     }
