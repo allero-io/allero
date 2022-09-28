@@ -3,6 +3,7 @@ package rulesConfig
 import (
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -46,6 +47,8 @@ type OutputSummary struct {
 	URL                 string `mapstructure:"URL"`
 }
 
+var NoFetchedDataError = errors.New("missing repository data. Run 'allero fetch -h' for more information")
+
 func New(deps *RulesConfigDependencies) *RulesConfig {
 	return &RulesConfig{
 		configurationManager: deps.ConfigurationManager,
@@ -54,12 +57,9 @@ func New(deps *RulesConfigDependencies) *RulesConfig {
 	}
 }
 
-func (rc *RulesConfig) Initialize(failOnNoFetch bool) error {
+func (rc *RulesConfig) Initialize() error {
 	if rc.githubData == nil && rc.gitlabData == nil {
-		if failOnNoFetch {
-			return fmt.Errorf("missing repository data. Run 'allero fetch -h' for more information")
-		}
-		rc.githubData = getLocalData()
+		return NoFetchedDataError
 	}
 
 	githubFiles, err := rc.GetRulesFiles("github", githubRulesList)
@@ -273,19 +273,19 @@ func getGithubData() map[string]*githubConnector.GithubOwner {
 	return githubData
 }
 
-func getLocalData() map[string]*githubConnector.GithubOwner {
-	// Fetch local folder glob to look for yamls
-	githubData := make(map[string]*githubConnector.GithubOwner)
+func (rc *RulesConfig) ReadLocalRepositoriesDataAsGithubData() error {
+	localData := make(map[string]*githubConnector.GithubOwner)
 	alleroHomedir := fileManager.GetAlleroHomedir()
-	githubDataFilename := fmt.Sprintf("%s/repo_files/github.json", alleroHomedir)
+	localDataFilename := fmt.Sprintf("%s/repo_files/local.json", alleroHomedir)
 
-	content, err := os.ReadFile(githubDataFilename)
+	content, err := os.ReadFile(localDataFilename)
 	if err != nil {
 		return nil
 	}
 
-	json.Unmarshal(content, &githubData)
-	return githubData
+	json.Unmarshal(content, &localData)
+	rc.githubData = localData
+	return nil
 }
 
 func getGitlabData() map[string]*gitlabConnector.GitlabGroup {

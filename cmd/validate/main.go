@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
+	localConnector "github.com/allero-io/allero/pkg/connectors/local"
 	"github.com/allero-io/allero/pkg/mapStructureEncoder"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
@@ -18,9 +19,10 @@ var (
 )
 
 type ValidateCommandDependencies struct {
-	RulesConfig          *rulesConfig.RulesConfig
-	ConfigurationManager *configurationManager.ConfigurationManager
-	PosthogClient        *posthog.PosthogClient
+	RulesConfig             *rulesConfig.RulesConfig
+	ConfigurationManager    *configurationManager.ConfigurationManager
+	PosthogClient           *posthog.PosthogClient
+	LocalRepositoriesClient *localConnector.LocalConnector
 }
 
 type ValidateCommandFlags struct {
@@ -110,8 +112,16 @@ func validateOutputFlag(output string) bool {
 }
 
 func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) error {
-	err := deps.RulesConfig.Initialize(flags.failOnNoFetch)
-	if err != nil {
+	err := deps.RulesConfig.Initialize()
+	if !flags.failOnNoFetch && err == rulesConfig.NoFetchedDataError {
+		err := deps.LocalRepositoriesClient.Get()
+		if err != nil {
+			return err
+		} else {
+			fmt.Printf("No fetched data found. Running validation on local data fetch from %s.\n", deps.LocalRepositoriesClient.RootPath)
+			deps.RulesConfig.ReadLocalRepositoriesDataAsGithubData()
+		}
+	} else if err != nil {
 		return err
 	}
 
