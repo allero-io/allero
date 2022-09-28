@@ -43,7 +43,7 @@ Generate the token with the following **read** permissions:
 
 2. Once the token is generated, run `export ALLERO_GITHUB_TOKEN={YOUR_TOKEN}`.  
 - When running Allero from GitHub Actions, the PAT should be stored as an [encrypted secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
-3. Fetch your private repositories: `allero fetch githib {your_repo}`
+3. Fetch your private repositories: `allero fetch github {your_repo}`
 
 ### Fetching private repositories from Gitlab
 Fetching data from a private GitLab group requires an access token.
