@@ -119,7 +119,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 			return err
 		} else {
 			fmt.Printf("No fetched data found. Running validation on local data fetch from %s.\n", deps.LocalRepositoriesClient.RootPath)
-			deps.RulesConfig.ReadLocalRepositoriesDataAsGithubData()
+			deps.RulesConfig.ReadLocalData()
 		}
 	} else if err != nil {
 		return err

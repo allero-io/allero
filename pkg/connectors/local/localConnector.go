@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/allero-io/allero/pkg/connectors"
+	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	"github.com/allero-io/allero/pkg/fileManager"
 )
 
@@ -28,20 +29,13 @@ func New() *LocalConnector {
 }
 
 func (lc *LocalConnector) Get() error {
-
-	localJsonObject := make(map[string]*LocalOwner)
-
-	err := lc.addRootPathAsNewRepo(localJsonObject)
+	var localJsonObject LocalRoot
+	githubJsonObject := make(map[string]*githubConnector.GithubOwner)
+	err := lc.getGithub(githubJsonObject)
 	if err != nil {
 		return err
 	}
-
-	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
-	err = lc.processWorkflowFiles(localJsonObject, escapedRepoName)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+	localJsonObject.GithubData = githubJsonObject
 
 	localJson, err := json.MarshalIndent(localJsonObject, "", "  ")
 	if err != nil {
@@ -52,30 +46,45 @@ func (lc *LocalConnector) Get() error {
 	return fileManager.WriteToFile(fmt.Sprintf("%s/repo_files/local.json", alleroHomedir), localJson)
 }
 
-func (lc *LocalConnector) addRootPathAsNewRepo(localJsonObject map[string]*LocalOwner) error {
-	localJsonObject["local"] = &LocalOwner{
+func (lc *LocalConnector) getGithub(githubJsonObject map[string]*githubConnector.GithubOwner) error {
+	err := lc.addRootPathAsNewRepo(githubJsonObject)
+	if err != nil {
+		return err
+	}
+
+	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
+	err = lc.processWorkflowFiles(githubJsonObject, escapedRepoName)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+
+}
+
+func (lc *LocalConnector) addRootPathAsNewRepo(githubJsonObject map[string]*githubConnector.GithubOwner) error {
+	githubJsonObject["local_owner"] = &githubConnector.GithubOwner{
 		Name:         "sudo",
 		Type:         "",
 		ID:           0,
-		Repositories: make(map[string]*LocalRepository),
+		Repositories: make(map[string]*githubConnector.GithubRepository),
 	}
 
 	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
 
-	localJsonObject["local"].Repositories[escapedRepoName] = &LocalRepository{
+	githubJsonObject["local_owner"].Repositories[escapedRepoName] = &githubConnector.GithubRepository{
 		Name:                   escapedRepoName,
 		FullName:               escapedRepoName,
 		ID:                     0,
 		ProgrammingLanguages:   nil,
-		GithubActionsWorkflows: make(map[string]*PipelineFile),
-		GitlabCi:               make(map[string]*GitlabPipelineFile),
-		JfrogPipelines:         make(map[string]*PipelineFile),
+		GithubActionsWorkflows: make(map[string]*githubConnector.PipelineFile),
+		JfrogPipelines:         make(map[string]*githubConnector.PipelineFile),
 	}
 
 	return nil
 }
 
-func (lc *LocalConnector) processWorkflowFiles(localJsonObject map[string]*LocalOwner, repoName string) error {
+func (lc *LocalConnector) processWorkflowFiles(githubJsonObject map[string]*githubConnector.GithubOwner, repoName string) error {
 	workflowFilesChan, _ := lc.getWorkflowFilesEntities(repoName)
 	var processingError error
 
@@ -104,12 +113,12 @@ func (lc *LocalConnector) processWorkflowFiles(localJsonObject map[string]*Local
 		escapedFilename := connectors.EscapeJsonKey(workflowFile.Filename)
 
 		if workflowFile.Origin == "github_actions" {
-			localJsonObject["local"].Repositories[repoName].GithubActionsWorkflows[escapedFilename] = workflowFile
+			githubJsonObject["local_owner"].Repositories[repoName].GithubActionsWorkflows[escapedFilename] = workflowFile
 		} else if workflowFile.Origin == "jfrog_pipelines" {
-			localJsonObject["local"].Repositories[repoName].JfrogPipelines[escapedFilename] = workflowFile
+			githubJsonObject["local_owner"].Repositories[repoName].JfrogPipelines[escapedFilename] = workflowFile
 		} else if workflowFile.Origin == "gitlab_ci" {
 			// TODO find a way to use a channel with GilabPipeline
-			// localJsonObject["local"].Repositories[repoName].GitlabCi[escapedFilename] = workflowFile
+			// localJsonObject["local_owner"].Repositories[repoName].GitlabCi[escapedFilename] = workflowFile
 		} else {
 			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, repoName)
 			continue
@@ -119,8 +128,8 @@ func (lc *LocalConnector) processWorkflowFiles(localJsonObject map[string]*Local
 	return processingError
 }
 
-func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *PipelineFile, error) {
-	workflowFilesEntitiesChan := make(chan *PipelineFile)
+func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *githubConnector.PipelineFile, error) {
+	workflowFilesEntitiesChan := make(chan *githubConnector.PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
@@ -132,7 +141,7 @@ func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *Pipel
 				return
 			}
 			for _, filePath := range relevantFilesPaths {
-				workflowFilesEntitiesChan <- &PipelineFile{
+				workflowFilesEntitiesChan <- &githubConnector.PipelineFile{
 					RelativePath: filePath,
 					Filename:     path.Base(filePath),
 					Origin:       cicdPlatform.Name,

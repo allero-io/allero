@@ -11,6 +11,7 @@ import (
 	"github.com/allero-io/allero/pkg/configurationManager"
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
+	localConnector "github.com/allero-io/allero/pkg/connectors/local"
 	"github.com/allero-io/allero/pkg/fileManager"
 	"github.com/allero-io/allero/pkg/rulesConfig/defaultRules"
 	"github.com/go-playground/validator"
@@ -273,8 +274,8 @@ func getGithubData() map[string]*githubConnector.GithubOwner {
 	return githubData
 }
 
-func (rc *RulesConfig) ReadLocalRepositoriesDataAsGithubData() error {
-	localData := make(map[string]*githubConnector.GithubOwner)
+func (rc *RulesConfig) ReadLocalData() error {
+	var localData localConnector.LocalRoot
 	alleroHomedir := fileManager.GetAlleroHomedir()
 	localDataFilename := fmt.Sprintf("%s/repo_files/local.json", alleroHomedir)
 
@@ -284,7 +285,8 @@ func (rc *RulesConfig) ReadLocalRepositoriesDataAsGithubData() error {
 	}
 
 	json.Unmarshal(content, &localData)
-	rc.githubData = localData
+	rc.githubData = localData.GithubData
+	rc.gitlabData = localData.GitlabData
 	return nil
 }
 
