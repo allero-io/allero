@@ -15,20 +15,28 @@ type OwnerWithRepo struct {
 type CICDPlatform struct {
 	Name               string
 	RelevantFilesRegex string
+	GithubValid        bool
+	GitlabValid        bool
 }
 
 var SUPPORTED_CICD_PLATFORMS = []CICDPlatform{
 	{
 		Name:               "github_actions",
 		RelevantFilesRegex: "\\.github/workflows/.*\\.ya?ml",
+		GithubValid:        true,
+		GitlabValid:        false,
 	},
 	{
 		Name:               "jfrog_pipelines",
 		RelevantFilesRegex: "jfrog.*\\.ya?ml",
+		GithubValid:        true,
+		GitlabValid:        true,
 	},
 	{
 		Name:               "gitlab_ci",
 		RelevantFilesRegex: "\\.gitlab-ci\\.ya?ml",
+		GithubValid:        false,
+		GitlabValid:        true,
 	},
 	// {
 	// 	Name:               "jenkins",

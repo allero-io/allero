@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
+	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 	"github.com/allero-io/allero/pkg/fileManager"
 )
 
@@ -34,6 +35,13 @@ func (lc *LocalConnector) Get() error {
 		return err
 	}
 	localJsonObject.GithubData = githubJsonObject
+
+	gitlabJsonObject := make(map[string]*gitlabConnector.GitlabGroup)
+	err = lc.getGitlab(gitlabJsonObject)
+	if err != nil {
+		return err
+	}
+	localJsonObject.GitlabData = gitlabJsonObject
 
 	localJson, err := json.MarshalIndent(localJsonObject, "", "  ")
 	if err != nil {

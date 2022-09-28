@@ -194,10 +194,10 @@ func (rc *RulesConfig) parseSchemaFieldGitlab(gitlabData map[string]*gitlabConne
 		workflowName := keyFields[4]
 
 		if schemaError.CiCdPlatform == "gitlab-ci" {
-			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].GitlabCi[workflowName].Filename
+			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].GitlabCi[workflowName].RelativePath
 		}
 		if schemaError.CiCdPlatform == "jfrog-pipelines" {
-			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].JfrogPipelines[workflowName].Filename
+			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
 		}
 		errorLevel = 4
 	}

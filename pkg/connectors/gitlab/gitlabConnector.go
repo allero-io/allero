@@ -3,6 +3,7 @@ package gitlabConnector
 import (
 	"encoding/json"
 	"fmt"
+	"path"
 	"regexp"
 	"strings"
 
@@ -70,7 +71,7 @@ func (gc *GitlabConnector) processPipelineFiles(gitlabJsonObject map[string]*Git
 	for workflowFile := range workflowFilesChan {
 		byteContent, _, err := gc.client.RepositoryFiles.GetRawFile(project.ID, workflowFile.Filename, &gitlab.GetRawFileOptions{})
 		if err != nil {
-			processingError = fmt.Errorf("failed to get content for file %s from repository %s", workflowFile.Filename, project.PathWithNamespace)
+			processingError = fmt.Errorf("failed to get content for file %s from repository %s", workflowFile.RelativePath, project.PathWithNamespace)
 			continue
 		}
 
@@ -95,7 +96,7 @@ func (gc *GitlabConnector) processPipelineFiles(gitlabJsonObject map[string]*Git
 		} else if workflowFile.Origin == "jfrog_pipelines" {
 			gitlabJsonObject[project.Namespace.Name].Projects[project.Path].JfrogPipelines[escapedFilename] = workflowFile
 		} else {
-			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.Filename, project.PathWithNamespace)
+			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, project.PathWithNamespace)
 			continue
 		}
 	}
@@ -117,11 +118,15 @@ func (gc *GitlabConnector) getPipelineFiles(project *gitlab.Project) (chan *Pipe
 		}
 
 		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
+			if !cicdPlatform.GitlabValid {
+				continue
+			}
 			relevantFilesPaths := gc.matchedFiles(treeNodes, cicdPlatform.RelevantFilesRegex)
 			for _, filePath := range relevantFilesPaths {
 				pipelineFilesChan <- &PipelineFile{
-					Filename: filePath,
-					Origin:   cicdPlatform.Name,
+					RelativePath: filePath,
+					Filename:     path.Base(filePath),
+					Origin:       cicdPlatform.Name,
 				}
 			}
 		}

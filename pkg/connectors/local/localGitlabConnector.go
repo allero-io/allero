@@ -51,7 +51,7 @@ func (lc *LocalConnector) processGitlabWorkflowFiles(gitlabJsonObject map[string
 	var processingError error
 
 	for workflowFile := range workflowFilesChan {
-		fullPath := lc.RootPath + workflowFile.Filename
+		fullPath := lc.RootPath + workflowFile.RelativePath
 		content, err := fileManager.ReadFile(fullPath)
 		if err != nil {
 			processingError = fmt.Errorf("failed to get content for file %s", fullPath)
@@ -79,7 +79,7 @@ func (lc *LocalConnector) processGitlabWorkflowFiles(gitlabJsonObject map[string
 		} else if workflowFile.Origin == "jfrog_pipelines" {
 			gitlabJsonObject["local_group"].Projects[repoName].JfrogPipelines[escapedFilename] = workflowFile
 		} else {
-			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.Filename, repoName)
+			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, repoName)
 			continue
 		}
 	}
@@ -95,14 +95,18 @@ func (lc *LocalConnector) getGitlabWorkflowFilesEntities(repoName string) (chan 
 		defer close(workflowFilesEntitiesChan)
 
 		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
+			if !cicdPlatform.GitlabValid {
+				continue
+			}
 			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.RootPath, cicdPlatform.RelevantFilesRegex)
 			if err != nil {
 				return
 			}
 			for _, filePath := range relevantFilesPaths {
 				workflowFilesEntitiesChan <- &gitlabConnector.PipelineFile{
-					Filename: path.Base(filePath),
-					Origin:   cicdPlatform.Name,
+					RelativePath: filePath,
+					Filename:     path.Base(filePath),
+					Origin:       cicdPlatform.Name,
 				}
 			}
 		}
