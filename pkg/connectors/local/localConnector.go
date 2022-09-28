@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/allero-io/allero/pkg/connectors"
 	"github.com/allero-io/allero/pkg/fileManager"
@@ -27,15 +31,17 @@ func (lc *LocalConnector) Get() error {
 
 	localJsonObject := make(map[string]*LocalOwner)
 
-	err := lc.addRootPathAsRepo(localJsonObject)
+	err := lc.addRootPathAsNewRepo(localJsonObject)
 	if err != nil {
 		return err
 	}
 
-	// err = lc.processWorkflowFiles(localJsonObject, "local")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
+	err = lc.processWorkflowFiles(localJsonObject, escapedRepoName)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	localJson, err := json.MarshalIndent(localJsonObject, "", "  ")
 	if err != nil {
@@ -46,7 +52,7 @@ func (lc *LocalConnector) Get() error {
 	return fileManager.WriteToFile(fmt.Sprintf("%s/repo_files/local.json", alleroHomedir), localJson)
 }
 
-func (lc *LocalConnector) addRootPathAsRepo(localJsonObject map[string]*LocalOwner) error {
+func (lc *LocalConnector) addRootPathAsNewRepo(localJsonObject map[string]*LocalOwner) error {
 	localJsonObject["local"] = &LocalOwner{
 		Name:         "sudo",
 		Type:         "",
@@ -57,104 +63,99 @@ func (lc *LocalConnector) addRootPathAsRepo(localJsonObject map[string]*LocalOwn
 	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
 
 	localJsonObject["local"].Repositories[escapedRepoName] = &LocalRepository{
-		Name:                  escapedRepoName,
-		FullName:              escapedRepoName,
-		ID:                    0,
-		ProgrammingLanguages:  nil,
-		LocalActionsWorkflows: make(map[string]*PipelineFile),
-		JfrogPipelines:        make(map[string]*PipelineFile),
+		Name:                   escapedRepoName,
+		FullName:               escapedRepoName,
+		ID:                     0,
+		ProgrammingLanguages:   nil,
+		GithubActionsWorkflows: make(map[string]*PipelineFile),
+		GitlabCi:               make(map[string]*GitlabPipelineFile),
+		JfrogPipelines:         make(map[string]*PipelineFile),
 	}
 
 	return nil
 }
 
-func (lc *LocalConnector) processWorkflowFiles(localJsonObject map[string]*LocalOwner, rootPath string) error {
-	// workflowFilesChan, _ := lc.getWorkflowFilesEntities(repo)
-	// var processingError error
+func (lc *LocalConnector) processWorkflowFiles(localJsonObject map[string]*LocalOwner, repoName string) error {
+	workflowFilesChan, _ := lc.getWorkflowFilesEntities(repoName)
+	var processingError error
 
-	// for workflowFile := range workflowFilesChan {
-	// 	content, _, _, err := lc.client.Repositories.GetContents(context.Background(), *repo.Owner.Login, *repo.Name, workflowFile.RelativePath, nil)
-	// 	if err != nil {
-	// 		processingError = fmt.Errorf("failed to get content for file %s from repository %s", workflowFile.RelativePath, *repo.FullName)
-	// 		continue
-	// 	}
+	for workflowFile := range workflowFilesChan {
+		fullPath := lc.RootPath + workflowFile.RelativePath
+		content, err := fileManager.ReadFile(fullPath)
+		if err != nil {
+			processingError = fmt.Errorf("failed to get content for file %s", fullPath)
+			continue
+		}
 
-	// 	byteContent, err := base64.StdEncoding.DecodeString(*content.Content)
-	// 	if err != nil {
-	// 		processingError = fmt.Errorf("failed to decode content for file %s from repository %s", workflowFile.RelativePath, *repo.FullName)
-	// 		continue
-	// 	}
+		jsonContentBytes, err := connectors.YamlToJson(content)
+		if err != nil {
+			processingError = err
+			continue
+		}
 
-	// 	jsonContentBytes, err := connectors.YamlToJson(byteContent)
-	// 	if err != nil {
-	// 		processingError = err
-	// 		continue
-	// 	}
+		jsonContent := make(map[string]interface{})
+		err = json.Unmarshal(jsonContentBytes, &jsonContent)
+		if err != nil {
+			processingError = err
+			continue
+		}
 
-	// 	jsonContent := make(map[string]interface{})
-	// 	err = json.Unmarshal(jsonContentBytes, &jsonContent)
-	// 	if err != nil {
-	// 		processingError = err
-	// 		continue
-	// 	}
+		workflowFile.Content = jsonContent
+		escapedFilename := connectors.EscapeJsonKey(workflowFile.Filename)
 
-	// 	workflowFile.Content = jsonContent
-	// 	escapedFilename := connectors.EscapeJsonKey(workflowFile.Filename)
+		if workflowFile.Origin == "github_actions" {
+			localJsonObject["local"].Repositories[repoName].GithubActionsWorkflows[escapedFilename] = workflowFile
+		} else if workflowFile.Origin == "jfrog_pipelines" {
+			localJsonObject["local"].Repositories[repoName].JfrogPipelines[escapedFilename] = workflowFile
+		} else if workflowFile.Origin == "gitlab_ci" {
+			// TODO find a way to use a channel with GilabPipeline
+			// localJsonObject["local"].Repositories[repoName].GitlabCi[escapedFilename] = workflowFile
+		} else {
+			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, repoName)
+			continue
+		}
+	}
 
-	// 	if workflowFile.Origin == "local_actions" {
-	// 		localJsonObject[*repo.Owner.Login].Repositories[*repo.Name].LocalActionsWorkflows[escapedFilename] = workflowFile
-	// 	} else if workflowFile.Origin == "jfrog_pipelines" {
-	// 		localJsonObject[*repo.Owner.Login].Repositories[*repo.Name].JfrogPipelines[escapedFilename] = workflowFile
-	// 	} else {
-	// 		processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, *repo.FullName)
-	// 		continue
-	// 	}
-	// }
-
-	// return processingError
-	return nil
+	return processingError
 }
 
-// func (lc *LocalConnector) getWorkflowFilesEntities(repo *local.Repository) (chan *PipelineFile, error) {
-// 	workflowFilesEntitiesChan := make(chan *PipelineFile)
+func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *PipelineFile, error) {
+	workflowFilesEntitiesChan := make(chan *PipelineFile)
 
-// 	var getEntitiesErr error
-// 	go func() {
-// 		defer close(workflowFilesEntitiesChan)
+	var getEntitiesErr error
+	go func() {
+		defer close(workflowFilesEntitiesChan)
 
-// 		tree, _, err := lc.client.Git.GetTree(context.Background(), *repo.Owner.Login, *repo.Name, *repo.DefaultBranch, true)
-// 		if err != nil {
-// 			return
-// 		}
+		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
+			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.RootPath, cicdPlatform.RelevantFilesRegex)
+			if err != nil {
+				return
+			}
+			for _, filePath := range relevantFilesPaths {
+				workflowFilesEntitiesChan <- &PipelineFile{
+					RelativePath: filePath,
+					Filename:     path.Base(filePath),
+					Origin:       cicdPlatform.Name,
+				}
+			}
+		}
+	}()
 
-// 		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
-// 			relevantFilesPaths := lc.matchedFiles(tree, cicdPlatform.RelevantFilesRegex)
-// 			for _, filePath := range relevantFilesPaths {
-// 				workflowFilesEntitiesChan <- &PipelineFile{
-// 					RelativePath: filePath,
-// 					Filename:     path.Base(filePath),
-// 					Origin:       cicdPlatform.Name,
-// 				}
-// 			}
-// 		}
-// 	}()
+	return workflowFilesEntitiesChan, getEntitiesErr
+}
 
-// 	return workflowFilesEntitiesChan, getEntitiesErr
-// }
+func (lc *LocalConnector) walkAndMatchedFiles(dir string, regex string) ([]string, error) {
 
-// func (lc *LocalConnector) matchedFiles(tree *local.Tree, regex string) []string {
-// 	var matchedFiles []string
-// 	for _, fileEntry := range tree.Entries {
-// 		// skip if entry is a folder
-// 		if *fileEntry.Type == "tree" {
-// 			continue
-// 		}
+	var allFiles []string
+	err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
 
-// 		filepath := *fileEntry.Path
-// 		if matched, _ := regexp.MatchString(regex, filepath); matched {
-// 			matchedFiles = append(matchedFiles, filepath)
-// 		}
-// 	}
+		if matched, _ := regexp.MatchString(regex, path); matched {
+			relativePath := strings.TrimPrefix(path, lc.RootPath)
+			allFiles = append(allFiles, relativePath)
+		}
 
-// 	return matchedFiles
-// }
+		return nil
+	})
+
+	return allFiles, err
+}

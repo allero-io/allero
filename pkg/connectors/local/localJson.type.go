@@ -8,12 +8,13 @@ type LocalOwner struct {
 }
 
 type LocalRepository struct {
-	Name                  string                   `json:"name"`
-	FullName              string                   `json:"fullName"`
-	ID                    int                      `json:"id"`
-	ProgrammingLanguages  []string                 `json:"programmingLanguages"`
-	LocalActionsWorkflows map[string]*PipelineFile `json:"local-actions-workflows"`
-	JfrogPipelines        map[string]*PipelineFile `json:"jfrog-pipelines"`
+	Name                   string                         `json:"name"`
+	FullName               string                         `json:"fullName"`
+	ID                     int                            `json:"id"`
+	ProgrammingLanguages   []string                       `json:"programmingLanguages"`
+	GithubActionsWorkflows map[string]*PipelineFile       `json:"github-actions-workflows"`
+	GitlabCi               map[string]*GitlabPipelineFile `json:"gitlab-ci"`
+	JfrogPipelines         map[string]*PipelineFile       `json:"jfrog-pipelines"`
 }
 
 type PipelineFile struct {
@@ -21,4 +22,10 @@ type PipelineFile struct {
 	Filename     string      `json:"filename"`
 	Origin       string      `json:"origin"`
 	Content      interface{} `json:"content"`
+}
+
+type GitlabPipelineFile struct {
+	Filename string                 `json:"filename"`
+	Origin   string                 `json:"origin"`
+	Content  map[string]interface{} `json:"content"`
 }

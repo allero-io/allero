@@ -57,7 +57,7 @@ func New(deps *RulesConfigDependencies) *RulesConfig {
 	}
 }
 
-func (rc *RulesConfig) Initialize(failOnNoFetch bool) error {
+func (rc *RulesConfig) Initialize() error {
 	if rc.githubData == nil && rc.gitlabData == nil {
 		return NoFetchedDataError
 	}
