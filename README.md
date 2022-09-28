@@ -82,9 +82,9 @@ Some rules apply to everyone, while others are very stack-specific. That is why 
 | ensure-node-version | Make sure a specific version is set when using a node image | Enabled | Avoid unexpected behavior
 | ensure-python-version | Make sure a specific version is set when using a python image | Enabled | Avoid unexpected behavior
 | ensure-github-action-version | Ensure github action version is set | Enabled | Avoid unexpected behavior
-| prevent-using-uncontrolled-values | avoid running malware commands through repository names | Enabled | Keep production secured
-| ensure-sca-scanner | Make sure every repository has at least one pipeline with sca scanner | Keep production secured
-| ensure-terraform-scanner | Make sure every repository has at least one pipeline with terraform scanner  | Keep production secured
+| prevent-using-uncontrolled-values | Avoid running malware commands through repository names | Enabled | Keep production secured
+| ensure-sca-scanner | Make sure every repository has at least one pipeline with (Trivy, BlackDuck, Grype) | Disabled | Keep production secured
+| ensure-terraform-scanner | Make sure every repository has at least one pipeline with terraform scanner (Checkov ,Snyk, Tenable)  | Disabled | Keep production secured
 
 ### Enabling and disabling rules
 A policy is a set of rules, and it is represented by a token.  
