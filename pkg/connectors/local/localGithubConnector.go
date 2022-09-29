@@ -100,6 +100,9 @@ func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *githu
 		defer close(workflowFilesEntitiesChan)
 
 		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
+			if !cicdPlatform.GithubValid {
+				continue
+			}
 			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.RootPath, cicdPlatform.RelevantFilesRegex)
 			if err != nil {
 				return
