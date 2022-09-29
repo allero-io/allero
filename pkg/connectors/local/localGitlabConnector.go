@@ -11,7 +11,7 @@ import (
 	"github.com/allero-io/allero/pkg/fileManager"
 )
 
-func (lc *LocalConnector) getGitlab(gitlabJsonObject map[string]*gitlabConnector.GitlabGroup) error {
+func (lc *LocalConnector) getLocalGitlab(gitlabJsonObject map[string]*gitlabConnector.GitlabGroup) error {
 	err := lc.addRootPathAsNewProject(gitlabJsonObject)
 	if err != nil {
 		return err

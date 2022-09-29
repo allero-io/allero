@@ -11,7 +11,7 @@ import (
 	"github.com/allero-io/allero/pkg/fileManager"
 )
 
-func (lc *LocalConnector) getGithub(githubJsonObject map[string]*githubConnector.GithubOwner) error {
+func (lc *LocalConnector) getLocalGithub(githubJsonObject map[string]*githubConnector.GithubOwner) error {
 	err := lc.addRootPathAsNewRepo(githubJsonObject)
 	if err != nil {
 		return err

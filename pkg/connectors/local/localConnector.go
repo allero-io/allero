@@ -14,17 +14,11 @@ import (
 )
 
 type LocalConnector struct {
-	runningPath      string
 	absoluteRootPath string
 }
 
 func New() *LocalConnector {
-	path, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
 	return &LocalConnector{
-		runningPath:      path,
 		absoluteRootPath: "",
 	}
 }
@@ -37,14 +31,14 @@ func (lc *LocalConnector) Get(path string) error {
 	lc.absoluteRootPath = abs
 	var localJsonObject LocalRoot
 	githubJsonObject := make(map[string]*githubConnector.GithubOwner)
-	err = lc.getGithub(githubJsonObject)
+	err = lc.getLocalGithub(githubJsonObject)
 	if err != nil {
 		return err
 	}
 	localJsonObject.GithubData = githubJsonObject
 
 	gitlabJsonObject := make(map[string]*gitlabConnector.GitlabGroup)
-	err = lc.getGitlab(gitlabJsonObject)
+	err = lc.getLocalGitlab(gitlabJsonObject)
 	if err != nil {
 		return err
 	}
