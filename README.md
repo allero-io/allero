@@ -28,7 +28,7 @@ _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 Local directory - a direct validate:
 * Validate your pipelines located under a path: `allero validate {path}`
 
-Remote directory - Fetch your data and then validate:
+Remote directory - fetch your data and then validate:
 * Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`
 * Validate your pipelines across all your fetched data: `allero validate`
 
