@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path"
+	"path/filepath"
 
 	"github.com/allero-io/allero/pkg/connectors"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
@@ -51,7 +52,7 @@ func (lc *LocalConnector) processGitlabWorkflowFiles(gitlabJsonObject map[string
 	var processingError error
 
 	for workflowFile := range workflowFilesChan {
-		fullPath := lc.absoluteRootPath + workflowFile.RelativePath
+		fullPath := filepath.Join(lc.absoluteRootPath, workflowFile.RelativePath)
 		content, err := fileManager.ReadFile(fullPath)
 		if err != nil {
 			processingError = fmt.Errorf("failed to get content for file %s", fullPath)
