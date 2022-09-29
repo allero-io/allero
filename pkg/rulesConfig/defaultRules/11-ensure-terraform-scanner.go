@@ -36,10 +36,14 @@ func githubErrorsRule11(githubData map[string]*githubConnector.GithubOwner) ([]*
 		".*tenable/terrascan-action@.*",
 		".*snyk/actions/iac@.*",
 		".*aquasecurity/trivy-action@.*",
+		".*checkmarx/kics-github-action@.*",
+		".*kubescape/github-action@.*",
 	}
 
 	runRegexExpressions := []string{
 		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
+		".*docker .* run .*checkmarx/kics scan.*",
+		".*kubescape scan.*",
 	}
 
 	for _, owner := range githubData {
@@ -133,6 +137,8 @@ func gitlabErrorsRule11(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 func findScaScannerRule11(project *gitlabConnector.GitlabProject) (bool, error) {
 	scriptRegexExpressions := []string{
 		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
+		".*docker .* run .*checkmarx/kics scan.*",
+		".*kubescape scan.*",
 	}
 
 	for _, pipeline := range project.GitlabCi {
