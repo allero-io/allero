@@ -3,6 +3,7 @@ package httpClient
 import (
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 )
 
 type HttpClient struct {
@@ -20,7 +21,7 @@ func (c *HttpClient) Get(relativeUrl string) ([]byte, error) {
 	if relativeUrl == "" {
 		url = c.baseUrl
 	} else {
-		url = c.baseUrl + "/" + relativeUrl
+		url = filepath.Join(c.baseUrl, relativeUrl)
 	}
 	resp, err := http.Get(url)
 	if err != nil {

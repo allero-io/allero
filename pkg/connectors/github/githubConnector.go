@@ -166,6 +166,9 @@ func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (ch
 		}
 
 		for _, cicdPlatform := range connectors.SUPPORTED_CICD_PLATFORMS {
+			if !cicdPlatform.GithubValid {
+				continue
+			}
 			relevantFilesPaths := gc.matchedFiles(tree, cicdPlatform.RelevantFilesRegex)
 			for _, filePath := range relevantFilesPaths {
 				workflowFilesEntitiesChan <- &PipelineFile{

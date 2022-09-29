@@ -3,6 +3,7 @@ package rulesConfig
 import (
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/allero-io/allero/pkg/configurationManager"
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
+	localConnector "github.com/allero-io/allero/pkg/connectors/local"
 	"github.com/allero-io/allero/pkg/fileManager"
 	"github.com/allero-io/allero/pkg/rulesConfig/defaultRules"
 	"github.com/go-playground/validator"
@@ -46,6 +48,8 @@ type OutputSummary struct {
 	URL                 string `mapstructure:"URL"`
 }
 
+var NoFetchedDataError = errors.New("missing repository data. Use PATH option to validate local directory or fetch data from remote first. Run 'allero fetch -h' for more information about remote data.")
+
 func New(deps *RulesConfigDependencies) *RulesConfig {
 	return &RulesConfig{
 		configurationManager: deps.ConfigurationManager,
@@ -56,7 +60,7 @@ func New(deps *RulesConfigDependencies) *RulesConfig {
 
 func (rc *RulesConfig) Initialize() error {
 	if rc.githubData == nil && rc.gitlabData == nil {
-		return fmt.Errorf("missing repository data. Run 'allero fetch -h' for more information")
+		return NoFetchedDataError
 	}
 
 	githubFiles, err := rc.GetRulesFiles("github", githubRulesList)
@@ -190,10 +194,10 @@ func (rc *RulesConfig) parseSchemaFieldGitlab(gitlabData map[string]*gitlabConne
 		workflowName := keyFields[4]
 
 		if schemaError.CiCdPlatform == "gitlab-ci" {
-			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].GitlabCi[workflowName].Filename
+			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].GitlabCi[workflowName].RelativePath
 		}
 		if schemaError.CiCdPlatform == "jfrog-pipelines" {
-			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].JfrogPipelines[workflowName].Filename
+			schemaError.WorkflowRelPath = gitlabData[schemaError.OwnerName].Projects[schemaError.RepositryName].JfrogPipelines[workflowName].RelativePath
 		}
 		errorLevel = 4
 	}
@@ -268,6 +272,22 @@ func getGithubData() map[string]*githubConnector.GithubOwner {
 
 	json.Unmarshal(content, &githubData)
 	return githubData
+}
+
+func (rc *RulesConfig) ReadLocalData() error {
+	var localData localConnector.LocalRoot
+	alleroHomedir := fileManager.GetAlleroHomedir()
+	localDataFilename := fmt.Sprintf("%s/repo_files/local.json", alleroHomedir)
+
+	content, err := os.ReadFile(localDataFilename)
+	if err != nil {
+		return nil
+	}
+
+	json.Unmarshal(content, &localData)
+	rc.githubData = localData.GithubData
+	rc.gitlabData = localData.GitlabData
+	return nil
 }
 
 func getGitlabData() map[string]*gitlabConnector.GitlabGroup {

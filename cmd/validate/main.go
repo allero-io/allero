@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
+	localConnector "github.com/allero-io/allero/pkg/connectors/local"
 	"github.com/allero-io/allero/pkg/mapStructureEncoder"
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
@@ -18,14 +19,16 @@ var (
 )
 
 type ValidateCommandDependencies struct {
-	RulesConfig          *rulesConfig.RulesConfig
-	ConfigurationManager *configurationManager.ConfigurationManager
-	PosthogClient        *posthog.PosthogClient
+	RulesConfig             *rulesConfig.RulesConfig
+	ConfigurationManager    *configurationManager.ConfigurationManager
+	PosthogClient           *posthog.PosthogClient
+	LocalRepositoriesClient *localConnector.LocalConnector
 }
 
-type ValidateCommandFlags struct {
-	output      string
-	ignoreToken bool
+type validateCommandOptions struct {
+	output              string
+	ignoreToken         bool
+	localPathToValidate string
 }
 
 type wrapper struct {
@@ -44,12 +47,15 @@ func (w *wrapper) Run(f func(cmd *cobra.Command, args []string) error) func(cmd 
 func New(deps *ValidateCommandDependencies) *cobra.Command {
 	cmdWrap := wrapper{}
 	var policiesCmd = &cobra.Command{
-		Use:           "validate",
-		Short:         "Validate set of default rules",
-		Long:          "Validate set of default rules over all fetched data",
-		Example:       `allero validate`,
+		Use:   "validate [OPTIONAL] PATH",
+		Short: "Validate set of default rules",
+		Long:  "Validate set of default rules over fetched data or the given path",
+		Example: `allero validate                     Validate over fetched repositories
+allero validate .                   Validate over current directory
+allero validate ~/my-repo-dir       Validate over local directory`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		Args:          cobra.MaximumNArgs(1),
 		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
 			args := make(map[string]any)
 			args["Args"] = cmdArgs
@@ -66,10 +72,15 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			}
 
 			ignoreToken := cmd.Flag("ignore-token").Value.String() == "true"
+			localPathToValidate := ""
+			if len(args) > 0 {
+				localPathToValidate = args[0]
+			}
 
-			validateCommandFlags := &ValidateCommandFlags{
-				output:      output,
-				ignoreToken: ignoreToken,
+			validateCommandFlags := &validateCommandOptions{
+				output:              output,
+				ignoreToken:         ignoreToken,
+				localPathToValidate: localPathToValidate,
 			}
 
 			return execute(deps, validateCommandFlags)
@@ -105,8 +116,20 @@ func validateOutputFlag(output string) bool {
 	return false
 }
 
-func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) error {
-	err := deps.RulesConfig.Initialize()
+func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) error {
+	var err error
+	if option.localPathToValidate != "" {
+		err = deps.LocalRepositoriesClient.Get(option.localPathToValidate)
+		if err == nil {
+			fmt.Printf("Running validation over %s\n", option.localPathToValidate)
+			deps.RulesConfig.ReadLocalData()
+		}
+	}
+	if err != nil {
+		return err
+	}
+
+	err = deps.RulesConfig.Initialize()
 	if err != nil {
 		return err
 	}
@@ -123,7 +146,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 	hasToken := false
 	selectedRuleIds := make(map[int]bool)
 
-	if !flags.ignoreToken {
+	if !option.ignoreToken {
 		selectedRuleIds, err = deps.RulesConfig.GetSelectedRuleIds()
 		if err != nil {
 			return err
@@ -185,7 +208,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
 	}
 
-	err = resultsPrinter.PrintResults(ruleResultsById, summary, flags.output)
+	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output, option.localPathToValidate != "")
 	if err != nil {
 		return err
 	}
