@@ -123,7 +123,9 @@ func printSummary(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConf
 	if summary.TotalFailedRules > 0 {
 		fmt.Println()
 		fmt.Println("Failed rules summary:")
-		for _, ruleResult := range ruleResults {
+		ruleIds := sortRulesOrder(ruleResults)
+		for _, id := range ruleIds {
+			ruleResult := ruleResults[id]
 			if !ruleResult.Valid {
 				fmt.Println(string(colorRed), "\r", ruleResult.RuleName, string(colorReset))
 			}

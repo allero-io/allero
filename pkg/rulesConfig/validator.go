@@ -3,6 +3,7 @@ package rulesConfig
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
@@ -54,11 +55,12 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 	lowestErrorLevel := 999
 
 	for _, rawSchemaError := range schemaResult.Errors() {
-		if errorByField[rawSchemaError.Field()] {
+		errorFields := strings.Split(rawSchemaError.Field(), ".")
+		trimedErrorField := strings.Join(errorFields[:5], ".")
+		if errorByField[trimedErrorField] {
 			continue
 		}
-
-		errorByField[rawSchemaError.Field()] = true
+		errorByField[trimedErrorField] = true
 		var schemaError *defaultRules.SchemaError
 
 		if scmPlatform == "github" {

@@ -2,6 +2,7 @@ package defaultRules
 
 import (
 	"encoding/json"
+	"fmt"
 
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
@@ -35,11 +36,16 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*
 		".*anchore/scan-action@.*",
 		".*synopsys-sig/detect-action@.*",
 		".*aquasecurity/trivy-action@.*",
+		".*checkmarx-ts/checkmarx-cxflow-github-action@.*",
+		".*snyk/actions/maven@.*",
 	}
 
 	runRegexExpressions := []string{
 		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
 		"^[\\S]*grype|docker .* run .*(anchore/)?grype.*",
+		"(jfrog|jf) (s|scan).*",
+		"ws scan.*",
+		"snyk (code | )test.*",
 	}
 
 	for _, owner := range githubData {
@@ -131,15 +137,31 @@ func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 }
 
 func findScaScannerRule10(project *gitlabConnector.GitlabProject) (bool, error) {
+
+	imageRegexExpressions := []string{
+		"registry.gitlab.com/secure.*",
+	}
+
 	scriptRegexExpressions := []string{
 		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
 		"^[\\S]*grype|docker .* run .*(anchore/)?grype.*",
+		"(jfrog|jf) (s|scan).*",
+		"ws scan.*",
+		"snyk ?(code | )test.*",
 	}
 
 	for _, pipeline := range project.GitlabCi {
 
-		for _, stage := range pipeline.Content {
-			stageBytes, err := json.Marshal(stage)
+		for key, value := range pipeline.Content {
+			if key == "image" {
+				imageValue := fmt.Sprintf("%v", value)
+				for _, imageRegexExpression := range imageRegexExpressions {
+					if matchRegex(imageRegexExpression, imageValue) {
+						return true, nil
+					}
+				}
+			}
+			stageBytes, err := json.Marshal(value)
 			if err != nil {
 				return false, err
 			}

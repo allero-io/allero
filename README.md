@@ -25,6 +25,10 @@ _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 
 
 ### 2. Validate your pipelines
+#### Validate pipelines in a local directory
+* Run `allero validate {DIRECTORY_PATH}`
+
+#### Validate pipelines from a remote source control
 * Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`
 * Validate your pipelines across all your fetched data: `allero validate`
 
@@ -43,7 +47,7 @@ Generate the token with the following **read** permissions:
 
 2. Once the token is generated, run `export ALLERO_GITHUB_TOKEN={YOUR_TOKEN}`.  
 - When running Allero from GitHub Actions, the PAT should be stored as an [encrypted secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
-3. Fetch your private repositories: `allero fetch githib {your_repo}`
+3. Fetch your private repositories: `allero fetch github {your_repo}`
 
 ### Fetching private repositories from Gitlab
 Fetching data from a private GitLab group requires an access token.
@@ -82,9 +86,9 @@ Some rules apply to everyone, while others are very stack-specific. That is why 
 | ensure-node-version | Make sure a specific version is set when using a node image | Enabled | Avoid unexpected behavior
 | ensure-python-version | Make sure a specific version is set when using a python image | Enabled | Avoid unexpected behavior
 | ensure-github-action-version | Ensure github action version is set | Enabled | Avoid unexpected behavior
-| prevent-using-uncontrolled-values | avoid running malware commands through repository names | Enabled | Keep production secured
-| ensure-sca-scanner | Make sure every repository has at least one pipeline with sca scanner | Keep production secured
-| ensure-terraform-scanner | Make sure every repository has at least one pipeline with terraform scanner  | Keep production secured
+| prevent-using-uncontrolled-values | Avoid running malware commands through repository names | Enabled | Keep production secured
+| ensure-sca-scanner | Make sure every repository has at least one pipeline with (Trivy, BlackDuck, Grype) | Disabled | Keep production secured
+| ensure-terraform-scanner | Make sure every repository has at least one pipeline with terraform scanner (Checkov ,Snyk, Tenable)  | Disabled | Keep production secured
 
 ### Enabling and disabling rules
 A policy is a set of rules, and it is represented by a token.  

@@ -2,3 +2,5 @@ allero
 .vscode/*.log
 dist
 .vscode/settings.json
+
+drafts/*
