@@ -117,16 +117,20 @@ func validateOutputFlag(output string) bool {
 }
 
 func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) error {
-	err := deps.RulesConfig.Initialize()
-	if err == rulesConfig.NoFetchedDataError && option.localPathToValidate != "" {
-		err := deps.LocalRepositoriesClient.Get(option.localPathToValidate)
-		if err != nil {
-			return err
-		} else {
+	var err error
+	if option.localPathToValidate != "" {
+		err = deps.LocalRepositoriesClient.Get(option.localPathToValidate)
+		if err == nil {
 			fmt.Printf("Running validation over %s\n", option.localPathToValidate)
 			deps.RulesConfig.ReadLocalData()
 		}
-	} else if err != nil {
+	}
+	if err != nil {
+		return err
+	}
+
+	err = deps.RulesConfig.Initialize()
+	if err != nil {
 		return err
 	}
 
@@ -204,7 +208,7 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
 	}
 
-	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output)
+	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output, option.localPathToValidate != "")
 	if err != nil {
 		return err
 	}

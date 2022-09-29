@@ -20,13 +20,17 @@ var CICD_PLATFORMS = map[string]string{
 var SCM_PLATFORMS = map[string]string{
 	"github": "Github",
 	"gitlab": "Gitlab",
+	"local":  "Local",
 }
 
 const colorRed = "\033[31m"
 const colorReset = "\033[0m"
 const colorBlue = "\033[34m"
 
-func PrintResults(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string) error {
+func PrintResults(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string, localValidation bool) error {
+	if localValidation {
+		PatchLocalErrors(ruleResults)
+	}
 	if outputFormat == "" {
 		printPretty(ruleResults, summary)
 		printSummary(ruleResults, summary)
@@ -35,6 +39,14 @@ func PrintResults(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConf
 	}
 
 	return nil
+}
+
+func PatchLocalErrors(ruleResults map[int]*rulesConfig.RuleResult) {
+	for _, ruleResult := range ruleResults {
+		for _, schemaError := range ruleResult.SchemaErrors {
+			schemaError.ScmPlatform = "local"
+		}
+	}
 }
 
 func printPretty(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) {
