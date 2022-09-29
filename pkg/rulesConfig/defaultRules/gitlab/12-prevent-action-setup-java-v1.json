@@ -1,0 +1,7 @@
+{
+	"description": "Prevent use of action/setup-java@v1.",
+	"failureMessage": "action/setup-java@v1 is used on the workflow.",
+	"uniqueId": 12,
+	"enableByDefault": true,
+	"schema": {} 
+}
