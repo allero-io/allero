@@ -30,7 +30,7 @@ func (lc *LocalConnector) getLocalGithub(githubJsonObject map[string]*githubConn
 func (lc *LocalConnector) addRootPathAsNewRepo(githubJsonObject map[string]*githubConnector.GithubOwner) error {
 	githubJsonObject["local_owner"] = &githubConnector.GithubOwner{
 		Name:         "sudo",
-		Type:         "",
+		Type:         "local_github",
 		ID:           0,
 		Repositories: make(map[string]*githubConnector.GithubRepository),
 	}

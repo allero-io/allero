@@ -55,6 +55,7 @@ allero validate .                   Validate over current directory
 allero validate ~/my-repo-dir       Validate over local directory`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		Args:          cobra.MaximumNArgs(1),
 		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
 			args := make(map[string]any)
 			args["Args"] = cmdArgs
@@ -71,15 +72,15 @@ allero validate ~/my-repo-dir       Validate over local directory`,
 			}
 
 			ignoreToken := cmd.Flag("ignore-token").Value.String() == "true"
-			localPathToFetch := ""
+			localPathToValidate := ""
 			if len(args) > 0 {
-				localPathToFetch = args[0]
+				localPathToValidate = args[0]
 			}
 
 			validateCommandFlags := &validateCommandOptions{
 				output:              output,
 				ignoreToken:         ignoreToken,
-				localPathToValidate: localPathToFetch,
+				localPathToValidate: localPathToValidate,
 			}
 
 			return execute(deps, validateCommandFlags)
