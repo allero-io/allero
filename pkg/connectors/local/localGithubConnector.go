@@ -16,7 +16,7 @@ func (lc *LocalConnector) getGithub(githubJsonObject map[string]*githubConnector
 		return err
 	}
 
-	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
+	escapedRepoName := connectors.EscapeJsonKey(lc.absoluteRootPath)
 	err = lc.processGithubWorkflowFiles(githubJsonObject, escapedRepoName)
 	if err != nil {
 		fmt.Println(err)
@@ -34,7 +34,7 @@ func (lc *LocalConnector) addRootPathAsNewRepo(githubJsonObject map[string]*gith
 		Repositories: make(map[string]*githubConnector.GithubRepository),
 	}
 
-	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
+	escapedRepoName := connectors.EscapeJsonKey(lc.absoluteRootPath)
 
 	githubJsonObject["local_owner"].Repositories[escapedRepoName] = &githubConnector.GithubRepository{
 		Name:                   escapedRepoName,
@@ -53,7 +53,7 @@ func (lc *LocalConnector) processGithubWorkflowFiles(githubJsonObject map[string
 	var processingError error
 
 	for workflowFile := range workflowFilesChan {
-		fullPath := lc.RootPath + workflowFile.RelativePath
+		fullPath := lc.absoluteRootPath + workflowFile.RelativePath
 		content, err := fileManager.ReadFile(fullPath)
 		if err != nil {
 			processingError = fmt.Errorf("failed to get content for file %s", fullPath)
@@ -80,9 +80,6 @@ func (lc *LocalConnector) processGithubWorkflowFiles(githubJsonObject map[string
 			githubJsonObject["local_owner"].Repositories[repoName].GithubActionsWorkflows[escapedFilename] = workflowFile
 		} else if workflowFile.Origin == "jfrog_pipelines" {
 			githubJsonObject["local_owner"].Repositories[repoName].JfrogPipelines[escapedFilename] = workflowFile
-		} else if workflowFile.Origin == "gitlab_ci" {
-			// TODO find a way to use a channel with GilabPipeline
-			// localJsonObject["local_owner"].Repositories[repoName].GitlabCi[escapedFilename] = workflowFile
 		} else {
 			processingError = fmt.Errorf("unsupported CICD platform %s for file %s from repository %s", workflowFile.Origin, workflowFile.RelativePath, repoName)
 			continue
@@ -103,7 +100,7 @@ func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *githu
 			if !cicdPlatform.GithubValid {
 				continue
 			}
-			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.RootPath, cicdPlatform.RelevantFilesRegex)
+			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.absoluteRootPath, cicdPlatform.RelevantFilesRegex)
 			if err != nil {
 				return
 			}

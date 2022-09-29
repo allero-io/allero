@@ -14,7 +14,8 @@ import (
 )
 
 type LocalConnector struct {
-	RootPath string
+	runningPath      string
+	absoluteRootPath string
 }
 
 func New() *LocalConnector {
@@ -23,11 +24,24 @@ func New() *LocalConnector {
 		panic(err)
 	}
 	return &LocalConnector{
-		RootPath: path,
+		runningPath:      path,
+		absoluteRootPath: "",
 	}
 }
 
-func (lc *LocalConnector) Get() error {
+func (lc *LocalConnector) Get(path string) error {
+	if path[0] == '.' {
+		lc.absoluteRootPath = lc.runningPath + path[1:]
+	} else {
+		if path[0] != '/' {
+			lc.absoluteRootPath = lc.runningPath + "/" + path
+		} else {
+			lc.absoluteRootPath = path
+		}
+	}
+	if lc.absoluteRootPath[len(lc.absoluteRootPath)-1] != '/' {
+		lc.absoluteRootPath = lc.absoluteRootPath + "/"
+	}
 	var localJsonObject LocalRoot
 	githubJsonObject := make(map[string]*githubConnector.GithubOwner)
 	err := lc.getGithub(githubJsonObject)
@@ -56,9 +70,8 @@ func (lc *LocalConnector) walkAndMatchedFiles(dir string, regex string) ([]strin
 
 	var allFiles []string
 	err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
-
 		if matched, _ := regexp.MatchString(regex, path); matched {
-			relativePath := strings.TrimPrefix(path, lc.RootPath)
+			relativePath := strings.TrimPrefix(path, lc.absoluteRootPath)
 			allFiles = append(allFiles, relativePath)
 		}
 

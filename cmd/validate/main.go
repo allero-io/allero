@@ -25,10 +25,10 @@ type ValidateCommandDependencies struct {
 	LocalRepositoriesClient *localConnector.LocalConnector
 }
 
-type ValidateCommandFlags struct {
-	output        string
-	ignoreToken   bool
-	failOnNoFetch bool
+type validateCommandOptions struct {
+	output              string
+	ignoreToken         bool
+	localPathToValidate string
 }
 
 type wrapper struct {
@@ -47,10 +47,12 @@ func (w *wrapper) Run(f func(cmd *cobra.Command, args []string) error) func(cmd 
 func New(deps *ValidateCommandDependencies) *cobra.Command {
 	cmdWrap := wrapper{}
 	var policiesCmd = &cobra.Command{
-		Use:           "validate",
-		Short:         "Validate set of default rules",
-		Long:          "Validate set of default rules over all fetched data",
-		Example:       `allero validate`,
+		Use:   "validate [OPTIONAL] PATH",
+		Short: "Validate set of default rules",
+		Long:  "Validate set of default rules over fetched data or the given path",
+		Example: `allero validate                     Validate over fetched repositories
+allero validate .                   Validate over current directory
+allero validate ~/my-repo-dir       Validate over local directory`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
@@ -69,12 +71,15 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 			}
 
 			ignoreToken := cmd.Flag("ignore-token").Value.String() == "true"
-			failOnNoFetch := cmd.Flag("fail-on-no-fetch").Value.String() == "true"
+			localPathToFetch := ""
+			if len(args) > 0 {
+				localPathToFetch = args[0]
+			}
 
-			validateCommandFlags := &ValidateCommandFlags{
-				output:        output,
-				ignoreToken:   ignoreToken,
-				failOnNoFetch: failOnNoFetch,
+			validateCommandFlags := &validateCommandOptions{
+				output:              output,
+				ignoreToken:         ignoreToken,
+				localPathToValidate: localPathToFetch,
 			}
 
 			return execute(deps, validateCommandFlags)
@@ -91,7 +96,6 @@ func New(deps *ValidateCommandDependencies) *cobra.Command {
 
 	policiesCmd.Flags().StringP("output", "o", "", "Define output format. Can be 'csv'")
 	policiesCmd.Flags().Bool("ignore-token", false, "Ignore token and run as anonymous user")
-	policiesCmd.Flags().Bool("fail-on-no-fetch", false, "Fail if validate command is run without any fetched data")
 
 	return policiesCmd
 }
@@ -111,14 +115,14 @@ func validateOutputFlag(output string) bool {
 	return false
 }
 
-func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) error {
+func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) error {
 	err := deps.RulesConfig.Initialize()
-	if !flags.failOnNoFetch && err == rulesConfig.NoFetchedDataError {
-		err := deps.LocalRepositoriesClient.Get()
+	if err == rulesConfig.NoFetchedDataError && option.localPathToValidate != "" {
+		err := deps.LocalRepositoriesClient.Get(option.localPathToValidate)
 		if err != nil {
 			return err
 		} else {
-			fmt.Printf("No fetched data found. Running validation on local data fetch from %s.\n", deps.LocalRepositoriesClient.RootPath)
+			fmt.Printf("Running validation over %s\n", option.localPathToValidate)
 			deps.RulesConfig.ReadLocalData()
 		}
 	} else if err != nil {
@@ -137,7 +141,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 	hasToken := false
 	selectedRuleIds := make(map[int]bool)
 
-	if !flags.ignoreToken {
+	if !option.ignoreToken {
 		selectedRuleIds, err = deps.RulesConfig.GetSelectedRuleIds()
 		if err != nil {
 			return err
@@ -199,7 +203,7 @@ func execute(deps *ValidateCommandDependencies, flags *ValidateCommandFlags) err
 		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
 	}
 
-	err = resultsPrinter.PrintResults(ruleResultsById, summary, flags.output)
+	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output)
 	if err != nil {
 		return err
 	}

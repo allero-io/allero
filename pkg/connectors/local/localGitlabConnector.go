@@ -16,7 +16,7 @@ func (lc *LocalConnector) getGitlab(gitlabJsonObject map[string]*gitlabConnector
 		return err
 	}
 
-	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
+	escapedRepoName := connectors.EscapeJsonKey(lc.absoluteRootPath)
 	err = lc.processGitlabWorkflowFiles(gitlabJsonObject, escapedRepoName)
 	if err != nil {
 		fmt.Println(err)
@@ -33,7 +33,7 @@ func (lc *LocalConnector) addRootPathAsNewProject(gitlabJsonObject map[string]*g
 		Projects: make(map[string]*gitlabConnector.GitlabProject),
 	}
 
-	escapedRepoName := connectors.EscapeJsonKey(lc.RootPath)
+	escapedRepoName := connectors.EscapeJsonKey(lc.absoluteRootPath)
 
 	gitlabJsonObject["local_group"].Projects[escapedRepoName] = &gitlabConnector.GitlabProject{
 		Name:           escapedRepoName,
@@ -51,7 +51,7 @@ func (lc *LocalConnector) processGitlabWorkflowFiles(gitlabJsonObject map[string
 	var processingError error
 
 	for workflowFile := range workflowFilesChan {
-		fullPath := lc.RootPath + workflowFile.RelativePath
+		fullPath := lc.absoluteRootPath + workflowFile.RelativePath
 		content, err := fileManager.ReadFile(fullPath)
 		if err != nil {
 			processingError = fmt.Errorf("failed to get content for file %s", fullPath)
@@ -98,7 +98,7 @@ func (lc *LocalConnector) getGitlabWorkflowFilesEntities(repoName string) (chan 
 			if !cicdPlatform.GitlabValid {
 				continue
 			}
-			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.RootPath, cicdPlatform.RelevantFilesRegex)
+			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.absoluteRootPath, cicdPlatform.RelevantFilesRegex)
 			if err != nil {
 				return
 			}
