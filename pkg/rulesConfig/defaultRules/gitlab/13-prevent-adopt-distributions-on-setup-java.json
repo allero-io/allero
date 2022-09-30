@@ -1,6 +1,6 @@
 {
 	"description": "Prevent use of adopt/adopt-hotspot distributions for actions/setup-java version 2+.",
-	"failureMessage": "adopt/adopt-hotspot distribution is used on the workflow.",
+	"failureMessage": "adopt/adopt-hotspot distribution is used on the workflow. Please, avoid the use of adopt/adopt-hotspot distributions since they are out of support. Use temurin based distributions instead (such distributions are currently maintained by the core adopt/adopt-hotspot team).",
 	"uniqueId": 13,
 	"enableByDefault": true,
 	"schema": {}
