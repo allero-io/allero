@@ -106,7 +106,7 @@ Tokens can be cleared from the CLI by running `allero config clear token`
 Rules can be defined using the [Json Schema](https://json-schema.org/) format. Json Schema rules should be based on our data schema. An example of our data schema structure can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules/data-schema-example.json).
 1. Create a new json file and define your rule. Example rules can be found [here](https://github.com/allero-io/allero/tree/main/examples/rules).
 Make sure to update the rule description and failureMessage.
-2. Copy-paste the rule-files to "~/.allero/rules/github/" and "~/.allero/rules/gitlab/".
+2. Copy-paste the rule-files to `~/.allero/rules/github/` and `~/.allero/rules/gitlab/`.
 3. Run `allero validate`
 
 ## Contribution 👩🏽‍💻
