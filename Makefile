@@ -10,6 +10,9 @@ run:
 validate:
 	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate
 
+validate-local:
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate . --ignore-token
+
 validate-ignore-token:
 	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate --ignore-token
 
