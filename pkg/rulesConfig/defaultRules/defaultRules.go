@@ -54,6 +54,9 @@ func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner, gi
 	if rule.UniqueId == 11 {
 		return EnsureTerraformScanner(githubData, gitlabData)
 	}
+	if rule.UniqueId == 12 {
+		return EnsureLinter(githubData, gitlabData)
+	}
 
 	return nil, fmt.Errorf("missing implementation for rule %d", rule.UniqueId)
 }
