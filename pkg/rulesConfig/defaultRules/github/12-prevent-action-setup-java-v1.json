@@ -2,7 +2,7 @@
 	"description": "Prevent use of action/setup-java@v1.",
 	"failureMessage": "action/setup-java@v1 is used on the workflow. action/setup-java@v1 uses a java distribution that is out of support (AdoptOpenJDK) by default, please use action/setup-java@v2+ and avoid the use of adopt/adopt-host distributions.",
 	"uniqueId": 12,
-	"enableByDefault": true,
+	"enabledByDefault": true,
 	"schema": {
 		"type": "object",
 		"additionalProperties": {
