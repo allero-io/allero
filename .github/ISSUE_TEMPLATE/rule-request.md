@@ -22,6 +22,9 @@ Short message for when this rule fails
 **What SCMs is this rule eligible for**
 Add here one or more: Github, Gitlab, etc.
 
+**Will this rule work in local run**
+Does this rule relevant when running allero validate on a local filesystem? If so, is there any different expected behavior for a local run?
+
 **What CI/CD platforms is this rule eligible for**
 Add here one or more: Github Actions, GitlabCI, JFrog Pipelines, etc.
 
