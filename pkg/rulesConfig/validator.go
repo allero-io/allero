@@ -56,12 +56,7 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 
 	for _, rawSchemaError := range schemaResult.Errors() {
 		errorFields := strings.Split(rawSchemaError.Field(), ".")
-		var trimedErrorField string
-		if len(errorFields) > 4 {
-			trimedErrorField = strings.Join(errorFields[:5], ".")
-		} else {
-			trimedErrorField = strings.Join(errorFields[:], ".")
-		}
+		trimedErrorField = strings.Join(errorFields[:5], ".")
 		if errorByField[trimedErrorField] {
 			continue
 		}
