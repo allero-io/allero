@@ -1,6 +1,7 @@
 package rulesConfig
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,7 +12,6 @@ import (
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	"github.com/allero-io/allero/pkg/fileManager"
 	"github.com/allero-io/allero/pkg/rulesConfig/defaultRules"
-	"gopkg.in/yaml.v2"
 )
 
 type TestFilesByRuleId = map[int]*FailAndPassTests
@@ -26,13 +26,14 @@ type FileWithName struct {
 	content interface{}
 }
 
-func ReadTestFileContent(filename string) (interface{}, error) {
+func ReadTestFileContent(filename string) (map[string]*githubConnector.GithubOwner, error) {
 	buf, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	var data interface{}
-	err = yaml.Unmarshal(buf, &data)
+
+	data := make(map[string]*githubConnector.GithubOwner)
+	err = json.Unmarshal([]byte(buf), &data)
 	return data, err
 }
 
@@ -50,12 +51,7 @@ func getFileData(filename string) (int, bool) {
 func SetGithubData(rc *RulesConfig, filename string) {
 	currDir, _ := os.Getwd()
 	fullFilePath := filepath.Join(currDir, "tests", "github", filename)
-	rc.githubData["dummy"].Repositories = make(map[string]*githubConnector.GithubRepository)
-	rc.githubData["dummy"].Repositories["dummy"] = new(githubConnector.GithubRepository)
-	rc.githubData["dummy"].Repositories["dummy"].GithubActionsWorkflows = make(map[string]*githubConnector.PipelineFile)
-	rc.githubData["dummy"].Repositories["dummy"].GithubActionsWorkflows["dummy"] = new(githubConnector.PipelineFile)
-	rc.githubData["dummy"].Repositories["dummy"].GithubActionsWorkflows["dummy"].Content, _ = ReadTestFileContent(fullFilePath)
-	println(rc.githubData["dummy"].Repositories["dummy"].GithubActionsWorkflows["dummy"].Content)
+	rc.githubData, _ = ReadTestFileContent(fullFilePath)
 }
 
 func validatePassing(t *testing.T, rule *defaultRules.Rule,
@@ -65,8 +61,6 @@ func validatePassing(t *testing.T, rule *defaultRules.Rule,
 		case "github":
 			SetGithubData(rc, file.name)
 		}
-		// mSchema, _ := json.Marshal(ruleSchema)
-		// schemaResult, _ := jsonschemaValidator.Validate(mSchema, rc.githubData)
 		schemaResult, _ := rc.Validate(ruleName, rule, scmPlatfrom)
 		println(schemaResult)
 	}
