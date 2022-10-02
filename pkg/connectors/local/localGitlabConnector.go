@@ -99,6 +99,10 @@ func (lc *LocalConnector) getGitlabWorkflowFilesEntities(repoName string) (chan 
 			if !cicdPlatform.GitlabValid {
 				continue
 			}
+			if cicdPlatform.Name == "jfrog_pipelines" {
+				// We don't need to get local jfrog pipelines files as gitlab files becuase we get them as github files
+				continue
+			}
 			relevantFilesPaths, err := lc.walkAndMatchedFiles(lc.absoluteRootPath, cicdPlatform.RelevantFilesRegex)
 			if err != nil {
 				return
