@@ -2,6 +2,6 @@
     "description": "Ensure that at least one pipeline in each repository runs linter",
     "failureMessage": "Linter was not detected in the repository pipelines. It is recommended to add one to keep standrads and clean code.",
     "uniqueId": 12,
-    "enabledByDefault": true,
+    "enabledByDefault": false,
     "inCodeImplementation": true
 }
