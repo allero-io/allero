@@ -32,18 +32,11 @@ func githubErrorsRule14(githubData map[string]*githubConnector.GithubOwner) ([]*
 	schemaErrors := make([]*SchemaError, 0)
 
 	usesRegexExpressions := []string{
-		".*bridgecrewio/checkov-action@.*",
-		".*tenable/terrascan-action@.*",
-		".*snyk/actions/iac@.*",
-		".*aquasecurity/trivy-action@.*",
-		".*checkmarx/kics-github-action@.*",
-		".*kubescape/github-action@.*",
+		".*codecov/codecov-action@.*",
 	}
 
 	runRegexExpressions := []string{
-		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
-		".*docker .* run .*checkmarx/kics scan.*",
-		".*kubescape scan.*",
+		".*codecov -t.*",
 	}
 
 	for _, owner := range githubData {
@@ -136,9 +129,7 @@ func gitlabErrorsRule14(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 
 func findCodeCoverageCheckerRule14(project *gitlabConnector.GitlabProject) (bool, error) {
 	scriptRegexExpressions := []string{
-		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
-		".*docker .* run .*checkmarx/kics scan.*",
-		".*kubescape scan.*",
+		".*codecov -t.*",
 	}
 
 	for _, pipeline := range project.GitlabCi {
