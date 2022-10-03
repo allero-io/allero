@@ -62,9 +62,15 @@ func validatePassing(t *testing.T, rule *defaultRules.Rule,
 			SetGithubData(rc, file.name)
 		}
 		schemaResult, _ := rc.Validate(ruleName, rule, scmPlatfrom)
-		println(schemaResult)
+		if len(schemaResult) > 0 && shouldPass {
+			t.Errorf("Expected validation for rule name %s to pass, but it failed for file %s\n", ruleName, file.name)
+		}
+		if len(schemaResult) == 0 && !shouldPass {
+			t.Errorf("Expected validation for rule name %s to pass, but it passed for file %s\n", ruleName, file.name)
+		}
 	}
 }
+
 func getTestFilesByRuleId(t *testing.T, scmPlatfrom string) TestFilesByRuleId {
 	currDir, _ := os.Getwd()
 	testDirPath := filepath.Join(currDir, "tests", scmPlatfrom)
@@ -100,17 +106,20 @@ func TestDefaultRulesValidation(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	scmPlatfrom := "github"
-	ruleNames := rc.GetAllRuleNames(scmPlatfrom)
-	testFilesByRuleId := getTestFilesByRuleId(t, scmPlatfrom)
-	for _, ruleName := range ruleNames {
-		println(ruleName)
-		rule, err := rc.GetRule(ruleName, scmPlatfrom)
-		if err != nil {
-			panic(err)
+	for _, scmPlatform := range []string{"github", "gitlab"} {
+		ruleNames := rc.GetAllRuleNames(scmPlatform)
+		testFilesByRuleId := getTestFilesByRuleId(t, scmPlatform)
+		for _, ruleName := range ruleNames {
+			println(ruleName)
+			rule, err := rc.GetRule(ruleName, scmPlatform)
+			if err != nil {
+				panic(err)
+			}
+			testFileByRuleId := testFilesByRuleId[rule.UniqueId]
+			if testFileByRuleId != nil {
+				validatePassing(t, rule, ruleName, testFileByRuleId.passes, true, &rc, scmPlatform)
+				validatePassing(t, rule, ruleName, testFileByRuleId.fails, false, &rc, scmPlatform)
+			}
 		}
-
-		validatePassing(t, rule, ruleName, testFilesByRuleId[rule.UniqueId].passes, true, &rc, scmPlatfrom)
-		validatePassing(t, rule, ruleName, testFilesByRuleId[rule.UniqueId].fails, false, &rc, scmPlatfrom)
 	}
 }
