@@ -1,0 +1,7 @@
+{
+    "description": "Ensure that at least one pipeline in each repository runs Code coverage checker",
+    "failureMessage": "Code coverage checker was not detected in the repository pipelines. It is highly recommended to add one to ensure that tests cover all code.",
+    "uniqueId": 14,
+    "enabledByDefault": false,
+    "inCodeImplementation": true
+}
