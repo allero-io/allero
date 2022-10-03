@@ -57,6 +57,7 @@ func SetGithubData(rc *RulesConfig, filename string) {
 func validatePassing(t *testing.T, rule *defaultRules.Rule,
 	ruleName string, files []*FileWithName, shouldPass bool, rc *RulesConfig, scmPlatfrom string) {
 	for _, file := range files {
+		// TODO: add gitlab support
 		switch scmPlatfrom {
 		case "github":
 			SetGithubData(rc, file.name)
