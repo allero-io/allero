@@ -83,6 +83,7 @@ func getTestFilesByRuleId(t *testing.T, scmPlatfrom string) TestFilesByRuleId {
 		if err != nil {
 			panic(err)
 		}
+		// test file will be looking like 1-pass.json where 1 is the rule id to test
 		id, isPass := getFileData(file.Name())
 		if testFilesByRuleId[id] == nil {
 			testFilesByRuleId[id] = &FailAndPassTests{}
@@ -101,6 +102,7 @@ func getTestFilesByRuleId(t *testing.T, scmPlatfrom string) TestFilesByRuleId {
 
 func TestDefaultRulesValidation(t *testing.T) {
 	var rc RulesConfig
+	// githubData have to be initialize to be able to init RuleConfig
 	rc.githubData = make(map[string]*githubConnector.GithubOwner)
 	rc.githubData["dummy"] = new(githubConnector.GithubOwner)
 	err := rc.Initialize()
@@ -110,6 +112,7 @@ func TestDefaultRulesValidation(t *testing.T) {
 	for _, scmPlatform := range []string{"github", "gitlab"} {
 		ruleNames := rc.GetAllRuleNames(scmPlatform)
 		testFilesByRuleId := getTestFilesByRuleId(t, scmPlatform)
+		// go over all rules
 		for _, ruleName := range ruleNames {
 			println(ruleName)
 			rule, err := rc.GetRule(ruleName, scmPlatform)
