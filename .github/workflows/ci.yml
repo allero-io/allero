@@ -25,3 +25,6 @@ jobs:
     - name: Run vet
       run: |
         go vet .
+
+    - name: Test rules
+      run: go test -v ./pkg/rulesConfig/rules_test.go
