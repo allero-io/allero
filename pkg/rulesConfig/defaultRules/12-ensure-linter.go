@@ -34,6 +34,7 @@ func githubErrorsRule12(githubData map[string]*githubConnector.GithubOwner) ([]*
 	usesRegexExpressions := []string{
 		".*wemake-services/wemake-python-styleguide@.*",
 		".*github/super-linter@.*",
+		".*oxsecurity/megalinter@.*",
 	}
 
 	runRegexExpressions := []string{
@@ -41,6 +42,7 @@ func githubErrorsRule12(githubData map[string]*githubConnector.GithubOwner) ([]*
 		".*^[\\S]*flake8 .*",
 		".*^[\\S]*{tool}.*",
 		".*docker .* run .*({tool}/)?renovate.*",
+		".*mega-linter-runner.*",
 	}
 
 	for _, owner := range githubData {
@@ -137,6 +139,7 @@ func findLinterRule12(project *gitlabConnector.GitlabProject) (bool, error) {
 		".*^[\\S]*flake8 .*",
 		".*^[\\S]*{tool}.*",
 		".*docker .* run .*({tool}/)?renovate.*",
+		".*mega-linter-runner.*",
 	}
 
 	for _, pipeline := range project.GitlabCi {
