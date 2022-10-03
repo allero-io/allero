@@ -109,7 +109,7 @@ func gitlabErrorsRule13(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 
 	for _, group := range gitlabData {
 		for _, project := range group.Projects {
-			foundCodeQualityScanner, err := findScaScannerRule11(project)
+			foundCodeQualityScanner, err := findCodeQualityScannerRule13(project)
 			if err != nil {
 				return nil, err
 			}
