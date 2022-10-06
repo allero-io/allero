@@ -61,9 +61,9 @@ jobs:
         with:
           context: .
           load: true
-          tags:
-            - allero/allero-cli:${{ github.event.inputs.release_version }}
-            - latest
+          tags: |
+            allero/allero-cli:${{ github.event.inputs.release_version }}
+            allero/allero-cli:latest
       -
         name: Test
         run: |
@@ -81,6 +81,7 @@ jobs:
         with:
           context: .
           push: true
-          tags:
-            - allero/allero-cli:${{ github.event.inputs.release_version }}
-            - latest
+          build-args: cli-version=${{ github.event.inputs.release_version }}
+          tags: |
+            allero/allero-cli:${{ github.event.inputs.release_version }}
+            allero/allero-cli:latest
