@@ -92,9 +92,9 @@ Some rules apply to everyone, while others are very stack-specific. That is why 
 | 12 | prevent-action-setup-java-v1 | Prevent using deprecated java version                                         | Disabled          | Keep production secured |
 | 13 | prevent-adopt-distributions-on-setup-java | Prevent using deprecated java distribution                       | Disabled          | Keep production secured |
 | 14 | ensure-code-coverage         | Make sure every repository has at least one pipeline with Codecov             | Disabled          | Keep Code Quality |
-| 15 | ensure-secrets-scanner       | Make sure every repository has at least one pipeline with Secrets scanner (Truffles ,GitGuardian, Gitleaks, Trivy)  | Disabled | Keep production secured |
-| 16 | ensure-linter                | Make sure every repository has at least one pipeline with Linetr (Wemake, SuperLinter, MegaLinter, Renovate)        | Disabled | Keep Code Quality |
-| 17 | ensure-code-quality          | Make sure every repository has at least one pipeline with Code Quality checker (CodeClimate ,SonarQube, SonarCloud) | Disabled | Keep Code Quality |
+| 15 | ensure-secrets-scanner       | Make sure every repository has at least one pipeline with secrets scanner (Truffles ,GitGuardian, Gitleaks, Trivy)  | Disabled | Keep production secured |
+| 16 | ensure-linter                | Make sure every repository has at least one pipeline with linter (Wemake, SuperLinter, MegaLinter, Renovate)        | Disabled | Keep Code Quality |
+| 17 | ensure-code-quality          | Make sure every repository has at least one pipeline with code cuality checker (CodeClimate, SonarQube, SonarCloud) | Disabled | Keep Code Quality |
 
 
 
