@@ -17,9 +17,9 @@ Allero comes with built-in rules, and developed to be as friendly as possible fo
 
 
 ## Quick Start!
+Allero supports GitHub Actions and GitLab Pipelines.
 <img src="./static/allero_validate.gif" alt="allero-cli">
 
-Allero supports GitHub Actions and GitLab Pipelines.
 ### 1. Install the latest release in your terminal
 _Linux & MacOS:_ `curl https://get.allero.io | /bin/bash`  
 _Brew:_ `brew install allero-io/allero/allero`  
