@@ -54,7 +54,7 @@ func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner, gi
 	if rule.UniqueId == 11 {
 		return EnsureTerraformScanner(githubData, gitlabData)
 	}
-	if rule.UniqueId == 12 {
+	if rule.UniqueId == 16 {
 		return EnsureLinter(githubData, gitlabData)
 	}
 

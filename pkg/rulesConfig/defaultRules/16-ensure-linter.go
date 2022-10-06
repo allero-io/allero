@@ -12,14 +12,14 @@ func EnsureLinter(githubData map[string]*githubConnector.GithubOwner, gitlabData
 	var err error
 
 	if githubData != nil {
-		schemaErrors, err = githubErrorsRule12(githubData)
+		schemaErrors, err = githubErrorsRule16(githubData)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if gitlabData != nil {
-		schemaErrors, err = gitlabErrorsRule12(gitlabData)
+		schemaErrors, err = gitlabErrorsRule16(gitlabData)
 		if err != nil {
 			return nil, err
 		}
@@ -28,7 +28,7 @@ func EnsureLinter(githubData map[string]*githubConnector.GithubOwner, gitlabData
 	return schemaErrors, nil
 }
 
-func githubErrorsRule12(githubData map[string]*githubConnector.GithubOwner) ([]*SchemaError, error) {
+func githubErrorsRule16(githubData map[string]*githubConnector.GithubOwner) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	usesRegexExpressions := []string{
@@ -108,12 +108,12 @@ func githubErrorsRule12(githubData map[string]*githubConnector.GithubOwner) ([]*
 	return schemaErrors, nil
 }
 
-func gitlabErrorsRule12(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
+func gitlabErrorsRule16(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	for _, group := range gitlabData {
 		for _, project := range group.Projects {
-			foundLinter, err := findLinterRule12(project)
+			foundLinter, err := findLinterRule16(project)
 			if err != nil {
 				return nil, err
 			}
@@ -133,7 +133,7 @@ func gitlabErrorsRule12(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 	return schemaErrors, nil
 }
 
-func findLinterRule12(project *gitlabConnector.GitlabProject) (bool, error) {
+func findLinterRule16(project *gitlabConnector.GitlabProject) (bool, error) {
 	scriptRegexExpressions := []string{
 		".*^[\\S]*pip install wemake-python-styleguide.*",
 		".*^[\\S]*flake8 .*",
