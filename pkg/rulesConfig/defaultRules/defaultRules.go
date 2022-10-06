@@ -57,6 +57,9 @@ func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner, gi
 	if rule.UniqueId == 14 {
 		return EnsureCodeCoverageChecker(githubData, gitlabData)
 	}
+	if rule.UniqueId == 16 {
+		return EnsureLinter(githubData, gitlabData)
+	}
 
 	return nil, fmt.Errorf("missing implementation for rule %d", rule.UniqueId)
 }
