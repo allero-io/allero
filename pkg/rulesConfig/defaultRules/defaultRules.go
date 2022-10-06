@@ -35,8 +35,9 @@ type Job struct {
 }
 
 type Step struct {
-	Uses string `json:"uses"`
-	Run  string `json:"run"`
+	Uses string         `json:"uses"`
+	Run  string         `json:"run"`
+	With map[string]any `json:"with"`
 }
 
 type GitlabStageScript struct {
@@ -56,6 +57,9 @@ func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner, gi
 	}
 	if rule.UniqueId == 14 {
 		return EnsureCodeCoverageChecker(githubData, gitlabData)
+	}
+	if rule.UniqueId == 15 {
+		return EnsureSecretsScanner(githubData, gitlabData)
 	}
 	if rule.UniqueId == 16 {
 		return EnsureLinter(githubData, gitlabData)
