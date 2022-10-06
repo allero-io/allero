@@ -31,8 +31,9 @@ func New(deps *GitlabConnectorDependencies) *GitlabConnector {
 	}
 }
 
-func (gc *GitlabConnector) Get(args []string) (int, error) {
-	projectsChan := gc.getAllProjects(args)
+func (gc *GitlabConnector) Get(ownersWithRepos []*connectors.OwnerWithRepo) (int, error) {
+	projectsChan := gc.getAllProjects(ownersWithRepos)
+
 	reposFetchCounter := 0
 	gitlabJsonObject := make(map[string]*GitlabGroup)
 
@@ -179,14 +180,16 @@ func (gc *GitlabConnector) addProject(gitlabJsonObject map[string]*GitlabGroup, 
 	return nil
 }
 
-func (gc *GitlabConnector) getAllProjects(args []string) chan *GitlabProjectApiResponse {
+func (gc *GitlabConnector) getAllProjects(ownersWithRepos []*connectors.OwnerWithRepo) chan *GitlabProjectApiResponse {
 	projectsChan := make(chan *GitlabProjectApiResponse)
 
 	go func() {
 		defer close(projectsChan)
 
-		for _, arg := range args {
-			ownerWithRepo := connectors.SplitParentRepo(arg)
+		for _, ownerWithRepo := range ownersWithRepos {
+			fmt.Printf("Start fetching gitlab group %s\n", ownerWithRepo.Owner)
+			fullName := ownerWithRepo.Owner + "/" + ownerWithRepo.Repo
+
 			group, _, err := gc.client.Groups.GetGroup(ownerWithRepo.Owner, nil)
 			if err != nil {
 				projectsChan <- &GitlabProjectApiResponse{
@@ -203,7 +206,7 @@ func (gc *GitlabConnector) getAllProjects(args []string) chan *GitlabProjectApiR
 				projects = group.Projects
 			} else {
 				for _, project := range group.Projects {
-					if project.PathWithNamespace == strings.ToLower(arg) {
+					if project.PathWithNamespace == strings.ToLower(fullName) {
 						projects = append(projects, project)
 						break
 					}

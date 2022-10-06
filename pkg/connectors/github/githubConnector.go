@@ -32,8 +32,8 @@ func New(deps *GithubConnectorDependencies) *GithubConnector {
 	}
 }
 
-func (gc *GithubConnector) Get(args []string) (int, error) {
-	repositoriesChan := gc.getAllRepositories(args)
+func (gc *GithubConnector) Get(ownersWithRepos []*connectors.OwnerWithRepo) (int, error) {
+	repositoriesChan := gc.getAllRepositories(ownersWithRepos)
 
 	githubJsonObject := make(map[string]*GithubOwner)
 	reposFetchCounter := 0
@@ -200,32 +200,32 @@ func (gc *GithubConnector) matchedFiles(tree *github.Tree, regex string) []strin
 	return matchedFiles
 }
 
-func (gc *GithubConnector) getAllRepositories(args []string) chan *GithubRepositoryApiResponse {
+func (gc *GithubConnector) getAllRepositories(ownersWithRepos []*connectors.OwnerWithRepo) chan *GithubRepositoryApiResponse {
 	repositoriesChan := make(chan *GithubRepositoryApiResponse)
 
 	go func() {
 		defer close(repositoriesChan)
 
-		for _, arg := range args {
-			ownerWithRepo := connectors.SplitParentRepo(arg)
+		for _, ownerWithRepo := range ownersWithRepos {
+			fullName := ownerWithRepo.Owner + "/" + ownerWithRepo.Repo
 
 			if ownerWithRepo.Repo != "" {
-				fmt.Printf("Start fetching repository %s/%s\n", ownerWithRepo.Owner, ownerWithRepo.Repo)
+				fmt.Printf("Start fetching github repository %s/%s\n", ownerWithRepo.Owner, ownerWithRepo.Repo)
 				repoMetadata, _, err := gc.client.Repositories.Get(context.Background(), ownerWithRepo.Owner, ownerWithRepo.Repo)
 				if err != nil {
-					err = fmt.Errorf("unable to get repository %s", arg)
+					err = fmt.Errorf("unable to get github repository %s", fullName)
 				}
 
 				repositoriesChan <- &GithubRepositoryApiResponse{
 					Repository: repoMetadata,
 					Error:      err,
 				}
-				fmt.Printf("Finished fetching repository %s/%s\n", ownerWithRepo.Owner, ownerWithRepo.Repo)
+				fmt.Printf("Finished fetching github repository %s/%s\n", ownerWithRepo.Owner, ownerWithRepo.Repo)
 
 			} else {
 				ownerType, err := gc.getGithubOwnerType(ownerWithRepo.Owner)
 				if err != nil {
-					err = fmt.Errorf("unable to get data on owner %s", ownerWithRepo.Owner)
+					err = fmt.Errorf("unable to get data on github owner %s", ownerWithRepo.Owner)
 
 					repositoriesChan <- &GithubRepositoryApiResponse{
 						Repository: nil,
@@ -234,7 +234,7 @@ func (gc *GithubConnector) getAllRepositories(args []string) chan *GithubReposit
 				} else {
 					ownerRepos, err := ListByOwnerWithPagination(gc.client, ownerWithRepo.Owner, ownerType)
 					if err != nil {
-						err = fmt.Errorf("unable to get repositories from owner %s", ownerWithRepo.Owner)
+						err = fmt.Errorf("unable to get repositories from github owner %s", ownerWithRepo.Owner)
 					}
 
 					for repo := range ownerRepos {
