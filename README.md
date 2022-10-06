@@ -17,6 +17,8 @@ Allero comes with built-in rules, and developed to be as friendly as possible fo
 
 
 ## Quick Start!
+<img src="./static/allero_validate.gif" alt="allero-cli">
+
 Allero supports GitHub Actions and GitLab Pipelines.
 ### 1. Install the latest release in your terminal
 _Linux & MacOS:_ `curl https://get.allero.io | /bin/bash`  
@@ -31,8 +33,6 @@ _Windows:_ `iwr -useb https://get.allero.io/windows_install.ps1 | iex`
 #### Validate pipelines from a remote source control
 * Fetch your organizations and/or repositories: `allero fetch github dapr/dapr`
 * Validate your pipelines across all your fetched data: `allero validate`
-
-<img src="./static/allero_validate.gif" alt="allero-cli">
 
 ### Fetching private repositories from Github
 Fetching data from a private GitHub organization requires a personal access token (PAT).
