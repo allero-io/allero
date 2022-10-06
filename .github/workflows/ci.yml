@@ -27,4 +27,5 @@ jobs:
         go vet .
 
     - name: Test rules
-      run: go test -v ./pkg/rulesConfig/rules_test.go
+      working-directory: ./pkg/rulesConfig
+      run: go test
