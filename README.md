@@ -76,19 +76,27 @@ Some rules apply to everyone, while others are very stack-specific. That is why 
 
 ### Supported Rules
 
-| _Rule Name_               | _Description_                                            | _Default State_               | _Reason_                                                                                                               |
-| ------------------------- | -------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| prevent-npm-install       | Prevents the usage of `npm install` in pipelines. We recommend using `npm ci` instead           | Enabled | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
-| prevent-kubectl-apply     | Prevents the usage of kubectl apply in pipelines. We recommend using helm or any other k8s deployment tool         | Enabled | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)                                                   |
-| ensure-npm-ignore-scripts | Ensures that pre/post-install scripts are not run by NPM | Enabled | [link](https://snyk.io/blog/ten-npm-security-best-practices/)                                                     |
-| snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects vulnerabilities | Enabled | Keep production secured
-| prevent-password-plain-text | Prevent use of password as plain text | Enabled | Keep passwords from leaking
-| ensure-node-version | Make sure a specific version is set when using a node image | Enabled | Avoid unexpected behavior
-| ensure-python-version | Make sure a specific version is set when using a python image | Enabled | Avoid unexpected behavior
-| ensure-github-action-version | Ensure github action version is set | Enabled | Avoid unexpected behavior
-| prevent-using-uncontrolled-values | Avoid running malware commands through repository names | Enabled | Keep production secured
-| ensure-sca-scanner | Make sure every repository has at least one pipeline with (Trivy, BlackDuck, Grype) | Disabled | Keep production secured
-| ensure-terraform-scanner | Make sure every repository has at least one pipeline with terraform scanner (Checkov ,Snyk, Tenable)  | Disabled | Keep production secured
+| _Unique Id_ | _Rule Name_                   | _Description_                                                                 | _Default State_   | _Reason_        |
+| ----------- | -------------------------     | -------------------------------------------------------- | ----------------------------- | ---------------------------------- |
+| 1 | ensure-github-action-version  | Ensure github action version is set                                           | Enabled           | Avoid unexpected behavior |
+| 2 | ensure-node-version           | Make sure a specific version is set when using a node image                   | Enabled           | Avoid unexpected behavior |
+| 3 | ensure-npm-ignore-scripts     | Ensures that pre/post-install scripts are not run by NPM                      | Enabled           | [link](https://snyk.io/blog/ten-npm-security-best-practices/) |
+| 4 | ensure-python-version         | Make sure a specific version is set when using a python image                 | Enabled           | Avoid unexpected behavior |
+| 5 | prevent-kubectl-apply         | Prevents the usage of kubectl apply in pipelines. We recommend using helm or any other k8s deployment tool | Enabled | [link](https://medium.com/@RedBaronDr1/helm-vs-kubectl-5aaf2dba7d71)   |
+| 6 | prevent-npm-install           | Prevents the usage of `npm install` in pipelines. We recommend using `npm ci` instead    | Enabled | [link](https://betterprogramming.pub/npm-ci-vs-npm-install-which-should-you-use-in-your-node-js-projects-51e07cb71e26) |
+| 7 | prevent-password-plain-text   | Prevent use of password as plain text                                         | Enabled           | Keep passwords from leaking |
+| 8 | snyk-prevent-continue-on-error | Prevent continuing workflows when snyk detects vulnerabilities               | Enabled           | Keep production secured |
+| 9 | prevent-using-uncontrolled-values | Avoid running malware commands through repository names                   | Enabled           | Keep production secured |
+| 10 | ensure-sca-scanner            | Make sure every repository has at least one pipeline with (Trivy, BlackDuck, Grype) | Disabled   | Keep production secured |
+| 11 | ensure-terraform-scanner      | Make sure every repository has at least one pipeline with terraform scanner (Checkov ,Snyk, Tenable)  | Disabled | Keep production secured |
+| 12 | prevent-action-setup-java-v1 | Prevent using deprecated java version                                         | Disabled          | Keep production secured |
+| 13 | prevent-adopt-distributions-on-setup-java | Prevent using deprecated java distribution                       | Disabled          | Keep production secured |
+| 14 | ensure-code-coverage         | Make sure every repository has at least one pipeline with Codecov             | Disabled          | Keep Code Quality |
+| 15 | ensure-secrets-scanner       | Make sure every repository has at least one pipeline with secrets scanner (Truffles ,GitGuardian, Gitleaks, Trivy)  | Disabled | Keep production secured |
+| 16 | ensure-linter                | Make sure every repository has at least one pipeline with linter (Wemake, SuperLinter, MegaLinter, Renovate)        | Disabled | Keep Code Quality |
+| 17 | ensure-code-quality          | Make sure every repository has at least one pipeline with code cuality checker (CodeClimate, SonarQube, SonarCloud) | Disabled | Keep Code Quality |
+
+
 
 ### Enabling and disabling rules
 A policy is a set of rules, and it is represented by a token.  
