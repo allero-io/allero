@@ -4,11 +4,13 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/allero-io/allero/pkg/configurationManager"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
-func CreateGithubClient(githubToken string) *github.Client {
+func CreateGithubClient(configurationManager configurationManager.ConfigurationManager) *github.Client {
+	githubToken := configurationManager.GetGithubToken()
 	httpClient := &http.Client{}
 
 	if githubToken != "" {
