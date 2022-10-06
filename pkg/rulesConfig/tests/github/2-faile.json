@@ -1,0 +1,98 @@
+{
+    "dummy": {
+     "ownerName": "dummy",
+     "ownerType": "User",
+     "id": 22151399,
+     "repositories": {
+      "dummy": {
+       "name": "dummy",
+       "fullName": "dummy",
+       "id": 406452034,
+       "programmingLanguages": [
+        "JavaScript",
+        "CSS"
+       ],
+       "github-actions-workflows": {
+        "pr[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/pr.yml",
+         "filename": "pr.yml",
+         "origin": "github_actions",
+         "content": {
+          "jobs": {
+           "lint-docs": {
+            "name": "Lint documentation files",
+            "permissions": {
+             "pull-requests": "write"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Lint markdown files",
+              "uses": "prologic/action-markdownlint@v0.9",
+              "with": {
+               "github_token": "${{ secrets.GITHUB_TOKEN }}",
+               "level": "error",
+               "reporter": "github-pr-check"
+              }
+             },
+             {
+              "name": "Check for spelling mistakes",
+              "uses": "reviewdog/action-misspell@v1.12",
+              "with": {
+               "github_token": "${{ secrets.GITHUB_TOKEN }}",
+               "level": "error",
+               "locale": "US",
+               "reporter": "github-pr-check"
+              }
+             }
+            ]
+           },
+           "test": {
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "uses": "actions/checkout@v2"
+             },
+             {
+              "name": "Test using Node.js",
+              "uses": "actions/setup-node@v1"
+             },
+             {
+              "run": "npm ci --ignore-scripts"
+             },
+             {
+              "run": "npm test"
+             },
+             {
+              "if": "${{ success() }}",
+              "name": "Tests ✅",
+              "run": "curl --request POST \\\n--url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \\\n--header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \\\n--header 'content-type: application/json' \\\n--data '{\n  \"context\": \"tests\",\n  \"state\": \"success\",\n  \"description\": \"Tests passed\",\n  \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"\n}'\n"
+             },
+             {
+              "if": "${{ failure() }}",
+              "name": "Tests 🚨",
+              "run": "curl --request POST \\\n--url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \\\n--header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \\\n--header 'content-type: application/json' \\\n--data '{\n  \"context\": \"tests\",\n  \"state\": \"failure\",\n  \"description\": \"Tests failed\",\n  \"target_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"\n}'\n"
+             }
+            ]
+           }
+          },
+          "name": "pr",
+          "true": {
+           "pull_request": {
+            "branches": [
+             "master"
+            ]
+           }
+          }
+         }
+        }
+       },
+       "jfrog-pipelines": {}
+      }
+     }
+    }
+   }
