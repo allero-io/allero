@@ -1,16 +1,17 @@
 package fetch
 
 import (
+	"github.com/allero-io/allero/pkg/clients"
+	"github.com/allero-io/allero/pkg/connectors"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 	"github.com/spf13/cobra"
 	"github.com/xanzy/go-gitlab"
 )
 
 type FetchGitlabDependencies struct {
-	GitlabClient *gitlab.Client
+	GitlabClient    *gitlab.Client
+	OwnersWithRepos []*connectors.OwnerWithRepo
 }
-
-var GITLAB_TOKEN string
 
 func NewGitlabCommand(deps *FetchCommandDependencies) *cobra.Command {
 	githubCmd := &cobra.Command{
@@ -29,19 +30,20 @@ func NewGitlabCommand(deps *FetchCommandDependencies) *cobra.Command {
 			deps.PosthogClient.PublishEventWithArgs("data fetched", args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			GITLAB_TOKEN = deps.ConfigurationManager.GetGitlabToken()
-			gitlabClient, err := gitlab.NewClient(GITLAB_TOKEN)
+			ownersWithRepos := connectors.SplitParentRepo(args)
+			gitlabClient, err := clients.CreateGitlabClient(*deps.ConfigurationManager)
 			if err != nil {
 				return err
 			}
 
 			fetchGitlabDeps := &FetchGitlabDependencies{
-				GitlabClient: gitlabClient,
+				GitlabClient:    gitlabClient,
+				OwnersWithRepos: ownersWithRepos,
 			}
-			return executeGitlab(fetchGitlabDeps, args)
+			return executeGitlab(fetchGitlabDeps)
 		},
 		PostRun: func(cmd *cobra.Command, args []string) {
-			tokenWasProvided := GITHUB_TOKEN != ""
+			tokenWasProvided := deps.ConfigurationManager.GetGitlabToken()
 
 			analyticsArgs := make(map[string]any)
 			analyticsArgs["Total Fetched Repos"] = reposFetchCounter
@@ -53,10 +55,11 @@ func NewGitlabCommand(deps *FetchCommandDependencies) *cobra.Command {
 	return githubCmd
 }
 
-func executeGitlab(deps *FetchGitlabDependencies, args []string) error {
+func executeGitlab(deps *FetchGitlabDependencies) error {
 	gitlabConnectorDeps := &gitlabConnector.GitlabConnectorDependencies{Client: deps.GitlabClient}
 	gitlabConnector := gitlabConnector.New(gitlabConnectorDeps)
 
-	reposFetchCounter, err = gitlabConnector.Get(args)
+	var err error
+	reposFetchCounter, err = gitlabConnector.Get(deps.OwnersWithRepos)
 	return err
 }

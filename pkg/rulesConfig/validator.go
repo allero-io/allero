@@ -54,8 +54,8 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 	errorByField := make(map[string]bool)
 	lowestErrorLevel := 999
 
-	for _, rawSchemaError := range schemaResult.Errors() {
-		errorFields := strings.Split(rawSchemaError.Field(), ".")
+	for _, schemaErrorField := range rc.createUniqueErrors(schemaResult) {
+		errorFields := strings.Split(schemaErrorField, ".")
 		var trimedErrorField string
 		if len(errorFields) > 4 {
 			trimedErrorField = strings.Join(errorFields[:5], ".")
@@ -69,9 +69,9 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 		var schemaError *defaultRules.SchemaError
 
 		if scmPlatform == "github" {
-			schemaError = rc.parseSchemaFieldGithub(rc.githubData, rawSchemaError.Field())
+			schemaError = rc.parseSchemaFieldGithub(rc.githubData, schemaErrorField)
 		} else if scmPlatform == "gitlab" {
-			schemaError = rc.parseSchemaFieldGitlab(rc.gitlabData, rawSchemaError.Field())
+			schemaError = rc.parseSchemaFieldGitlab(rc.gitlabData, schemaErrorField)
 		}
 
 		if schemaError.ErrorLevel < lowestErrorLevel {
@@ -83,6 +83,25 @@ func (rc *RulesConfig) JSONSchemaValidate(ruleName string, rule *defaultRules.Ru
 	}
 
 	return schemaErrors, nil
+}
+
+func (rc *RulesConfig) createUniqueErrors(schemaResult *gojsonschema.Result) []string {
+	uniqueMapping := make(map[string]bool)
+
+	for _, schemaError := range schemaResult.Errors() {
+		if schemaError.Type() == "number_all_of" {
+			continue
+		}
+		if ok := uniqueMapping[schemaError.Field()]; !ok {
+			uniqueMapping[schemaError.Field()] = true
+		}
+	}
+
+	uniqueErrorsField := make([]string, 0, len(uniqueMapping))
+	for k := range uniqueMapping {
+		uniqueErrorsField = append(uniqueErrorsField, k)
+	}
+	return uniqueErrorsField
 }
 
 func (rc *RulesConfig) InCodeValidate(rule *defaultRules.Rule, githubData map[string]*githubConnector.GithubOwner, gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*defaultRules.SchemaError, error) {

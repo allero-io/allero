@@ -12,13 +12,22 @@
             "showLog": true
         },
         {
-            "name": "Fetch",
+            "name": "Fetch Github",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/main.go",
             "env": {},
             "args": ["fetch", "github", "allero-io"],
+        },
+        {
+            "name": "Fetch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {},
+            "args": ["fetch", "https://github.com/allero-io/allero", "https://gitlab.com/allero"],
         }
     ]
 }

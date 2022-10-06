@@ -44,16 +44,25 @@ var SUPPORTED_CICD_PLATFORMS = []CICDPlatform{
 	// },
 }
 
-func SplitParentRepo(arg string) *OwnerWithRepo {
-	splits := strings.Split(arg, "/")
-	owner := splits[0]
+func SplitParentRepo(args []string) []*OwnerWithRepo {
+	ownersWithRepos := make([]*OwnerWithRepo, 0)
 
-	var repo string
-	if len(splits) > 1 {
-		repo = splits[1]
+	for _, arg := range args {
+		splits := strings.Split(arg, "/")
+		owner := splits[0]
+
+		var repo string
+		if len(splits) > 1 {
+			repo = splits[1]
+		}
+
+		ownersWithRepos = append(ownersWithRepos, &OwnerWithRepo{
+			Repo:  repo,
+			Owner: owner,
+		})
 	}
 
-	return &OwnerWithRepo{Owner: owner, Repo: repo}
+	return ownersWithRepos
 }
 
 func YamlToJson(byteContent []byte) ([]byte, error) {

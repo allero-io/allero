@@ -156,9 +156,9 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 
 	ruleResultsById := map[int]*rulesConfig.RuleResult{}
 
-	for scmPlaform, ruleNames := range ruleNamesByScmPlatform {
+	for scmPlatform, ruleNames := range ruleNamesByScmPlatform {
 		for _, ruleName := range ruleNames {
-			rule, err := deps.RulesConfig.GetRule(ruleName, scmPlaform)
+			rule, err := deps.RulesConfig.GetRule(ruleName, scmPlatform)
 			if err != nil {
 				return err
 			}
@@ -169,7 +169,7 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 				continue
 			}
 
-			schemaErrors, err := deps.RulesConfig.Validate(ruleName, rule, scmPlaform)
+			schemaErrors, err := deps.RulesConfig.Validate(ruleName, rule, scmPlatform)
 			if err != nil {
 				return err
 			}

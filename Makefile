@@ -10,6 +10,9 @@ run:
 validate:
 	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate
 
+validate-local:
+	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate . --ignore-token
+
 validate-ignore-token:
 	go run -ldflags="-X github.com/allero-io/allero/cmd.CliVersion=test" main.go validate --ignore-token
 
@@ -22,10 +25,12 @@ clear-token:
 create-bin:
 	goreleaser --snapshot --skip-publish --rm-dist
 
+fetch:
+	go run main.go fetch https://github.com/allero-io/allero https://gitlab.com/allero
+
 github: 
-	# go run main.go fetch github supran2811/familyApp
-	go run main.go fetch github curbengh/hexo-yam
+	go run main.go fetch github supran2811/familyApp
 
 gitlab:
 	# go run main.go fetch gitlab GitLab-examples/clojure-web-application
-	go run main.go fetch gitlab allero/demo
+	go run main.go fetch gitlab allero
