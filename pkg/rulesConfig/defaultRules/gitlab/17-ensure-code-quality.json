@@ -1,7 +1,7 @@
 {
     "description": "Ensure that at least one pipeline in each repository runs Code Quality scanner",
     "failureMessage": "Code Quality scanner was not detected in the repository pipelines. It is highly recommended to add one to keep quality code.",
-    "uniqueId": 13,
+    "uniqueId": 17,
     "enabledByDefault": false,
     "inCodeImplementation": true
 }

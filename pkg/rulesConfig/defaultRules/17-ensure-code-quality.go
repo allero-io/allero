@@ -12,14 +12,14 @@ func EnsureCodeQualityScanner(githubData map[string]*githubConnector.GithubOwner
 	var err error
 
 	if githubData != nil {
-		schemaErrors, err = githubErrorsRule13(githubData)
+		schemaErrors, err = githubErrorsRule17(githubData)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if gitlabData != nil {
-		schemaErrors, err = gitlabErrorsRule13(gitlabData)
+		schemaErrors, err = gitlabErrorsRule17(gitlabData)
 		if err != nil {
 			return nil, err
 		}
@@ -28,7 +28,7 @@ func EnsureCodeQualityScanner(githubData map[string]*githubConnector.GithubOwner
 	return schemaErrors, nil
 }
 
-func githubErrorsRule13(githubData map[string]*githubConnector.GithubOwner) ([]*SchemaError, error) {
+func githubErrorsRule17(githubData map[string]*githubConnector.GithubOwner) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	usesRegexExpressions := []string{
@@ -104,12 +104,12 @@ func githubErrorsRule13(githubData map[string]*githubConnector.GithubOwner) ([]*
 	return schemaErrors, nil
 }
 
-func gitlabErrorsRule13(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
+func gitlabErrorsRule17(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	for _, group := range gitlabData {
 		for _, project := range group.Projects {
-			foundCodeQualityScanner, err := findCodeQualityScannerRule13(project)
+			foundCodeQualityScanner, err := findCodeQualityScannerRule17(project)
 			if err != nil {
 				return nil, err
 			}
@@ -129,7 +129,7 @@ func gitlabErrorsRule13(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 	return schemaErrors, nil
 }
 
-func findCodeQualityScannerRule13(project *gitlabConnector.GitlabProject) (bool, error) {
+func findCodeQualityScannerRule17(project *gitlabConnector.GitlabProject) (bool, error) {
 	scriptRegexExpressions := []string{
 		".*docker .* run .*codeclimate/codeclimate analyze.*",
 	}
