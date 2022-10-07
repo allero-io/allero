@@ -1,0 +1,226 @@
+{
+    "dummy": {
+     "ownerName": "dummy",
+     "ownerType": "User",
+     "id": 22151399,
+     "repositories": {
+      "dummy": {
+       "name": "dummy",
+       "fullName": "dummy/dummy",
+       "id": 507650266,
+       "programmingLanguages": [
+        "Python"
+       ],
+       "github-actions-workflows": {
+        "pr[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/pr.yml",
+         "filename": "pr.yml",
+         "origin": "github_actions",
+         "content": {
+          "env": {
+           "MAIN_PY_VER": "3.10"
+          },
+          "jobs": {
+           "docs": {
+            "name": "Verify documentation site",
+            "needs": [
+             "lint"
+            ],
+            "permissions": {
+             "pull-requests": "read"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+                "name": "fake step",
+                "run": "title=\"${{ github.event.pull_request.title }}\"\nif [[ $title =~ ^octocat ]]; then\necho \"PR title starts with 'octocat'\"\nexit 0\nelse\necho \"PR title did not start with 'octocat'\"\nexit 1\nfi\n"
+             },
+             {
+              "name": "Set up Python",
+              "uses": "actions/setup-python@v3",
+              "with": {
+               "python-version": "${{ env.MAIN_PY_VER }}"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ env.MAIN_PY_VER }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ env.MAIN_PY_VER }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Build documentation site",
+              "run": "poetry install --no-interaction\npoetry run poe docs_build\n"
+             }
+            ]
+           },
+           "lint": {
+            "name": "Lint source files",
+            "permissions": {
+             "pull-requests": "read"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Set up Python ${{ env.MAIN_PY_VER }}",
+              "uses": "actions/setup-python@v4",
+              "with": {
+               "python-version": "${{ env.MAIN_PY_VER }}"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ env.MAIN_PY_VER }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ env.MAIN_PY_VER }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Install deno runtime",
+              "uses": "denoland/setup-deno@v1.1.0"
+             },
+             {
+              "name": "Lint the project",
+              "run": "poetry install --no-interaction\npoetry run poe lint\npoetry run poe lic_check\n"
+             }
+            ]
+           },
+           "test": {
+            "name": "Test project with Python ${{ matrix.python }}",
+            "needs": [
+             "lint"
+            ],
+            "permissions": {
+             "checks": "write",
+             "pull-requests": "write"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Setup timezone",
+              "uses": "zcong1993/setup-timezone@v1.1.2",
+              "with": {
+               "timezone": "Asia/Jerusalem"
+              }
+             },
+             {
+              "name": "Set up Python",
+              "uses": "actions/setup-python@v4",
+              "with": {
+               "python-version": "${{ matrix.python }}"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ matrix.python }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Install project build dependencies",
+              "run": "poetry install --no-interaction"
+             },
+             {
+              "name": "Test the project",
+              "run": "if [ ${{ matrix.python }} == ${{ env.MAIN_PY_VER }} ]; then poetry run poe test_rep; else poetry run poe test; fi\n"
+             },
+             {
+              "if": "${{ matrix.python == env.MAIN_PY_VER \u0026\u0026 always() }}",
+              "name": "Report test summary",
+              "uses": "EnricoMi/publish-unit-test-result-action@v2",
+              "with": {
+               "junit_files": "./junit.xml",
+               "report_individual_runs": true,
+               "test_changes_limit": 0
+              }
+             },
+             {
+              "if": "${{ matrix.python == env.MAIN_PY_VER }}",
+              "name": "Push to CodeCov",
+              "uses": "codecov/codecov-action@v3",
+              "with": {
+               "files": "./coverage.xml"
+              }
+             }
+            ],
+            "strategy": {
+             "matrix": {
+              "python": [
+               "3.9",
+               "3.10"
+              ]
+             }
+            }
+           }
+          },
+          "name": "Pull request build",
+          "true": {
+           "pull_request": {
+            "branches": [
+             "dev",
+             "release/*"
+            ]
+           }
+          }
+         }
+        }
+       },
+       "jfrog-pipelines": {}
+      }
+     }
+    }
+   }
+  
