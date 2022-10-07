@@ -1,0 +1,503 @@
+{
+    "dummy": {
+     "ownerName": "dummy",
+     "ownerType": "User",
+     "id": 22151399,
+     "repositories": {
+      "dummy": {
+       "name": "dummy",
+       "fullName": "dummy/dummy",
+       "id": 507650266,
+       "programmingLanguages": [
+        "Python"
+       ],
+       "github-actions-workflows": {
+        "pages[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/pages.yml",
+         "filename": "pages.yml",
+         "origin": "github_actions",
+         "content": {
+          "jobs": {
+           "deploy-pages": {
+            "environment": "github-pages",
+            "name": "Build documentation site and deploy to GH-Pages",
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Checkout sources",
+              "uses": "actions/checkout@v3",
+              "with": {
+               "ref": "${{ github.ref }}"
+              }
+             },
+             {
+              "name": "Setup Python 3.10",
+              "uses": "actions/setup-python@v4",
+              "with": {
+               "python-version": "3.10"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Build documentation site",
+              "run": "poetry install --no-interaction --without dev\npoetry run poe docs_build\n"
+             }
+            ]
+           }
+          },
+          "name": "Pages Deploy",
+          "true": {
+           "release": {
+            "types": [
+             "published"
+            ]
+           }
+          }
+         }
+        },
+        "pr[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/pr.yml",
+         "filename": "pr.yml",
+         "origin": "github_actions",
+         "content": {
+          "env": {
+           "MAIN_PY_VER": "3.10"
+          },
+          "jobs": {
+           "docs": {
+            "name": "Verify documentation site",
+            "needs": [
+             "lint"
+            ],
+            "permissions": {
+             "pull-requests": "read"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Set up Python",
+              "uses": "actions/setup-python@v3",
+              "with": {
+               "python-version": "${{ env.MAIN_PY_VER }}"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ env.MAIN_PY_VER }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ env.MAIN_PY_VER }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Build documentation site",
+              "run": "poetry install --no-interaction\npoetry run poe docs_build\n"
+             }
+            ]
+           },
+           "lint": {
+            "name": "Lint source files",
+            "permissions": {
+             "pull-requests": "read"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Set up Python ${{ env.MAIN_PY_VER }}",
+              "uses": "actions/setup-python@v4",
+              "with": {
+               "python-version": "${{ env.MAIN_PY_VER }}"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ env.MAIN_PY_VER }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ env.MAIN_PY_VER }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Install deno runtime",
+              "uses": "denoland/setup-deno@v1.1.0"
+             },
+             {
+              "name": "Lint the project",
+              "run": "poetry install --no-interaction\npoetry run poe lint\npoetry run poe lic_check\n"
+             }
+            ]
+           },
+           "test": {
+            "name": "Test project with Python ${{ matrix.python }}",
+            "needs": [
+             "lint"
+            ],
+            "permissions": {
+             "checks": "write",
+             "pull-requests": "write"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Source checkout",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Setup timezone",
+              "uses": "zcong1993/setup-timezone@v1.1.2",
+              "with": {
+               "timezone": "Asia/Jerusalem"
+              }
+             },
+             {
+              "name": "Set up Python",
+              "uses": "actions/setup-python@v4",
+              "with": {
+               "python-version": "${{ matrix.python }}"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ matrix.python }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ matrix.python }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Install project build dependencies",
+              "run": "poetry install --no-interaction"
+             },
+             {
+              "name": "Test the project",
+              "run": "if [ ${{ matrix.python }} == ${{ env.MAIN_PY_VER }} ]; then poetry run poe test_rep; else poetry run poe test; fi\n"
+             },
+             {
+              "if": "${{ matrix.python == env.MAIN_PY_VER \u0026\u0026 always() }}",
+              "name": "Report test summary",
+              "uses": "EnricoMi/publish-unit-test-result-action@v2",
+              "with": {
+               "junit_files": "./junit.xml",
+               "report_individual_runs": true,
+               "test_changes_limit": 0
+              }
+             },
+             {
+              "if": "${{ matrix.python == env.MAIN_PY_VER }}",
+              "name": "Push to CodeCov",
+              "uses": "codecov/codecov-action@v3",
+              "with": {
+               "files": "./coverage.xml"
+              }
+             }
+            ],
+            "strategy": {
+             "matrix": {
+              "python": [
+               "3.9",
+               "3.10"
+              ]
+             }
+            }
+           }
+          },
+          "name": "Pull request build",
+          "true": {
+           "pull_request": {
+            "branches": [
+             "dev",
+             "release/*"
+            ]
+           }
+          }
+         }
+        },
+        "release[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/release.yml",
+         "filename": "release.yml",
+         "origin": "github_actions",
+         "content": {
+          "jobs": {
+           "release": {
+            "environment": "deployment",
+            "name": "Build, publish, release, and announce",
+            "needs": [
+             "secrets_keys"
+            ],
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Checkout sources",
+              "uses": "actions/checkout@v3",
+              "with": {
+               "fetch-depth": 0,
+               "ssh-key": "${{ secrets.DEPLOY_KEY }}"
+              }
+             },
+             {
+              "name": "Setup Python 3.10",
+              "uses": "actions/setup-python@v4",
+              "with": {
+               "python-version": "3.10"
+              }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Configure git",
+              "run": "git config user.name \"${{ github.actor }}\"\ngit config user.email \"${{ github.actor }}@users.noreply.github.com\"\n"
+             },
+             {
+              "id": "bumper",
+              "name": "Determine version and create changelog",
+              "uses": "tomerfi/version-bumper-action@1.2.0"
+             },
+             {
+              "name": "Set new project version",
+              "uses": "ciiiii/toml-editor@1.0.0",
+              "with": {
+               "file": "pyproject.toml",
+               "key": "tool.poetry.version",
+               "value": "${{ steps.bumper.outputs.new_version }}"
+              }
+             },
+             {
+              "name": "Commit, tag, and push",
+              "run": "git add pyproject.toml\ngit commit -m \"build: bump version to ${{ steps.bumper.outputs.new_version }} [skip ci]\"\ngit push\ngit tag ${{ steps.bumper.outputs.new_version }} -m \"${{ steps.bumper.outputs.new_version }}\"\ngit push origin ${{ steps.bumper.outputs.new_version }}\n"
+             },
+             {
+              "name": "Verify documentation site build",
+              "run": "poetry install --no-interaction --without dev\npoetry run poe docs_build\n"
+             },
+             {
+              "name": "Publish build to PyPi",
+              "run": "poetry publish --build -u __token__ -p ${{ secrets[needs.secrets_keys.outputs.pypi_token] }}\n"
+             },
+             {
+              "name": "Set development project version",
+              "uses": "ciiiii/toml-editor@1.0.0",
+              "with": {
+               "file": "pyproject.toml",
+               "key": "tool.poetry.version",
+               "value": "${{ steps.bumper.outputs.next_dev_iteration }}"
+              }
+             },
+             {
+              "name": "Commit and push",
+              "run": "git add pyproject.toml\ngit commit -m \"build: bump version to ${{ steps.bumper.outputs.next_dev_iteration }} [skip ci]\"\ngit push\n"
+             },
+             {
+              "id": "gh_release",
+              "name": "Create a release",
+              "uses": "actions/github-script@v6",
+              "with": {
+               "github-token": "${{ secrets[needs.secrets_keys.outputs.release_pat] }}",
+               "script": "const repo_name = context.payload.repository.full_name\nconst response = await github.request('POST /repos/' + repo_name + '/releases', {\n  tag_name: '${{ steps.bumper.outputs.new_version }}',\n  generate_release_notes: true\n})\ncore.setOutput('html_url', response.data.html_url)\n"
+              }
+             }
+            ]
+           },
+           "secrets_keys": {
+            "name": "Determine secrets keys",
+            "outputs": {
+             "pypi_token": "${{ steps.output_keys.outputs.pypi_token }}",
+             "release_pat": "${{ steps.output_keys.outputs.release_pat }}",
+             "twitter_access_token": "${{ steps.output_keys.outputs.twitter_access_token }}",
+             "twitter_access_token_secret": "${{ steps.output_keys.outputs.twitter_access_token_secret }}",
+             "twitter_api_key": "${{ steps.output_keys.outputs.twitter_api_key }}",
+             "twitter_api_secret_key": "${{ steps.output_keys.outputs.twitter_api_secret_key }}"
+            },
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "id": "output_keys",
+              "name": "Save keys as output",
+              "run": "actor=$( echo ${{ github.actor }} | tr [:lower:] [:upper:])\necho \"::set-output name=pypi_token::$actor\"_PYPI_TOKEN\necho \"::set-output name=twitter_api_key::$actor\"_TWITTER_API_KEY\necho \"::set-output name=twitter_api_secret_key::$actor\"_TWITTER_API_SECRET_KEY\necho \"::set-output name=twitter_access_token::$actor\"_TWITTER_ACCESS_TOKEN\necho \"::set-output name=twitter_access_token_secret::$actor\"_TWITTER_ACCESS_TOKEN_SECRET\necho \"::set-output name=release_pat::$actor\"_RELEASE_PAT\n"
+             }
+            ]
+           }
+          },
+          "name": "Release",
+          "true": {
+           "workflow_dispatch": {
+            "inputs": {
+             "tweet": {
+              "default": "no",
+              "description": "Tweet new release?",
+              "required": false
+             }
+            }
+           }
+          }
+         }
+        },
+        "stage[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/stage.yml",
+         "filename": "stage.yml",
+         "origin": "github_actions",
+         "content": {
+          "jobs": {
+           "stage": {
+            "environment": "staging",
+            "name": "Stage project",
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Checkout sources",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Setup timezone",
+              "uses": "zcong1993/setup-timezone@v1.1.2",
+              "with": {
+               "timezone": "Asia/Jerusalem"
+              }
+             },
+             {
+              "name": "Setup Python 3.10",
+              "uses": "actions/setup-python@v4",
+              "with": {
+                "python-version": "3.10"
+               }
+             },
+             {
+                "name": "liquibase",
+                "uses": "liquibase/liquibase-github-action@v7",
+                "with": {
+                    "operation": "update",
+                    "classpath": "example/changelogs",
+                    "changeLogFile": "samplechangelog.h2.sql",
+                    "username": "my_db_username",
+                    "password": "${{ secrets.PUBLISH_KEY }}",
+                    "url": "my_db_url"
+                }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Install, test with coverage report, and build",
+              "run": "poetry install --no-interaction\npoetry run poe test_rep\npoetry build\n"
+             },
+             {
+              "name": "Push to CodeCov",
+              "uses": "codecov/codecov-action@v3",
+              "with": {
+               "fail_ci_if_error": true,
+               "files": "coverage.xml"
+              }
+             }
+            ]
+           }
+          },
+          "name": "Stage",
+          "true": {
+           "push": {
+            "branches": [
+             "dev"
+            ],
+            "paths-ignore": [
+             ".github",
+             ".vscode"
+            ]
+           },
+           "workflow_dispatch": null
+          }
+         }
+        }
+       },
+       "jfrog-pipelines": {}
+      }
+     }
+    }
+   }
