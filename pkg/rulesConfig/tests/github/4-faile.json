@@ -1,12 +1,12 @@
 {
-    "dolby360": {
-     "ownerName": "dolby360",
+    "dummy": {
+     "ownerName": "dummy",
      "ownerType": "User",
      "id": 22151399,
      "repositories": {
-      "aioswitcher": {
-       "name": "aioswitcher",
-       "fullName": "dolby360/aioswitcher",
+      "dummy": {
+       "name": "dummy",
+       "fullName": "dummy/dummy",
        "id": 507650266,
        "programmingLanguages": [
         "Python"
@@ -60,16 +60,6 @@
              {
               "name": "Build documentation site",
               "run": "poetry install --no-interaction --without dev\npoetry run poe docs_build\n"
-             },
-             {
-              "name": "Deploy to GH-Pages",
-              "uses": "peaceiris/actions-gh-pages@v3.8.0",
-              "with": {
-               "cname": "aioswitcher.tomfi.info",
-               "commit_message": "docs: deployed documentation site ",
-               "github_token": "${{ secrets.GITHUB_TOKEN }}",
-               "publish_dir": "./site"
-              }
              }
             ]
            }
@@ -384,18 +374,6 @@
               "with": {
                "github-token": "${{ secrets[needs.secrets_keys.outputs.release_pat] }}",
                "script": "const repo_name = context.payload.repository.full_name\nconst response = await github.request('POST /repos/' + repo_name + '/releases', {\n  tag_name: '${{ steps.bumper.outputs.new_version }}',\n  generate_release_notes: true\n})\ncore.setOutput('html_url', response.data.html_url)\n"
-              }
-             },
-             {
-              "if": "${{ github.event.inputs.tweet == 'yes' }}",
-              "name": "Tweet new release",
-              "uses": "lazy-actions/tweet-action@1.0.1",
-              "with": {
-               "message": "🚀🎉 Aioswitcher ${{ steps.bumper.outputs.new_version }} has been released! 🎉🚀\n${{ steps.gh_release.outputs.html_url }}\n\n#aioswitcher #smarthome #python\n",
-               "oauth_consumer_key": "${{ secrets[needs.secrets_keys.outputs.twitter_api_key] }}",
-               "oauth_consumer_secret": "${{ secrets[needs.secrets_keys.outputs.twitter_api_secret_key] }}",
-               "oauth_token": "${{ secrets[needs.secrets_keys.outputs.twitter_access_token] }}",
-               "oauth_token_secret": "${{ secrets[needs.secrets_keys.outputs.twitter_access_token_secret] }}"
               }
              }
             ]
