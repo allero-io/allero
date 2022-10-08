@@ -114,13 +114,13 @@ func TestDefaultRulesValidation(t *testing.T) {
 		testFilesByRuleId := getTestFilesByRuleId(t, scmPlatform)
 		// go over all rules
 		for _, ruleName := range ruleNames {
-			println(ruleName)
 			rule, err := rc.GetRule(ruleName, scmPlatform)
 			if err != nil {
 				panic(err)
 			}
 			testFileByRuleId := testFilesByRuleId[rule.UniqueId]
 			if testFileByRuleId != nil {
+				println("test - " + ruleName)
 				validatePassing(t, rule, ruleName, testFileByRuleId.passes, true, &rc, scmPlatform)
 				validatePassing(t, rule, ruleName, testFileByRuleId.fails, false, &rc, scmPlatform)
 			}
