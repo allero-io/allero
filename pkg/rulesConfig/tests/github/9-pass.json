@@ -2,12 +2,12 @@
   "dummy": {
    "ownerName": "dummy",
    "ownerType": "User",
-   "id": 22151399,
+   "id": 0,
    "repositories": {
     "dummy": {
      "name": "dummy",
      "fullName": "dummy/dummy",
-     "id": 507650266,
+     "id": 0,
      "programmingLanguages": [
       "Python"
      ],
