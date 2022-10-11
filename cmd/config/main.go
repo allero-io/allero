@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ConfigAvailableKeys = []string{"token"}
+var ConfigAvailableKeys = []string{"token", "gitlabClientURL"}
 
 type ConfigCommandDependencies struct {
 	ConfigurationManager *configurationManager.ConfigurationManager

@@ -8,15 +8,18 @@ import (
 
 func CreateGitlabClient(configurationManager configurationManager.ConfigurationManager) (*gitlab.Client, error) {
 	GITLAB_TOKEN := configurationManager.GetGitlabToken()
+	gitlabPrivateServerUrl := "" 
 
-	gitlabCustomServerValue, err := configurationManager.Get("")
+	gitlabCustomServerValue, err := configurationManager.Get("gitlabClientURL")
 	if err != nil {
 		return nil, err
 	}
 
-	gitlabPrivateServerURL := fmt.Sprintf("%s", gitlabCustomServerValue)
+	if gitlabCustomServerValue != nil {
+		gitlabPrivateServerUrl = fmt.Sprintf("%s", gitlabCustomServerValue)
+	}
 
-	gitlabClient, err := generateGitlabClient(GITLAB_TOKEN, gitlabPrivateServerURL) 
+	gitlabClient, err := generateGitlabClient(GITLAB_TOKEN, gitlabPrivateServerUrl) 
 	if err != nil {
 		return nil, err
 	}
@@ -25,6 +28,7 @@ func CreateGitlabClient(configurationManager configurationManager.ConfigurationM
 }
 
 func generateGitlabClient(gitlabToken, gitlabPrivateServerUrl string) (*gitlab.Client, error) {
+	fmt.Printf("Gitlab token: %s, Private Server URL: %s", gitlabToken, gitlabPrivateServerUrl)
 	if gitlabPrivateServerUrl != "" {
 		gitlabClient, err := gitlab.NewClient(gitlabToken, gitlab.WithBaseURL(gitlabPrivateServerUrl))
 		if err != nil {
