@@ -28,7 +28,7 @@ func CreateGitlabClient(configurationManager configurationManager.ConfigurationM
 }
 
 func generateGitlabClient(gitlabToken, gitlabPrivateServerUrl string) (*gitlab.Client, error) {
-	fmt.Printf("Gitlab token: %s, Private Server URL: %s", gitlabToken, gitlabPrivateServerUrl)
+	fmt.Printf("Gitlab token: %s, Private Server URL: %s\n", gitlabToken, gitlabPrivateServerUrl)
 	if gitlabPrivateServerUrl != "" {
 		gitlabClient, err := gitlab.NewClient(gitlabToken, gitlab.WithBaseURL(gitlabPrivateServerUrl))
 		if err != nil {
