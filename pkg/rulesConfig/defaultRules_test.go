@@ -2,7 +2,6 @@ package rulesConfig
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -27,7 +26,7 @@ type FileWithName struct {
 }
 
 func ReadTestFileContent(filename string) (map[string]*githubConnector.GithubOwner, error) {
-	buf, err := ioutil.ReadFile(filename)
+	buf, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +66,7 @@ func validatePassing(t *testing.T, rule *defaultRules.Rule,
 			t.Errorf("Expected validation for rule name %s to pass, but it failed for file %s\n", ruleName, file.name)
 		}
 		if len(schemaResult) == 0 && !shouldPass {
-			t.Errorf("Expected validation for rule name %s to pass, but it passed for file %s\n", ruleName, file.name)
+			t.Errorf("Expected validation for rule name %s to fail, but it passed for file %s\n", ruleName, file.name)
 		}
 	}
 }

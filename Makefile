@@ -34,3 +34,6 @@ github:
 gitlab:
 	# go run main.go fetch gitlab GitLab-examples/clojure-web-application
 	go run main.go fetch gitlab allero
+
+test:
+	go test ./...
