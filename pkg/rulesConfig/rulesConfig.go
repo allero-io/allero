@@ -48,7 +48,7 @@ type OutputSummary struct {
 	URL                 string `mapstructure:"URL"`
 }
 
-var NoFetchedDataError = errors.New("missing repository data. Use PATH option to validate local directory or fetch data from remote first. Run 'allero fetch -h' for more information about remote data.")
+var ErrNoFetchedData = errors.New("missing repository data. Use PATH option to validate local directory or fetch data from remote first. Run 'allero fetch -h' for more information about remote data")
 
 func New(deps *RulesConfigDependencies) *RulesConfig {
 	return &RulesConfig{
@@ -60,7 +60,7 @@ func New(deps *RulesConfigDependencies) *RulesConfig {
 
 func (rc *RulesConfig) Initialize() error {
 	if rc.githubData == nil && rc.gitlabData == nil {
-		return NoFetchedDataError
+		return ErrNoFetchedData
 	}
 
 	githubFiles, err := rc.GetRulesFiles("github", githubRulesList)

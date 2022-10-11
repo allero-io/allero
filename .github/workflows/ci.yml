@@ -25,3 +25,6 @@ jobs:
     - name: Run vet
       run: |
         go vet .
+
+    - name: Unit tests
+      run: go test ./...

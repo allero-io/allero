@@ -1,0 +1,99 @@
+{
+    "dummy": {
+     "ownerName": "dummy",
+     "ownerType": "User",
+     "id": 22151399,
+     "repositories": {
+      "dummy": {
+       "name": "dummy",
+       "fullName": "dummy/dummy",
+       "id": 507650266,
+       "programmingLanguages": [
+        "Python"
+       ],
+       "github-actions-workflows": {
+        "stage[ESCAPED_DOT]yml": {
+         "relativePath": ".github/workflows/stage.yml",
+         "filename": "stage.yml",
+         "origin": "github_actions",
+         "content": {
+          "jobs": {
+           "stage": {
+            "environment": "staging",
+            "name": "Stage project",
+            "runs-on": "ubuntu-latest",
+            "steps": [
+             {
+              "name": "Checkout sources",
+              "uses": "actions/checkout@v3"
+             },
+             {
+              "name": "Setup timezone",
+              "uses": "zcong1993/setup-timezone@v1.1.2",
+              "with": {
+               "timezone": "Asia/Jerusalem"
+              }
+             },
+             {
+              "name": "Setup Python 3.10",
+              "uses": "actions/setup-python@v4",
+              "with": {
+                "python-version": "3.10"
+               }
+             },
+             {
+              "name": "Cache pip repository",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}",
+               "path": "~/.cache/pip"
+              }
+             },
+             {
+              "name": "Prepare python environment",
+              "run": "pip install -r requirements.txt\npoetry config virtualenvs.create true\npoetry config virtualenvs.in-project true\n"
+             },
+             {
+              "name": "Cache poetry virtual environment",
+              "uses": "actions/cache@v3",
+              "with": {
+               "key": "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}",
+               "path": ".venv"
+              }
+             },
+             {
+              "name": "Install, test with coverage report, and build",
+              "run": "poetry install --no-interaction\npoetry run poe test_rep\npoetry build\n"
+             },
+             {
+              "name": "Push to CodeCov",
+              "uses": "codecov/codecov-action@v3",
+              "with": {
+               "fail_ci_if_error": true,
+               "files": "coverage.xml"
+              }
+             }
+            ]
+           }
+          },
+          "name": "Stage",
+          "true": {
+           "push": {
+            "branches": [
+             "dev"
+            ],
+            "paths-ignore": [
+             ".github",
+             ".vscode"
+            ]
+           },
+           "workflow_dispatch": null
+          }
+         }
+        }
+       },
+       "jfrog-pipelines": {}
+      }
+     }
+    }
+   }
