@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/allero-io/allero/pkg/connectors"
 	githubConnector "github.com/allero-io/allero/pkg/connectors/github"
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 )
@@ -12,15 +13,24 @@ func EnsureScaScanner(githubData map[string]*githubConnector.GithubOwner, gitlab
 	schemaErrors := make([]*SchemaError, 0)
 	var err error
 
+	sharedRegexExpressions := []string{
+		"^[\\S]*trivy.*|.*docker( .*)? run .*(aquasec/)?trivy.*",
+		"^[\\S]*grype.*|.*docker( .*)? run .*(anchore/)?grype.*",
+		"(jfrog|jf) (s|scan).*",
+		"ws scan.*",
+		"snyk (code |)test.*",
+		"(jfrog|jf) (xr).*",
+	}
+
 	if githubData != nil {
-		schemaErrors, err = githubErrorsRule10(githubData)
+		schemaErrors, err = githubErrorsRule10(githubData, sharedRegexExpressions)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if gitlabData != nil {
-		schemaErrors, err = gitlabErrorsRule10(gitlabData)
+		schemaErrors, err = gitlabErrorsRule10(gitlabData, sharedRegexExpressions)
 		if err != nil {
 			return nil, err
 		}
@@ -29,7 +39,7 @@ func EnsureScaScanner(githubData map[string]*githubConnector.GithubOwner, gitlab
 	return schemaErrors, nil
 }
 
-func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*SchemaError, error) {
+func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, sharedRegexExpressions []string) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	usesRegexExpressions := []string{
@@ -38,14 +48,6 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*
 		".*aquasecurity/trivy-action@.*",
 		".*checkmarx-ts/checkmarx-cxflow-github-action@.*",
 		".*snyk/actions/maven@.*",
-	}
-
-	runRegexExpressions := []string{
-		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
-		"^[\\S]*grype|docker .* run .*(anchore/)?grype.*",
-		"(jfrog|jf) (s|scan).*",
-		"ws scan.*",
-		"snyk (code | )test.*",
 	}
 
 	for _, owner := range githubData {
@@ -59,7 +61,7 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*
 					return nil, err
 				}
 
-				var workflowObj Workflow
+				var workflowObj GithubWorkflow
 				err = json.Unmarshal(contentByteArr, &workflowObj)
 				if err != nil {
 					return nil, err
@@ -74,7 +76,7 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*
 							}
 						}
 
-						for _, regexExpression := range runRegexExpressions {
+						for _, regexExpression := range sharedRegexExpressions {
 							if matchRegex(regexExpression, step.Run) {
 								foundScaScanner = true
 								break
@@ -97,6 +99,15 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*
 			}
 
 			if !foundScaScanner {
+				var err error
+				foundScaScanner, err = findJfrogScanScannerRule10(repo.JfrogPipelines, sharedRegexExpressions)
+
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			if !foundScaScanner {
 				schemaErrors = append(schemaErrors, &SchemaError{
 					ErrorLevel:    2,
 					RepositryName: repo.Name,
@@ -111,12 +122,12 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner) ([]*
 	return schemaErrors, nil
 }
 
-func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
+func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup, sharedRegexExpressions []string) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	for _, group := range gitlabData {
 		for _, project := range group.Projects {
-			foundScaScanner, err := findScaScannerRule10(project)
+			foundScaScanner, err := findGitlabScaScannerRule10(project, sharedRegexExpressions)
 			if err != nil {
 				return nil, err
 			}
@@ -136,18 +147,10 @@ func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 	return schemaErrors, nil
 }
 
-func findScaScannerRule10(project *gitlabConnector.GitlabProject) (bool, error) {
+func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, sharedRegexExpressions []string) (bool, error) {
 
 	imageRegexExpressions := []string{
 		"registry.gitlab.com/secure.*",
-	}
-
-	scriptRegexExpressions := []string{
-		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
-		"^[\\S]*grype|docker .* run .*(anchore/)?grype.*",
-		"(jfrog|jf) (s|scan).*",
-		"ws scan.*",
-		"snyk ?(code | )test.*",
 	}
 
 	for _, pipeline := range project.GitlabCi {
@@ -178,7 +181,7 @@ func findScaScannerRule10(project *gitlabConnector.GitlabProject) (bool, error) 
 			}
 
 			if stageWithSingleScript.Script != "" {
-				for _, regexExpression := range scriptRegexExpressions {
+				for _, regexExpression := range sharedRegexExpressions {
 					if matchRegex(regexExpression, stageWithSingleScript.Script) {
 						return true, nil
 					}
@@ -187,8 +190,49 @@ func findScaScannerRule10(project *gitlabConnector.GitlabProject) (bool, error) 
 
 			if stageWithScripts.Scripts != nil {
 				for _, script := range stageWithScripts.Scripts {
-					for _, regexExpression := range scriptRegexExpressions {
+					for _, regexExpression := range sharedRegexExpressions {
 						if matchRegex(regexExpression, script) {
+							return true, nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	foundInJfrog, err := findJfrogScanScannerRule10(project.JfrogPipelines, sharedRegexExpressions)
+	if err != nil {
+		return false, err
+	}
+
+	return foundInJfrog, nil
+}
+
+func findJfrogScanScannerRule10(jfrogPipelines map[string]*connectors.PipelineFile, sharedRegexExpressions []string) (bool, error) {
+	jfrogPiplineFiles := make([]*JfrogPipelineFile, 0)
+
+	for _, pipeline := range jfrogPipelines {
+		content := pipeline.Content
+		contentByteArr, err := json.Marshal(content)
+		if err != nil {
+			return false, err
+		}
+
+		var jfrogPipelineFile JfrogPipelineFile
+		err = json.Unmarshal(contentByteArr, &jfrogPipelineFile)
+		if err != nil {
+			return false, err
+		}
+
+		jfrogPiplineFiles = append(jfrogPiplineFiles, &jfrogPipelineFile)
+	}
+
+	for _, jfrogPipelineFile := range jfrogPiplineFiles {
+		for _, pipeline := range jfrogPipelineFile.Pipelines {
+			for _, step := range pipeline.Steps {
+				for _, executionCommand := range step.Execution.OnExecute {
+					for _, regexExpression := range sharedRegexExpressions {
+						if matchRegex(regexExpression, executionCommand) {
 							return true, nil
 						}
 					}

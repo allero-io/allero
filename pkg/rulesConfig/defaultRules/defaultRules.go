@@ -26,15 +26,15 @@ type Rule struct {
 	InCodeImplementation bool                   `json:"inCodeImplementation"`
 }
 
-type Workflow struct {
-	Jobs map[string]Job `json:"jobs"`
+type GithubWorkflow struct {
+	Jobs map[string]GithubJob `json:"jobs"`
 }
 
-type Job struct {
-	Steps []Step `json:"steps"`
+type GithubJob struct {
+	Steps []GithubStep `json:"steps"`
 }
 
-type Step struct {
+type GithubStep struct {
 	Uses string         `json:"uses"`
 	Run  string         `json:"run"`
 	With map[string]any `json:"with"`
@@ -46,6 +46,22 @@ type GitlabStageScript struct {
 
 type GitlabStageScripts struct {
 	Scripts []string `json:"script"`
+}
+
+type JfrogPipelineFile struct {
+	Pipelines []JfrogPipeline `json:"pipelines"`
+}
+
+type JfrogPipeline struct {
+	Steps []JfrogPipelineStep `json:"steps"`
+}
+
+type JfrogPipelineStep struct {
+	Execution JfrogPipelineStepExecution `json:"execution"`
+}
+
+type JfrogPipelineStepExecution struct {
+	OnExecute []string `json:"onExecute"`
 }
 
 func Validate(rule *Rule, githubData map[string]*githubConnector.GithubOwner, gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {

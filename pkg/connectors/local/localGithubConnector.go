@@ -42,8 +42,8 @@ func (lc *LocalConnector) addRootPathAsNewRepo(githubJsonObject map[string]*gith
 		FullName:               escapedRepoName,
 		ID:                     0,
 		ProgrammingLanguages:   nil,
-		GithubActionsWorkflows: make(map[string]*githubConnector.PipelineFile),
-		JfrogPipelines:         make(map[string]*githubConnector.PipelineFile),
+		GithubActionsWorkflows: make(map[string]*connectors.PipelineFile),
+		JfrogPipelines:         make(map[string]*connectors.PipelineFile),
 	}
 
 	return nil
@@ -90,8 +90,8 @@ func (lc *LocalConnector) processGithubWorkflowFiles(githubJsonObject map[string
 	return processingError
 }
 
-func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *githubConnector.PipelineFile, error) {
-	workflowFilesEntitiesChan := make(chan *githubConnector.PipelineFile)
+func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *connectors.PipelineFile, error) {
+	workflowFilesEntitiesChan := make(chan *connectors.PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
@@ -106,7 +106,7 @@ func (lc *LocalConnector) getWorkflowFilesEntities(repoName string) (chan *githu
 				return
 			}
 			for _, filePath := range relevantFilesPaths {
-				workflowFilesEntitiesChan <- &githubConnector.PipelineFile{
+				workflowFilesEntitiesChan <- &connectors.PipelineFile{
 					RelativePath: filePath,
 					Filename:     path.Base(filePath),
 					Origin:       cicdPlatform.Name,

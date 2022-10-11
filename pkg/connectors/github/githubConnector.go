@@ -86,8 +86,8 @@ func (gc *GithubConnector) addRepo(githubJsonObject map[string]*GithubOwner, rep
 		FullName:               *repo.FullName,
 		ID:                     int(*repo.ID),
 		ProgrammingLanguages:   languages,
-		GithubActionsWorkflows: make(map[string]*PipelineFile),
-		JfrogPipelines:         make(map[string]*PipelineFile),
+		GithubActionsWorkflows: make(map[string]*connectors.PipelineFile),
+		JfrogPipelines:         make(map[string]*connectors.PipelineFile),
 	}
 
 	return nil
@@ -153,8 +153,8 @@ func (gc *GithubConnector) processWorkflowFiles(githubJsonObject map[string]*Git
 	return processingError
 }
 
-func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (chan *PipelineFile, error) {
-	workflowFilesEntitiesChan := make(chan *PipelineFile)
+func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (chan *connectors.PipelineFile, error) {
+	workflowFilesEntitiesChan := make(chan *connectors.PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
@@ -171,7 +171,7 @@ func (gc *GithubConnector) getWorkflowFilesEntities(repo *github.Repository) (ch
 			}
 			relevantFilesPaths := gc.matchedFiles(tree, cicdPlatform.RelevantFilesRegex)
 			for _, filePath := range relevantFilesPaths {
-				workflowFilesEntitiesChan <- &PipelineFile{
+				workflowFilesEntitiesChan <- &connectors.PipelineFile{
 					RelativePath: filePath,
 					Filename:     path.Base(filePath),
 					Origin:       cicdPlatform.Name,

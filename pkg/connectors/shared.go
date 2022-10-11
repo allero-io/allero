@@ -19,6 +19,13 @@ type CICDPlatform struct {
 	GitlabValid        bool
 }
 
+type PipelineFile struct {
+	RelativePath string                 `json:"relativePath"`
+	Filename     string                 `json:"filename"`
+	Origin       string                 `json:"origin"`
+	Content      map[string]interface{} `json:"content"`
+}
+
 var SUPPORTED_CICD_PLATFORMS = []CICDPlatform{
 	{
 		Name:               "github_actions",
