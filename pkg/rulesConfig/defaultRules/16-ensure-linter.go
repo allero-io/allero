@@ -56,7 +56,7 @@ func githubErrorsRule16(githubData map[string]*githubConnector.GithubOwner) ([]*
 					return nil, err
 				}
 
-				var workflowObj Workflow
+				var workflowObj GithubWorkflow
 				err = json.Unmarshal(contentByteArr, &workflowObj)
 				if err != nil {
 					return nil, err

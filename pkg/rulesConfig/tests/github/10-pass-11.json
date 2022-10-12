@@ -1,0 +1,97 @@
+{
+  "allero-io": {
+    "ownerName": "allero-io",
+    "ownerType": "Organization",
+    "id": 98962497,
+    "repositories": {
+      "demo": {
+        "name": "demo",
+        "fullName": "allero-io/demo",
+        "id": 539394261,
+        "programmingLanguages": null,
+        "github-actions-workflows": {
+          "sca-scanner[ESCAPED_DOT]yml": {
+            "relativePath": ".github/workflows/sca-scanner.yml",
+            "filename": "sca-scanner.yml",
+            "origin": "github_actions",
+            "content": {
+              "jobs": {
+                "sca-job": {
+                  "name": "sca-job",
+                  "runs-on": "ubuntu-latest",
+                  "steps": [
+                    {
+                      "name": "use sca example",
+                      "run": "jfrog foo"
+                    }
+                  ]
+                }
+              },
+              "true": [
+                "push"
+              ]
+            }
+          }
+        },
+        "jfrog-pipelines": {
+          "jfrog-pipelines-hello-world[ESCAPED_DOT]yml": {
+            "relativePath": "jfrog-pipelines-hello-world.yml",
+            "filename": "jfrog-pipelines-hello-world.yml",
+            "origin": "jfrog_pipelines",
+            "content": {
+              "pipelines": [
+                {
+                  "name": "my_first_pipeline",
+                  "steps": [
+                    {
+                      "configuration": {
+                        "inputResources": [
+                          {
+                            "name": "myFirstRepo"
+                          }
+                        ]
+                      },
+                      "execution": {
+                        "onExecute": [
+                          "jf xr",
+                          "add_run_variables current_runid=$run_id",
+                          "add_run_variables commitSha=$res_myFirstRepo_commitSha",
+                          "echo \"Previous run ID is $prev_runid\""
+                        ]
+                      },
+                      "name": "p1_s1",
+                      "type": "Bash"
+                    }
+                  ]
+                }
+              ],
+              "resources": [
+                {
+                  "configuration": {
+                    "branches": {
+                      "include": "master"
+                    },
+                    "gitProvider": "DYNAMIC_VALUE",
+                    "path": "DYNAMIC_VALUE"
+                  },
+                  "name": "myFirstRepo",
+                  "type": "GitRepo"
+                },
+                {
+                  "configuration": {
+                    "commitSha": 1,
+                    "runID": 1
+                  },
+                  "name": "myPropertyBag",
+                  "type": "PropertyBag"
+                }
+              ],
+              "template": true,
+              "valuesFilePath": "./values.yml"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+    "allero-io": {
+      "ownerName": "allero-io",
+      "ownerType": "Organization",
+      "id": 98962497,
+      "repositories": {
+        "demo": {
+          "name": "demo",
+          "fullName": "allero-io/demo",
+          "id": 539394261,
+          "programmingLanguages": null,
+          "github-actions-workflows": {
+            "sca-scanner[ESCAPED_DOT]yml": {
+              "relativePath": ".github/workflows/sca-scanner.yml",
+              "filename": "sca-scanner.yml",
+              "origin": "github_actions",
+              "content": {
+                "jobs": {
+                  "sca-job": {
+                    "name": "sca-job",
+                    "runs-on": "ubuntu-latest",
+                    "steps": [
+                      {
+                        "name": "use sca example",
+                        "run": "snyk test"
+                      }
+                    ]
+                  }
+                },
+                "true": [
+                  "push"
+                ]
+              }
+            }
+          },
+          "jfrog-pipelines": {}
+        }
+      }
+    }
+  }

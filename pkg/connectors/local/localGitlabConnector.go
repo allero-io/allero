@@ -40,8 +40,8 @@ func (lc *LocalConnector) addRootPathAsNewProject(gitlabJsonObject map[string]*g
 		Name:           escapedRepoName,
 		FullName:       escapedRepoName,
 		ID:             0,
-		GitlabCi:       make(map[string]*gitlabConnector.PipelineFile),
-		JfrogPipelines: make(map[string]*gitlabConnector.PipelineFile),
+		GitlabCi:       make(map[string]*connectors.PipelineFile),
+		JfrogPipelines: make(map[string]*connectors.PipelineFile),
 	}
 
 	return nil
@@ -88,8 +88,8 @@ func (lc *LocalConnector) processGitlabWorkflowFiles(gitlabJsonObject map[string
 	return processingError
 }
 
-func (lc *LocalConnector) getGitlabWorkflowFilesEntities(repoName string) (chan *gitlabConnector.PipelineFile, error) {
-	workflowFilesEntitiesChan := make(chan *gitlabConnector.PipelineFile)
+func (lc *LocalConnector) getGitlabWorkflowFilesEntities(repoName string) (chan *connectors.PipelineFile, error) {
+	workflowFilesEntitiesChan := make(chan *connectors.PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
@@ -108,7 +108,7 @@ func (lc *LocalConnector) getGitlabWorkflowFilesEntities(repoName string) (chan 
 				return
 			}
 			for _, filePath := range relevantFilesPaths {
-				workflowFilesEntitiesChan <- &gitlabConnector.PipelineFile{
+				workflowFilesEntitiesChan <- &connectors.PipelineFile{
 					RelativePath: filePath,
 					Filename:     path.Base(filePath),
 					Origin:       cicdPlatform.Name,

@@ -1,5 +1,7 @@
 package githubConnector
 
+import "github.com/allero-io/allero/pkg/connectors"
+
 type GithubOwner struct {
 	Name         string                       `json:"ownerName"`
 	Type         string                       `json:"ownerType"`
@@ -8,17 +10,10 @@ type GithubOwner struct {
 }
 
 type GithubRepository struct {
-	Name                   string                   `json:"name"`
-	FullName               string                   `json:"fullName"`
-	ID                     int                      `json:"id"`
-	ProgrammingLanguages   []string                 `json:"programmingLanguages"`
-	GithubActionsWorkflows map[string]*PipelineFile `json:"github-actions-workflows"`
-	JfrogPipelines         map[string]*PipelineFile `json:"jfrog-pipelines"`
-}
-
-type PipelineFile struct {
-	RelativePath string      `json:"relativePath"`
-	Filename     string      `json:"filename"`
-	Origin       string      `json:"origin"`
-	Content      interface{} `json:"content"`
+	Name                   string                              `json:"name"`
+	FullName               string                              `json:"fullName"`
+	ID                     int                                 `json:"id"`
+	ProgrammingLanguages   []string                            `json:"programmingLanguages"`
+	GithubActionsWorkflows map[string]*connectors.PipelineFile `json:"github-actions-workflows"`
+	JfrogPipelines         map[string]*connectors.PipelineFile `json:"jfrog-pipelines"`
 }

@@ -105,8 +105,8 @@ func (gc *GitlabConnector) processPipelineFiles(gitlabJsonObject map[string]*Git
 	return processingError
 }
 
-func (gc *GitlabConnector) getPipelineFiles(project *gitlab.Project) (chan *PipelineFile, error) {
-	pipelineFilesChan := make(chan *PipelineFile)
+func (gc *GitlabConnector) getPipelineFiles(project *gitlab.Project) (chan *connectors.PipelineFile, error) {
+	pipelineFilesChan := make(chan *connectors.PipelineFile)
 
 	var getEntitiesErr error
 	go func() {
@@ -124,7 +124,7 @@ func (gc *GitlabConnector) getPipelineFiles(project *gitlab.Project) (chan *Pipe
 			}
 			relevantFilesPaths := gc.matchedFiles(treeNodes, cicdPlatform.RelevantFilesRegex)
 			for _, filePath := range relevantFilesPaths {
-				pipelineFilesChan <- &PipelineFile{
+				pipelineFilesChan <- &connectors.PipelineFile{
 					RelativePath: filePath,
 					Filename:     path.Base(filePath),
 					Origin:       cicdPlatform.Name,
@@ -173,8 +173,8 @@ func (gc *GitlabConnector) addProject(gitlabJsonObject map[string]*GitlabGroup, 
 		Name:           projectName,
 		FullName:       fullName,
 		ID:             project.ID,
-		GitlabCi:       make(map[string]*PipelineFile),
-		JfrogPipelines: make(map[string]*PipelineFile),
+		GitlabCi:       make(map[string]*connectors.PipelineFile),
+		JfrogPipelines: make(map[string]*connectors.PipelineFile),
 	}
 
 	return nil

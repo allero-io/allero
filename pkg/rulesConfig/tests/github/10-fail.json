@@ -1,0 +1,100 @@
+{
+    "allero-io": {
+      "ownerName": "allero-io",
+      "ownerType": "Organization",
+      "id": 98962497,
+      "repositories": {
+        "demo": {
+          "name": "demo",
+          "fullName": "allero-io/demo",
+          "id": 539394261,
+          "programmingLanguages": null,
+          "github-actions-workflows": {
+            "checkov[ESCAPED_DOT]yml": {
+              "relativePath": ".github/workflows/checkov.yml",
+              "filename": "checkov.yml",
+              "origin": "github_actions",
+              "content": {
+                "jobs": {
+                  "checkov-job": {
+                    "name": "checkov-action",
+                    "runs-on": "ubuntu-latest",
+                    "steps": [
+                      {
+                        "name": "Checkout repo",
+                        "uses": "actions/checkout@master"
+                      },
+                      {
+                        "name": "use sca example",
+                        "run": "fail trivy image python:3.4-alpine"
+                      },
+                      {
+                        "id": "checkov",
+                        "name": "Run Checkov action",
+                        "uses": "bridgecrewio/checkov-action@master",
+                        "with": {
+                          "baseline": "cloudformation/.checkov.baseline",
+                          "check": "CKV_AWS_1",
+                          "config_file": "path/this_file",
+                          "container_user": 1000,
+                          "directory": "example/",
+                          "download_external_modules": true,
+                          "file": "example/tfplan.json",
+                          "framework": "terraform",
+                          "log_level": "DEBUG",
+                          "output_format": "sarif",
+                          "quiet": true,
+                          "skip_check": "CKV_AWS_2",
+                          "soft_fail": true
+                        }
+                      }
+                    ]
+                  }
+                },
+                "true": [
+                  "push"
+                ]
+              }
+            },
+            "uncontrolled-value[ESCAPED_DOT]yml": {
+              "relativePath": ".github/workflows/uncontrolled-value.yml",
+              "filename": "uncontrolled-value.yml",
+              "origin": "github_actions",
+              "content": {
+                "jobs": {
+                  "Explore-GitHub-Actions": {
+                    "runs-on": "ubuntu-latest",
+                    "steps": [
+                      {
+                        "run": "echo \"A demo job to test uncontrolled values\""
+                      },
+                      {
+                        "run": "echo \"should not use ${{ github.event.pull_request.title }}\""
+                      },
+                      {
+                        "run": "echo \"should not use ${{ github.event.actor.id }}\""
+                      },
+                      {
+                        "run": "echo \"should not use ${{ github.event.actor.login }}\""
+                      },
+                      {
+                        "run": "echo \"should not use ${{ github.event.actor.display_login }}\""
+                      },
+                      {
+                        "run": "echo \"should not use ${{ github.event.org.login }}\""
+                      }
+                    ]
+                  }
+                },
+                "name": "Uncontrolled Value Example",
+                "true": [
+                  "push"
+                ]
+              }
+            }
+          },
+          "jfrog-pipelines": {}
+        }
+      }
+    }
+  }
