@@ -39,7 +39,7 @@ func EnsureScaScanner(githubData map[string]*githubConnector.GithubOwner, gitlab
 	return schemaErrors, nil
 }
 
-func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, sharedRegexExpressions []string) ([]*SchemaError, error) {
+func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, runRegexExpressions []string) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	usesRegexExpressions := []string{
@@ -76,7 +76,7 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, shar
 							}
 						}
 
-						for _, regexExpression := range sharedRegexExpressions {
+						for _, regexExpression := range runRegexExpressions {
 							if matchRegex(regexExpression, step.Run) {
 								foundScaScanner = true
 								break
@@ -100,7 +100,7 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, shar
 
 			if !foundScaScanner {
 				var err error
-				foundScaScanner, err = findJfrogScanScannerRule10(repo.JfrogPipelines, sharedRegexExpressions)
+				foundScaScanner, err = findJfrogScanScannerRule10(repo.JfrogPipelines, runRegexExpressions)
 
 				if err != nil {
 					return nil, err
@@ -111,7 +111,7 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, shar
 				schemaErrors = append(schemaErrors, &SchemaError{
 					ErrorLevel:    2,
 					RepositryName: repo.Name,
-					CiCdPlatform:  "github-actions-workflows",
+					CiCdPlatform:  "",
 					OwnerName:     owner.Name,
 					ScmPlatform:   "github",
 				})
@@ -122,12 +122,12 @@ func githubErrorsRule10(githubData map[string]*githubConnector.GithubOwner, shar
 	return schemaErrors, nil
 }
 
-func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup, sharedRegexExpressions []string) ([]*SchemaError, error) {
+func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup, scriptsRegexExpressions []string) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 
 	for _, group := range gitlabData {
 		for _, project := range group.Projects {
-			foundScaScanner, err := findGitlabScaScannerRule10(project, sharedRegexExpressions)
+			foundScaScanner, err := findGitlabScaScannerRule10(project, scriptsRegexExpressions)
 			if err != nil {
 				return nil, err
 			}
@@ -136,7 +136,7 @@ func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup, shar
 				schemaErrors = append(schemaErrors, &SchemaError{
 					ErrorLevel:    2,
 					RepositryName: project.Name,
-					CiCdPlatform:  "gitlab-ci",
+					CiCdPlatform:  "",
 					OwnerName:     group.Name,
 					ScmPlatform:   "gitlab",
 				})
@@ -147,7 +147,7 @@ func gitlabErrorsRule10(gitlabData map[string]*gitlabConnector.GitlabGroup, shar
 	return schemaErrors, nil
 }
 
-func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, sharedRegexExpressions []string) (bool, error) {
+func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, scriptsRegexExpressions []string) (bool, error) {
 
 	imageRegexExpressions := []string{
 		"registry.gitlab.com/secure.*",
@@ -181,7 +181,7 @@ func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, sharedRe
 			}
 
 			if stageWithSingleScript.Script != "" {
-				for _, regexExpression := range sharedRegexExpressions {
+				for _, regexExpression := range scriptsRegexExpressions {
 					if matchRegex(regexExpression, stageWithSingleScript.Script) {
 						return true, nil
 					}
@@ -190,7 +190,7 @@ func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, sharedRe
 
 			if stageWithScripts.Scripts != nil {
 				for _, script := range stageWithScripts.Scripts {
-					for _, regexExpression := range sharedRegexExpressions {
+					for _, regexExpression := range scriptsRegexExpressions {
 						if matchRegex(regexExpression, script) {
 							return true, nil
 						}
@@ -200,7 +200,7 @@ func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, sharedRe
 		}
 	}
 
-	foundInJfrog, err := findJfrogScanScannerRule10(project.JfrogPipelines, sharedRegexExpressions)
+	foundInJfrog, err := findJfrogScanScannerRule10(project.JfrogPipelines, scriptsRegexExpressions)
 	if err != nil {
 		return false, err
 	}
@@ -208,7 +208,7 @@ func findGitlabScaScannerRule10(project *gitlabConnector.GitlabProject, sharedRe
 	return foundInJfrog, nil
 }
 
-func findJfrogScanScannerRule10(jfrogPipelines map[string]*connectors.PipelineFile, sharedRegexExpressions []string) (bool, error) {
+func findJfrogScanScannerRule10(jfrogPipelines map[string]*connectors.PipelineFile, executionRegexExpressions []string) (bool, error) {
 	jfrogPiplineFiles := make([]*JfrogPipelineFile, 0)
 
 	for _, pipeline := range jfrogPipelines {
@@ -231,7 +231,7 @@ func findJfrogScanScannerRule10(jfrogPipelines map[string]*connectors.PipelineFi
 		for _, pipeline := range jfrogPipelineFile.Pipelines {
 			for _, step := range pipeline.Steps {
 				for _, executionCommand := range step.Execution.OnExecute {
-					for _, regexExpression := range sharedRegexExpressions {
+					for _, regexExpression := range executionRegexExpressions {
 						if matchRegex(regexExpression, executionCommand) {
 							return true, nil
 						}
