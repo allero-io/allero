@@ -12,6 +12,8 @@ jobs:
   allero-validate:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
       - name: Missing GitHub Token
         if: ${{ env.ALLERO_GITHUB_TOKEN != '' }}
         run: |
