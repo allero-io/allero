@@ -8,22 +8,28 @@ on:
 
 env:
   ALLERO_GITHUB_TOKEN: ${{ secrets.ALLERO_GITHUB_TOKEN }}
+  ALLERO_TOKEN: ${{ secrets.ALLERO_TOKEN }}
+
 
 jobs:
   allero-validate:
     runs-on: ubuntu-latest
     steps:
+      - name: Missing GitHub Token
+        if: ${{ env.ALLERO_GITHUB_TOKEN != '' }}
+        run: |
+          echo "::notice::Couldn'nt find an ALLERO_GITHUB_TOKEN, set up the token to validate private repositories."
+    
       - name: Get allero cli
         run: curl https://get.allero.io | bash
 
       - name: Fetch all organization workflow files from all repositories
         run: allero fetch github ${{ github.repository_owner }}
 
+      - name: Allero Config Token
+        if: ${{ env.ALLERO_TOKEN != '' }}
+        run: |
+          allero config set token $ALLERO_TOKEN
+          
       - name: Run policies validation
         run: allero validate
-        
-      - name: Missing GitHub Token
-        run: |
-          if [ ! "$ALLERO_GITHUB_TOKEN" ]; then
-            echo "::notice::Policies ran only on public repositories associated with your organization. Define ALLERO_GITHUB_TOKEN with your GitHub PAT as an Encrypted Secret to run on your private repos."
-          fi
