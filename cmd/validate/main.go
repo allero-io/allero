@@ -166,7 +166,9 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 				return err
 			}
 
-			if hasToken && !selectedRuleIds[rule.UniqueId] {
+			isCustomRule := rule.UniqueId >= 1000
+
+			if hasToken && !selectedRuleIds[rule.UniqueId] && !isCustomRule {
 				continue
 			} else if !hasToken && !rule.EnabledByDefault {
 				continue
