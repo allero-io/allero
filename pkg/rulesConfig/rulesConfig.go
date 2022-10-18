@@ -106,7 +106,7 @@ func (rc *RulesConfig) GetRulesFiles(folderName string, rulesList embed.FS) (map
 	return files, nil
 }
 
-func (rc *RulesConfig) GetSummary() OutputSummary {
+func (rc *RulesConfig) GetSummary(localValidation bool) OutputSummary {
 	totalOwners := len(rc.githubData) + len(rc.gitlabData)
 	totalRepositories := 0
 	totalPipelines := 0
@@ -127,6 +127,12 @@ func (rc *RulesConfig) GetSummary() OutputSummary {
 			totalPipelines += len(project.GitlabCi)
 			totalPipelines += len(project.JfrogPipelines)
 		}
+	}
+
+	if localValidation {
+		// Patch total # owners and repositories because github owner and gitlab group are the same.
+		totalOwners = 1
+		totalRepositories = 1
 	}
 
 	return OutputSummary{
