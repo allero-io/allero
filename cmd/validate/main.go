@@ -138,7 +138,7 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 	}
 
 	shouldPassExecution := true
-	summary = deps.RulesConfig.GetSummary()
+	summary = deps.RulesConfig.GetSummary(option.localPathToValidate != "")
 	totalRulesFailed := 0
 
 	ruleNamesByScmPlatform := map[string][]string{}
