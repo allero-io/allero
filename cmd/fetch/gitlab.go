@@ -43,7 +43,7 @@ func NewGitlabCommand(deps *FetchCommandDependencies) *cobra.Command {
 			return executeGitlab(fetchGitlabDeps)
 		},
 		PostRun: func(cmd *cobra.Command, args []string) {
-			tokenWasProvided := deps.ConfigurationManager.GetGitlabToken()
+			tokenWasProvided := deps.ConfigurationManager.GetGitlabToken() != ""
 
 			analyticsArgs := make(map[string]any)
 			analyticsArgs["Total Fetched Repos"] = reposFetchCounter
