@@ -93,7 +93,7 @@ func githubErrorsRule17(githubData map[string]*githubConnector.GithubOwner) ([]*
 				schemaErrors = append(schemaErrors, &SchemaError{
 					ErrorLevel:    1,
 					RepositryName: repo.Name,
-					CiCdPlatform:  "github-actions-workflows",
+					CiCdPlatform:  "",
 					OwnerName:     owner.Name,
 					ScmPlatform:   "github",
 				})
@@ -118,7 +118,7 @@ func gitlabErrorsRule17(gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*
 				schemaErrors = append(schemaErrors, &SchemaError{
 					ErrorLevel:    2,
 					RepositryName: project.Name,
-					CiCdPlatform:  "gitlab-ci",
+					CiCdPlatform:  "",
 					OwnerName:     group.Name,
 					ScmPlatform:   "gitlab",
 				})
