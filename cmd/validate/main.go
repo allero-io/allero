@@ -10,6 +10,7 @@ import (
 	"github.com/allero-io/allero/pkg/posthog"
 	"github.com/allero-io/allero/pkg/resultsPrinter"
 	"github.com/allero-io/allero/pkg/rulesConfig"
+	"github.com/allero-io/allero/pkg/rulesConfig/defaultRules"
 	"github.com/spf13/cobra"
 )
 
@@ -117,8 +118,10 @@ func validateOutputFlag(output string) bool {
 }
 
 func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) error {
+	isLocal := option.localPathToValidate != ""
 	var err error
-	if option.localPathToValidate != "" {
+
+	if isLocal {
 		err = deps.LocalRepositoriesClient.Get(option.localPathToValidate)
 		if err == nil {
 			fmt.Printf("Running validation over %s\n", option.localPathToValidate)
@@ -163,7 +166,9 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 				return err
 			}
 
-			if hasToken && !selectedRuleIds[rule.UniqueId] {
+			isCustomRule := rule.UniqueId >= 1000
+
+			if hasToken && !selectedRuleIds[rule.UniqueId] && !isCustomRule {
 				continue
 			} else if !hasToken && !rule.EnabledByDefault {
 				continue
@@ -208,7 +213,11 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
 	}
 
-	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output, option.localPathToValidate != "")
+	if isLocal {
+		ruleResultsById = reduceLocalRuleResults(ruleResultsById)
+	}
+
+	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output, isLocal)
 	if err != nil {
 		return err
 	}
@@ -216,4 +225,36 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 		return ErrViolationsFound
 	}
 	return nil
+}
+
+func reduceLocalRuleResults(ruleResultsById map[int]*rulesConfig.RuleResult) map[int]*rulesConfig.RuleResult {
+	reducedRuleResultsById := map[int]*rulesConfig.RuleResult{}
+	for uniqueId, ruleResult := range ruleResultsById {
+		if ruleResult.Valid {
+			reducedRuleResultsById[uniqueId] = ruleResult
+			continue
+		}
+
+		schemaErrorsByScmPlatform := map[string][]*defaultRules.SchemaError{}
+		for _, schemaError := range ruleResult.SchemaErrors {
+			schemaErrorsByScmPlatform[schemaError.ScmPlatform] = append(schemaErrorsByScmPlatform[schemaError.ScmPlatform], schemaError)
+		}
+
+		maxErrors := 0
+		schemaErrors := []*defaultRules.SchemaError{}
+		for _, scmSchemaErrors := range schemaErrorsByScmPlatform {
+			if len(scmSchemaErrors) > maxErrors {
+				maxErrors = len(scmSchemaErrors)
+				schemaErrors = scmSchemaErrors
+			}
+		}
+
+		reducedRuleResultsById[uniqueId] = &rulesConfig.RuleResult{
+			RuleName:       ruleResult.RuleName,
+			Valid:          false,
+			SchemaErrors:   schemaErrors,
+			FailureMessage: ruleResult.FailureMessage,
+		}
+	}
+	return reducedRuleResultsById
 }

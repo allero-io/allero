@@ -209,13 +209,23 @@ func (rc *RulesConfig) parseSchemaFieldGitlab(gitlabData map[string]*gitlabConne
 func (rc *RulesConfig) GetAllRuleNames(scmPlatform string) []string {
 	alleroHomedir := fileManager.GetAlleroHomedir()
 	rulesPath := fmt.Sprintf("%s/rules/%s", alleroHomedir, scmPlatform)
+	customRulesPath := fmt.Sprintf("%s/rules/%s/custom", alleroHomedir, scmPlatform)
 
 	ruleNames := []string{}
 
 	files := fileManager.ReadFolder(rulesPath)
+	customFiles := fileManager.ReadFolder(customRulesPath)
+
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".json") {
 			ruleNames = append(ruleNames, strings.TrimSuffix(file.Name(), ".json"))
+		}
+	}
+
+	for _, file := range customFiles {
+		if strings.HasSuffix(file.Name(), ".json") {
+			ruleName := "custom/" + strings.TrimSuffix(file.Name(), ".json")
+			ruleNames = append(ruleNames, ruleName)
 		}
 	}
 
@@ -243,6 +253,8 @@ func (rc *RulesConfig) GetSelectedRuleIds() (map[int]bool, error) {
 }
 
 func (rc *RulesConfig) GetRule(ruleName string, scmPlatform string) (*defaultRules.Rule, error) {
+	isCustomRule := strings.HasPrefix(ruleName, "custom/")
+
 	alleroHomedir := fileManager.GetAlleroHomedir()
 	ruleFilename := fmt.Sprintf("%s/rules/%s/%s.json", alleroHomedir, scmPlatform, ruleName)
 
@@ -255,6 +267,10 @@ func (rc *RulesConfig) GetRule(ruleName string, scmPlatform string) (*defaultRul
 	err = json.Unmarshal(content, rule)
 	if err != nil {
 		return nil, err
+	}
+
+	if isCustomRule {
+		rule.UniqueId = rule.UniqueId + 1000
 	}
 
 	return rule, rc.validateRuleStructure(ruleName, rule)
