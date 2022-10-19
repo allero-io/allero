@@ -28,3 +28,12 @@ jobs:
 
     - name: Unit tests
       run: go test ./...
+
+    - uses: actions/checkout@v3
+    - name: Check PR title  
+      env:
+        TITLE: ${{ github.event.pull_request.title }}
+      run: |
+        echo "module.exports = { extends: ['@commitlint/config-conventional'] };" > commitlint.config.js
+        npm i -g commitlint @commitlint/config-conventional
+        echo "$TITLE" | commitlint
