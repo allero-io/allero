@@ -22,9 +22,6 @@ jobs:
       - name: Get allero cli
         run: curl https://get.allero.io | bash
 
-      - name: Fetch all organization workflow files from all repositories
-        run: allero fetch github ${{ github.repository_owner }}
-
       - name: Allero Config Token
         if: ${{ env.ALLERO_TOKEN != '' }}
         run: |
