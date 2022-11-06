@@ -3,6 +3,7 @@ package validate
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
 	localConnector "github.com/allero-io/allero/pkg/connectors/local"
@@ -59,7 +60,15 @@ allero validate ~/my-repo-dir       Validate over local directory`,
 		Args:          cobra.MaximumNArgs(1),
 		PreRun: func(cmd *cobra.Command, cmdArgs []string) {
 			args := make(map[string]any)
+
+			if len(cmdArgs) > 0 {
+				absolutePath, err := filepath.Abs(cmdArgs[0])
+				if err == nil {
+					cmdArgs[0] = absolutePath
+				}
+			}
 			args["Args"] = cmdArgs
+
 			decodedToken, _ := deps.ConfigurationManager.ParseToken()
 			if decodedToken != nil {
 				args["User Email"] = decodedToken.Email
@@ -158,6 +167,7 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 	}
 
 	ruleResultsById := map[int]*rulesConfig.RuleResult{}
+	disabledRules := map[string]bool{}
 
 	for scmPlatform, ruleNames := range ruleNamesByScmPlatform {
 		for _, ruleName := range ruleNames {
@@ -168,9 +178,8 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 
 			isCustomRule := rule.UniqueId >= 1000
 
-			if hasToken && !selectedRuleIds[rule.UniqueId] && !isCustomRule {
-				continue
-			} else if !hasToken && !rule.EnabledByDefault {
+			if isRuleDisabled(hasToken, selectedRuleIds, rule, isCustomRule) {
+				disabledRules[ruleName] = true
 				continue
 			}
 
@@ -208,16 +217,13 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 
 	summary.TotalRulesEvaluated = len(ruleResultsById)
 	summary.TotalFailedRules = totalRulesFailed
-
-	if !hasToken {
-		summary.URL = deps.ConfigurationManager.TokenGenerationUrl
-	}
+	summary.URL = deps.ConfigurationManager.TokenGenerationUrl
 
 	if isLocal {
 		ruleResultsById = reduceLocalRuleResults(ruleResultsById)
 	}
 
-	err = resultsPrinter.PrintResults(ruleResultsById, summary, option.output, isLocal)
+	err = resultsPrinter.PrintResults(ruleResultsById, summary, disabledRules, option.output, isLocal)
 	if err != nil {
 		return err
 	}
@@ -225,6 +231,16 @@ func execute(deps *ValidateCommandDependencies, option *validateCommandOptions) 
 		return ErrViolationsFound
 	}
 	return nil
+}
+
+func isRuleDisabled(hasToken bool, selectedRuleIds map[int]bool, rule *defaultRules.Rule, isCustomRule bool) bool {
+	if hasToken && !selectedRuleIds[rule.UniqueId] && !isCustomRule {
+		return true
+	} else if !hasToken && !rule.EnabledByDefault {
+		return true
+	}
+
+	return false
 }
 
 func reduceLocalRuleResults(ruleResultsById map[int]*rulesConfig.RuleResult) map[int]*rulesConfig.RuleResult {

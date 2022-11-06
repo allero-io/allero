@@ -27,13 +27,13 @@ const colorRed = "\033[31m"
 const colorReset = "\033[0m"
 const colorBlue = "\033[34m"
 
-func PrintResults(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, outputFormat string, localValidation bool) error {
+func PrintResults(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, disabledRules map[string]bool, outputFormat string, localValidation bool) error {
 	if localValidation {
 		PatchLocalErrors(ruleResults)
 	}
 	if outputFormat == "" {
 		printPretty(ruleResults, summary)
-		printSummary(ruleResults, summary)
+		printSummary(ruleResults, summary, disabledRules)
 	} else if outputFormat == "csv" {
 		return printCSV(ruleResults, summary)
 	}
@@ -99,7 +99,7 @@ func unescapeValue(value string) string {
 	return strings.ReplaceAll(value, "[ESCAPED_DOT]", ".")
 }
 
-func printSummary(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary) {
+func printSummary(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConfig.OutputSummary, disabledRules map[string]bool) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	fmt.Println("Summary")
@@ -115,10 +115,17 @@ func printSummary(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConf
 	t.AppendRow([]interface{}{"Failed rules", summary.TotalFailedRules})
 	t.Render()
 
-	if summary.URL != "" {
-		fmt.Println()
-		fmt.Println("Select your own rules:", string(colorBlue), summary.URL, string(colorReset))
+	fmt.Println()
+
+	if len(disabledRules) > 0 {
+		fmt.Println("The following rules are disabled:")
+		for ruleName := range disabledRules {
+			fmt.Println(string(colorBlue), "\r", ruleName, string(colorReset))
+		}
 	}
+
+	fmt.Println()
+	fmt.Println("Click on the link to activate/deactivate rules:", string(colorBlue), summary.URL, string(colorReset))
 
 	if summary.TotalFailedRules > 0 {
 		fmt.Println()
