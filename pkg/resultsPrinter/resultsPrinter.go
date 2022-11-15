@@ -125,7 +125,7 @@ func printSummary(ruleResults map[int]*rulesConfig.RuleResult, summary rulesConf
 	}
 
 	fmt.Println()
-	fmt.Println("Click on the link to activate/deactivate rules:", string(colorBlue), summary.URL, string(colorReset))
+	fmt.Println("Want to select your own rules or interested in achieving more with Allero SaaS? click here:", string(colorBlue), summary.URL, string(colorReset))
 
 	if summary.TotalFailedRules > 0 {
 		fmt.Println()
