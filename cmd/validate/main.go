@@ -3,6 +3,7 @@ package validate
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/allero-io/allero/pkg/configurationManager"
@@ -73,6 +74,10 @@ allero validate ~/my-repo-dir       Validate over local directory`,
 			if decodedToken != nil {
 				args["User Email"] = decodedToken.Email
 			}
+
+			args["Github Actor"] = os.Getenv("GITHUB_ACTOR")
+			args["Github Repository"] = os.Getenv("GITHUB_REPOSITORY")
+
 			deps.PosthogClient.PublishEventWithArgs("data validated", args)
 		},
 		Run: cmdWrap.Run(func(cmd *cobra.Command, args []string) error {
