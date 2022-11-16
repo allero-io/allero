@@ -1,0 +1,18 @@
+name: Print Envs
+
+on:
+  push:
+    branches:
+      - add-github-actions-context
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Print Environment Variables
+      run: |
+        printenv
+        
