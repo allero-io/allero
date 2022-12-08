@@ -7,6 +7,7 @@ import (
 	gitlabConnector "github.com/allero-io/allero/pkg/connectors/gitlab"
 )
 
+// EnsureTerraformScanner is a function which checks pipelines for the presence of a terraform scanner
 func EnsureTerraformScanner(githubData map[string]*githubConnector.GithubOwner, gitlabData map[string]*gitlabConnector.GitlabGroup) ([]*SchemaError, error) {
 	schemaErrors := make([]*SchemaError, 0)
 	var err error
@@ -36,12 +37,14 @@ func githubErrorsRule11(githubData map[string]*githubConnector.GithubOwner) ([]*
 		".*tenable/terrascan-action@.*",
 		".*snyk/actions/iac@.*",
 		".*aquasecurity/trivy-action@.*",
+		".*aquasecurity/tfsec-action@(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
 		".*checkmarx/kics-github-action@.*",
 		".*kubescape/github-action@.*",
 	}
 
 	runRegexExpressions := []string{
 		".*^[\\S]*trivy.*|.*docker .* run .*(aquasec/)?trivy.*",
+		".*^[\\S]*tfsec.*",
 		".*docker .* run .*checkmarx/kics scan.*",
 		".*kubescape scan.*",
 	}
