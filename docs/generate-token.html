@@ -112,8 +112,6 @@
                     data.rules.push(checkboxElement.checked);
                   }
                   const b64token = btoa(JSON.stringify(data));
-                  console.log(data);
-                  console.log(b64token);
                   successTextDiv.innerText = `Thank you! Your token is:\n\n${b64token}`;
                   successTextDiv.style.wordBreak = 'break-word';
                 });
